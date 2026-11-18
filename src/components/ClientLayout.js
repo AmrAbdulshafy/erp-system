@@ -7,11 +7,12 @@ import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard, Users, Package, Clock, Box, Briefcase, 
   ShoppingCart, Receipt, Truck, ShoppingBag, Shield, 
-  FileText, ClipboardCheck, Banknote, Search, Database, Settings, MapPin, BookOpen, Wallet, LogOut, UserCircle, UserCheck, Building2, HandCoins, Globe, RotateCcw 
+  FileText, ClipboardCheck, Banknote, Search, Database, Settings, MapPin, BookOpen, Wallet, LogOut, UserCircle, UserCheck, Building2, HandCoins, Globe, RotateCcw, Menu, X 
 } from 'lucide-react';
 import SyncButton from './SyncButton';
 import { ModeToggle } from './mode-toggle';
 import GlobalSearchModal from './GlobalSearchModal';
+import PWAInstallPrompt from './PWAInstallPrompt';
 import '../i18n';
 import { db } from '../db';
 import { useDialog } from './DialogProvider';
@@ -37,6 +38,7 @@ export default function ClientLayout({ children }) {
   );
   const pathname = usePathname();
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [, setMatrixRevision] = useState(0);
   const { profile, getDisplayName, getTagline } = useCompanyProfile();
@@ -253,30 +255,44 @@ export default function ClientLayout({ children }) {
       style={{ 
         display: 'flex', 
         flexDirection: 'row', 
-        height: '100vh', 
-        maxHeight: '100vh', 
+        height: '100dvh', 
+        maxHeight: '100dvh', 
         width: '100%', 
         maxWidth: '100vw', 
         overflow: 'hidden' 
       }}
     >
+      {/* Mobile Drawer Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          className="mobile-drawer-backdrop"
+          onClick={() => setIsMobileMenuOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 55,
+          }}
+        />
+      )}
+
       {/* Isolated Scrollable Sidebar */}
       <aside 
-        className="sidebar" 
+        className={`sidebar ${isMobileMenuOpen ? 'sidebar-mobile-open' : ''}`}
         onMouseEnter={() => setIsSidebarHovered(true)}
         onMouseLeave={() => setIsSidebarHovered(false)}
         style={{ 
-          width: isSidebarHovered ? '240px' : '68px', 
-          height: '100vh',
-          maxHeight: '100vh',
+          width: (isSidebarHovered || isMobileMenuOpen) ? '240px' : '68px', 
+          height: '100dvh',
+          maxHeight: '100dvh',
           flexShrink: 0,
           backgroundColor: 'var(--surface)', 
           borderInlineEnd: '1px solid var(--border)', 
           display: 'flex', 
           flexDirection: 'column', 
-          transition: 'width 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition: 'width 0.22s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s ease',
           overflow: 'hidden',
-          zIndex: 30
+          zIndex: 60
         }}
       >
         {/* Brand / Logo (Sticky Top of Sidebar) */}
@@ -326,7 +342,7 @@ export default function ClientLayout({ children }) {
               {profile.logo_symbol || 'U'}
             </div>
           )}
-          <div style={{ display: 'flex', flexDirection: 'column', opacity: isSidebarHovered ? 1 : 0, transition: 'opacity 0.2s', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', opacity: (isSidebarHovered || isMobileMenuOpen) ? 1 : 0, transition: 'opacity 0.2s', overflow: 'hidden' }}>
             <h2 style={{ fontSize: '1.02rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.2, margin: 0, textOverflow: 'ellipsis', overflow: 'hidden' }}>
               {getDisplayName(i18n.language === 'ar')}
             </h2>
@@ -355,6 +371,7 @@ export default function ClientLayout({ children }) {
                 key={item.name} 
                 href={item.path}
                 className="sidebar-link"
+                onClick={() => setIsMobileMenuOpen(false)}
                 style={{
                   display: 'flex', 
                   alignItems: 'center', 
@@ -371,7 +388,7 @@ export default function ClientLayout({ children }) {
                 }}
               >
                 <item.icon size={20} style={{ flexShrink: 0, marginRight: i18n.language === 'ar' ? 0 : '0.85rem', marginLeft: i18n.language === 'ar' ? '0.85rem' : 0 }} />
-                <span style={{ opacity: isSidebarHovered ? 1 : 0, transition: 'opacity 0.2s' }}>{item.name}</span>
+                <span style={{ opacity: (isSidebarHovered || isMobileMenuOpen) ? 1 : 0, transition: 'opacity 0.2s' }}>{item.name}</span>
               </Link>
             );
           })}
@@ -383,8 +400,8 @@ export default function ClientLayout({ children }) {
         style={{ 
           flex: 1, 
           minWidth: 0, 
-          height: '100vh', 
-          maxHeight: '100vh', 
+          height: '100dvh', 
+          maxHeight: '100dvh', 
           display: 'flex', 
           flexDirection: 'column', 
           overflow: 'hidden' 
@@ -403,6 +420,28 @@ export default function ClientLayout({ children }) {
             flexWrap: 'wrap' 
           }}
         >
+          {/* Mobile Menu Toggle */}
+          <button
+            type="button"
+            className="btn mobile-menu-btn"
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            aria-label={isRTL ? 'القائمة' : 'Menu'}
+            style={{
+              display: 'none',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0.45rem',
+              borderRadius: '8px',
+              border: '1px solid var(--border)',
+              backgroundColor: 'var(--surface-hover)',
+              color: 'var(--text-main)',
+              cursor: 'pointer',
+              flexShrink: 0,
+            }}
+          >
+            {isMobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+          </button>
+
           {/* Global Search Trigger (Ctrl+K) */}
           <button 
             type="button"
@@ -429,6 +468,7 @@ export default function ClientLayout({ children }) {
               {t('search_globally')}
             </span>
             <kbd 
+              className="hide-on-mobile"
               style={{ 
                 padding: '0.15rem 0.4rem', 
                 fontSize: '0.68rem', 
@@ -475,6 +515,8 @@ export default function ClientLayout({ children }) {
               </button>
             )}
 
+            <PWAInstallPrompt />
+
             <SyncButton />
 
             {/* Clear Cache Quick Action (Web & Desktop) */}
@@ -514,7 +556,7 @@ export default function ClientLayout({ children }) {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ea580c' }}>
                 <RotateCcw size={15} />
               </div>
-              <span>{isRTL ? 'مسح الكاش' : 'Clear Cache'}</span>
+              <span className="hide-on-mobile">{isRTL ? 'مسح الكاش' : 'Clear Cache'}</span>
             </button>
 
             <ModeToggle />

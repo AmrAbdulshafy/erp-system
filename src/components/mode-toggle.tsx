@@ -8,12 +8,12 @@ import { useTranslation } from "react-i18next";
 export function ModeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { t, i18n } = useTranslation();
-  const [mounted, setMounted] = React.useState(false);
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const isRTL = i18n?.language === 'ar';
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const isDark = mounted && (resolvedTheme === 'dark' || theme === 'dark');
 

@@ -57,12 +57,13 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
   // Auto-focus input on open
   useEffect(() => {
     if (isOpen) {
-      setQuery('');
-      setSelectedIndex(0);
-      setCardModalData(null);
-      setTimeout(() => {
+      const timer = setTimeout(() => {
+        setQuery('');
+        setSelectedIndex(0);
+        setCardModalData(null);
         inputRef.current?.focus();
       }, 50);
+      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -962,7 +963,7 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
                 ) : (
                   <>
                     <Search size={32} style={{ margin: '0 auto 0.75rem', opacity: 0.4 }} />
-                    <div style={{ fontWeight: 500, fontSize: '0.95rem' }}>{t('no_results_for') || 'No results found for'} "{query}"</div>
+                    <div style={{ fontWeight: 500, fontSize: '0.95rem' }}>{t('no_results_for') || 'No results found for'} &ldquo;{query}&rdquo;</div>
                     <div style={{ fontSize: '0.8rem', marginTop: '0.25rem' }}>{t('try_different_search') || 'Try searching with a customer name, material, or keyword'}</div>
                   </>
                 )}

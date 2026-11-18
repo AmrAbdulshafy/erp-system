@@ -8,16 +8,10 @@ import { getStoredDepartments, DEFAULT_DEPARTMENTS } from '../../utils/permissio
 export default function Employees() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  const [departments, setDepartments] = useState([]);
-
-  const loadDepartments = () => {
-    const depts = getStoredDepartments();
-    setDepartments(depts);
-  };
+  const [departments, setDepartments] = useState(() => (typeof window !== 'undefined' ? getStoredDepartments() : []));
 
   useEffect(() => {
-    loadDepartments();
-    const handleUpdate = () => loadDepartments();
+    const handleUpdate = () => setDepartments(getStoredDepartments());
     window.addEventListener('permission-matrix-updated', handleUpdate);
     return () => window.removeEventListener('permission-matrix-updated', handleUpdate);
   }, []);

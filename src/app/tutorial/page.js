@@ -311,10 +311,12 @@ export default function TutorialPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedLang = localStorage.getItem('jin-engine-lang');
-      if (savedLang && (savedLang === 'ar' || savedLang === 'en')) {
-        setTutorialLang(savedLang);
-      } else if (i18n?.language && (i18n.language === 'ar' || i18n.language === 'en')) {
-        setTutorialLang(i18n.language);
+      const nextLang = (savedLang === 'ar' || savedLang === 'en')
+        ? savedLang
+        : (i18n?.language === 'ar' || i18n?.language === 'en' ? i18n.language : null);
+      if (nextLang) {
+        const timer = setTimeout(() => setTutorialLang(nextLang), 0);
+        return () => clearTimeout(timer);
       }
     }
   }, [i18n?.language]);

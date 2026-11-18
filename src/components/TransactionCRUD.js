@@ -49,15 +49,6 @@ export default function TransactionCRUD({
   const [viewDetailRecord, setViewDetailRecord] = useState(null);
   const [viewDetailItems, setViewDetailItems] = useState([]);
 
-  useEffect(() => {
-    setSelectedIds([]);
-  }, [headerTable]);
-
-  useEffect(() => {
-    loadData();
-    loadRelations();
-  }, []);
-
   const loadData = async () => {
     const rawHeaders = await db[headerTable].filter(r => !r.deleted_at).toArray();
     setHeaders(rawHeaders.sort((a,b) => new Date(b.created_at) - new Date(a.created_at)));
@@ -68,6 +59,28 @@ export default function TransactionCRUD({
     setInventory(inv);
 
     const rels = {};
+    if (headerTable === 'sales') {
+      rels.customers = await db.customers.filter(r => !r.deleted_at).toArray();
+    } else if (headerTable === 'purchases') {
+      rels.suppliers = await db.suppliers.filter(r => !r.deleted_at).toArray();
+    } else if (headerTable === 'quotations') {
+      rels.customers = await db.customers.filter(r => !r.deleted_at).toArray();
+    }
+    setRelations(rels);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSelectedIds([]), 0);
+    return () => clearTimeout(timer);
+  }, [headerTable]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadData();
+      loadRelations();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
     for (const field of headerSchema) {
       if (field.type === 'relation') {
         const data = await db[field.relationTable].filter(r => !r.deleted_at).toArray();

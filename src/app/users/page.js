@@ -17,16 +17,14 @@ export default function Users() {
     }
     return 'users';
   });
-  const [roleOptions, setRoleOptions] = useState(['ADMIN', 'ACCOUNTANT', 'SUPERVISOR']);
-
-  const loadRoleOptions = () => {
-    const roles = getStoredRoles();
-    setRoleOptions(roles.map(r => r.key));
-  };
+  const [roleOptions, setRoleOptions] = useState(() =>
+    typeof window !== 'undefined'
+      ? getStoredRoles().map(r => r.key)
+      : ['ADMIN', 'ACCOUNTANT', 'SUPERVISOR']
+  );
 
   useEffect(() => {
-    loadRoleOptions();
-    const handleUpdate = () => loadRoleOptions();
+    const handleUpdate = () => setRoleOptions(getStoredRoles().map(r => r.key));
     window.addEventListener('permission-matrix-updated', handleUpdate);
     return () => window.removeEventListener('permission-matrix-updated', handleUpdate);
   }, []);

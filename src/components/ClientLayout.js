@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -30,7 +30,11 @@ export default function ClientLayout({ children }) {
   const isRTL = i18n?.language === 'ar';
   const dialog = useDialog();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const pathname = usePathname();
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -88,7 +92,6 @@ export default function ClientLayout({ children }) {
   };
 
   useEffect(() => {
-    setMounted(true);
     if (typeof window !== 'undefined') {
       const savedLang = localStorage.getItem('jin-engine-lang') || 'ar';
       if (i18n.language !== savedLang) {

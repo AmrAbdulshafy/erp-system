@@ -90,12 +90,15 @@ export default function DynamicCRUD({
   const [workOrderEmpCount, setWorkOrderEmpCount] = useState(1);
 
   useEffect(() => {
-    setSelectedIds([]);
+    const timer = setTimeout(() => setSelectedIds([]), 0);
+    return () => clearTimeout(timer);
   }, [tableName]);
 
   const formDataRef = useRef({});
   const onFieldChangeRef = useRef(onFieldChange);
-  onFieldChangeRef.current = onFieldChange;
+  useEffect(() => {
+    onFieldChangeRef.current = onFieldChange;
+  }, [onFieldChange]);
 
   const updateField = (key, value) => {
     setFormData(prev => {

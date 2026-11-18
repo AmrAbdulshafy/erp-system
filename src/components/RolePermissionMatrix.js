@@ -70,10 +70,15 @@ export default function RolePermissionMatrix() {
   };
 
   useEffect(() => {
-    loadData();
+    const timer = setTimeout(() => {
+      loadData();
+    }, 0);
     const handleUpdate = () => loadData();
     window.addEventListener('permission-matrix-updated', handleUpdate);
-    return () => window.removeEventListener('permission-matrix-updated', handleUpdate);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('permission-matrix-updated', handleUpdate);
+    };
   }, []);
 
   const handleToggleScreen = (roleKey, path) => {

@@ -197,13 +197,15 @@ export default function EntityProfileModal({
 
   useEffect(() => {
     if (record) {
-      setFormData({ ...record });
+      const timer = setTimeout(() => setFormData({ ...record }), 0);
+      return () => clearTimeout(timer);
     }
   }, [record]);
 
   useEffect(() => {
     if (initialEditMode) {
-      setIsEditing(true);
+      const timer = setTimeout(() => setIsEditing(true), 0);
+      return () => clearTimeout(timer);
     }
   }, [initialEditMode]);
 

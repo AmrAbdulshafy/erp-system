@@ -50,7 +50,8 @@ export default function RecordDetailModal({
   useEffect(() => {
     if (record && tableName === 'work_orders') {
       const activeCount = [6, 5, 4, 3, 2, 1].find(i => Boolean(record?.[`employee_${i}`])) || 1;
-      setWorkOrderEmpCount(activeCount);
+      const timer = setTimeout(() => setWorkOrderEmpCount(activeCount), 0);
+      return () => clearTimeout(timer);
     }
   }, [record, tableName]);
 
@@ -69,14 +70,18 @@ export default function RecordDetailModal({
       if (rec.vehicle_number && !rec.bill_of_lading_number) {
         rec.bill_of_lading_number = rec.vehicle_number;
       }
-      setLocalRecord(rec);
-      setFormData(rec);
+      const timer = setTimeout(() => {
+        setLocalRecord(rec);
+        setFormData(rec);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [record]);
 
   useEffect(() => {
     if (initialEditMode) {
-      setIsEditing(true);
+      const timer = setTimeout(() => setIsEditing(true), 0);
+      return () => clearTimeout(timer);
     }
   }, [initialEditMode]);
 

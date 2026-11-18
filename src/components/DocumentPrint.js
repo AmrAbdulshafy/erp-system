@@ -164,12 +164,13 @@ export default function DocumentPrint({
         textAlign: isRTL ? 'right' : 'left',
         fontFamily: isRTL ? "'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif" : "'Segoe UI', Arial, sans-serif"
       }}>
-        {/* ── Header Band (Black & White Zinc Theme) ── */}
-        <div style={{
-          background: '#09090b',
-          borderBottom: '2px solid #27272a',
+        {/* ── Header Band (Executive Zinc & Blue Theme) ── */}
+        <div className="doc-header-band" style={{
+          background: 'linear-gradient(135deg, #09090b 0%, #18181b 100%)',
+          borderBottom: '3px solid #2563eb',
           padding: '2rem 2.5rem', color: '#ffffff',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'
+          display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+          flexWrap: 'wrap', gap: '1.25rem'
         }}>
           {/* Left: Status + Quote info */}
           <div>
@@ -216,7 +217,13 @@ export default function DocumentPrint({
                   alt={companyName} 
                   style={{ height: 44, width: 'auto', maxWidth: 140, objectFit: 'contain', background: 'transparent' }}
                 />
-              ) : null}
+              ) : (
+                <img
+                  src="/jin-engine-logo.svg"
+                  alt={companyName}
+                  style={{ height: 44, width: 44, borderRadius: '10px', objectFit: 'contain' }}
+                />
+              )}
             </div>
             {(profile.phone && String(profile.phone).trim() !== '') || (profile.email && String(profile.email).trim() !== '') ? (
               <p style={{ margin: '2px 0 0', color: '#71717a', fontSize: '0.75rem' }}>
@@ -227,7 +234,7 @@ export default function DocumentPrint({
         </div>
 
         {/* ── Bill To / Prepared By ── */}
-        <div style={{
+        <div className="doc-meta-grid" style={{
           display: 'grid', gridTemplateColumns: '1fr 1fr',
           padding: '1.5rem 2.5rem', gap: '2rem',
           borderBottom: '1px solid #e4e4e7', background: '#fafafa'
@@ -250,10 +257,11 @@ export default function DocumentPrint({
         </div>
 
         {/* ── Line Items Table ── */}
-        <div style={{ padding: '1.5rem 2.5rem 0' }}>
+        <div className="doc-items-section" style={{ padding: '1.5rem 2.5rem 0' }}>
           <p style={{ margin: '0 0 1rem', fontSize: '0.72rem', fontWeight: 700, color: '#71717a', textTransform: isRTL ? 'none' : 'uppercase', letterSpacing: isRTL ? 'normal' : '0.5px' }}>
             {t('line_items') || (isRTL ? 'بنود الطلب' : 'Line Items')}
           </p>
+          <div className="doc-table-scroll">
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem', textAlign: isRTL ? 'right' : 'left' }}>
             <thead>
               <tr style={{ background: '#18181b', color: '#ffffff', border: '1px solid #18181b' }}>
@@ -326,6 +334,7 @@ export default function DocumentPrint({
               )}
             </tbody>
           </table>
+          </div>
         </div>
 
         {/* ── Totals ── */}

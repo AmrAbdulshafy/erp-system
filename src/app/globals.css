@@ -1334,4 +1334,87 @@ select option {
   }
 }
 
+/* ==========================================================================
+   Elite UI/UX Polish: Tabular Numerals, Responsive Print Sheets & Modals
+   ========================================================================== */
+
+table th,
+table td,
+.stat-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.table-card {
+  border-radius: 14px;
+  box-shadow: 0 2px 10px -2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.table-card thead th {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.doc-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.profile-tabs-headerbar {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.profile-tabs-headerbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .document-print-page {
+    padding: 0.75rem !important;
+  }
+
+  .doc-header-band,
+  .doc-meta-grid,
+  .doc-items-section {
+    padding-left: 1.15rem !important;
+    padding-right: 1.15rem !important;
+  }
+
+  .doc-meta-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .doc-table-scroll table {
+    min-width: 560px;
+  }
+
+  /* Constrain any modal / dialog cleanly on mobile viewports */
+  div[role="dialog"] > div {
+    max-width: calc(100vw - 1rem) !important;
+    max-height: 92dvh !important;
+    border-radius: 14px !important;
+  }
+}
+
+@media print {
+  .document-print-page {
+    background: #ffffff !important;
+    padding: 0 !important;
+    min-height: auto !important;
+  }
+
+  .doc-table-scroll {
+    overflow: visible !important;
+  }
+
+  .doc-table-scroll table {
+    min-width: 0 !important;
+  }
+}
+
+
 

@@ -190,7 +190,7 @@ export default function ClientLayout({ children }) {
           background: 'var(--surface)',
           border: '1px solid var(--border)'
         }}>
-          <img src={resolvedTheme === 'light' ? '/jinnworx-logo-light.png' : '/jinnworx-logo-dark.png'} alt="Jinnworx" style={{ height: 24, width: 'auto', objectFit: 'contain' }} />
+          <img src={resolvedTheme === 'light' ? '/jin-engine-wordmark-light.svg' : '/jin-engine-wordmark-dark.svg'} alt="Jin Engine" style={{ height: 30, width: 'auto', objectFit: 'contain' }} />
           <div dir="ltr" style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 600 }}>
             Created by <strong style={{ color: '#f97316' }}>Jinnworx</strong> &bull; Developed by <strong style={{ color: 'var(--text-main)' }}>Amr Abdulshafy</strong>
           </div>

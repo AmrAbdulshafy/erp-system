@@ -551,7 +551,7 @@ export default function LoginScreen() {
             <span>{isRTL ? 'حماية مشفرة ومصادقة جلسة آمنة (Role-Based Access)' : 'Protected Session & Encrypted Roles'}</span>
           </div>
           <div dir="ltr" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.9, fontSize: '0.72rem' }}>
-            <img src={resolvedTheme === 'light' ? '/jinnworx-logo-light.png' : '/jinnworx-logo-dark.png'} alt="Jinnworx" style={{ height: 18, width: 'auto', objectFit: 'contain' }} />
+            <img src={resolvedTheme === 'light' ? '/jin-engine-wordmark-light.svg' : '/jin-engine-wordmark-dark.svg'} alt="Jin Engine" style={{ height: 22, width: 'auto', objectFit: 'contain' }} />
             <span>Created by <strong style={{ color: '#f97316' }}>Jinnworx</strong> &bull; Developed by <strong style={{ color: 'var(--text-main)' }}>Amr Abdulshafy</strong></span>
           </div>
         </div>

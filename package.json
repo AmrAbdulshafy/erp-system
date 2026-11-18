@@ -60,9 +60,11 @@
     },
     "files": [
       "electron/**/*",
-      "public/jinnworx-logo-dark.png",
-      "public/jinnworx-logo-light.png",
-      "public/jinnworx-logo-512.png",
+      "public/jin-engine-logo.svg",
+      "public/jin-engine-icon-512.png",
+      "public/jin-engine-icon-192.png",
+      "public/jin-engine-wordmark-dark.svg",
+      "public/jin-engine-wordmark-light.svg",
       ".next/standalone/**/*"
     ],
     "asarUnpack": [

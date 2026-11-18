@@ -288,17 +288,18 @@ function loadServerWithRetry(win, maxAttempts = 60) {
   }, 800);
 }
 
-function getCreatorLogoDataUri(filename = 'jinnworx-logo-dark.png') {
+function getCreatorLogoDataUri(filename = 'jin-engine-wordmark-dark.svg') {
   const candidates = [
     path.join(__dirname, '..', 'public', filename),
     path.join(process.resourcesPath || '', 'standalone', 'public', filename),
     path.join(process.resourcesPath || '', 'app.asar.unpacked', '.next', 'standalone', 'public', filename)
   ];
+  const mime = filename.endsWith('.svg') ? 'image/svg+xml' : 'image/png';
   for (const p of candidates) {
     try {
       if (fs.existsSync(p)) {
         const b64 = fs.readFileSync(p).toString('base64');
-        return `data:image/png;base64,${b64}`;
+        return `data:${mime};base64,${b64}`;
       }
     } catch {
       // ignore
@@ -308,8 +309,8 @@ function getCreatorLogoDataUri(filename = 'jinnworx-logo-dark.png') {
 }
 
 function buildSplashHtml(initialDark = true) {
-  const darkLogoUri = getCreatorLogoDataUri('jinnworx-logo-dark.png');
-  const lightLogoUri = getCreatorLogoDataUri('jinnworx-logo-light.png') || darkLogoUri;
+  const darkLogoUri = getCreatorLogoDataUri('jin-engine-wordmark-dark.svg');
+  const lightLogoUri = getCreatorLogoDataUri('jin-engine-wordmark-light.svg') || darkLogoUri;
   return `<!DOCTYPE html>
 <html lang="ar" dir="rtl" class="${initialDark ? 'dark' : 'light'}">
 <head>
@@ -724,7 +725,7 @@ function createWindow() {
   const isDark = nativeTheme.shouldUseDarkColors;
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
-  const iconPath = path.join(__dirname, '..', 'public', 'jinnworx-logo-dark.png');
+  const iconPath = path.join(__dirname, '..', 'public', 'jin-engine-icon-512.png');
 
   mainWindow = new BrowserWindow({
     width,

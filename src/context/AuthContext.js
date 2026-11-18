@@ -467,8 +467,8 @@ export function AuthProvider({ children }) {
           >
             <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
               <img
-                src="/jinnworx-logo-dark.png"
-                alt="Jinnworx"
+                src="/jin-engine-wordmark-dark.svg"
+                alt="Jin Engine"
                 style={{ height: '46px', width: 'auto', margin: '0 auto 1rem auto', display: 'block', objectFit: 'contain' }}
               />
               <h1 style={{ fontSize: '1.35rem', fontWeight: 800, margin: '0 0 0.5rem 0', color: 'var(--text-main)' }}>

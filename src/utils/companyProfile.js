@@ -1,5 +1,5 @@
 /**
- * Ultra Pack ERP - Company & Organization Profile Management
+ * Jin Engine ERP - Company & Organization Profile Management
  * 
  * Provides centralized storage and real-time subscription for company metadata:
  * - Company Name (Arabic & English)
@@ -13,8 +13,8 @@
  */
 
 export const DEFAULT_COMPANY_PROFILE = {
-  company_name_ar: 'ألترا باك',
-  company_name_en: 'Ultra Pack',
+  company_name_ar: 'Jin Engine',
+  company_name_en: 'Jin Engine',
   tagline_ar: 'نظام متكامل لإدارة وتخطيط مصانع الكرتون والتعبئة والتغليف',
   tagline_en: 'Packaging Solutions & Factory Management ERP',
   logo: '',
@@ -38,14 +38,14 @@ export const DEFAULT_COMPANY_PROFILE = {
   updated_at: new Date().toISOString()
 };
 
-const STORAGE_KEY = 'ultrapack_company_profile';
-const EVENT_NAME = 'ultrapack-company-profile-updated';
+const STORAGE_KEY = 'jin_engine_company_profile';
+const EVENT_NAME = 'jin-engine-company-profile-updated';
 
 const LEGACY_PLACEHOLDERS = {
   phone: '01000000000',
   mobile: '01100000000',
-  email: 'info@ultrapack.com',
-  website: 'www.ultrapack.com',
+  email: 'info@jinengine.com',
+  website: 'www.jinengine.com',
   tax_number: '100-234-567',
   commercial_reg: '89421',
   bank_name: 'البنك الأهلي المصري (NBE)',
@@ -65,8 +65,8 @@ export function getCompanyProfile() {
     const parsed = JSON.parse(raw);
     const merged = { ...DEFAULT_COMPANY_PROFILE, ...parsed };
     if (!merged.company_name_en || merged.company_name_en.includes('Jinn Worx')) {
-      merged.company_name_en = 'Ultra Pack';
-      merged.company_name_ar = 'ألترا باك';
+      merged.company_name_en = 'Jin Engine';
+      merged.company_name_ar = 'Jin Engine';
       merged.logo = '';
       merged.logo_symbol = 'U';
     }
@@ -141,9 +141,9 @@ export function useCompanyProfile() {
     updateProfile: saveCompanyProfile,
     getDisplayName: (isRTL = false) => {
       if (isRTL) {
-        return profile.company_name_ar || profile.company_name_en || 'ألترا باك';
+        return profile.company_name_ar || profile.company_name_en || 'Jin Engine';
       }
-      return profile.company_name_en || profile.company_name_ar || 'Ultra Pack';
+      return profile.company_name_en || profile.company_name_ar || 'Jin Engine';
     },
     getTagline: (isRTL = false) => {
       if (isRTL) {

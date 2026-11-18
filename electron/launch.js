@@ -29,15 +29,15 @@ async function waitForServer(url, timeoutMs = 60000) {
 }
 
 async function main() {
-  console.log('🚀 [Ultra Pack Desktop] Initializing Desktop Environment (V8 Engine)...');
+  console.log('🚀 [Jin Engine Desktop] Initializing Desktop Environment (V8 Engine)...');
   
   let serverProcess = null;
   const running = await isServerRunning(URL);
 
   if (running) {
-    console.log(`✅ [Ultra Pack Desktop] Server already running at ${URL}`);
+    console.log(`✅ [Jin Engine Desktop] Server already running at ${URL}`);
   } else {
-    console.log(`⚡ [Ultra Pack Desktop] Starting local Next.js server on port ${PORT}...`);
+    console.log(`⚡ [Jin Engine Desktop] Starting local Next.js server on port ${PORT}...`);
     
     const standaloneServer = path.join(__dirname, '..', '.next', 'standalone', 'server.js');
     let serverCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
@@ -48,9 +48,9 @@ async function main() {
       serverCmd = process.execPath;
       serverArgs = [standaloneServer];
       useShell = false;
-      console.log(`📦 [Ultra Pack Desktop] Executing standalone Next.js server (${standaloneServer})...`);
+      console.log(`📦 [Jin Engine Desktop] Executing standalone Next.js server (${standaloneServer})...`);
     } else {
-      console.log(`📦 [Ultra Pack Desktop] Executing: ${serverCmd} ${serverArgs.join(' ')}`);
+      console.log(`📦 [Jin Engine Desktop] Executing: ${serverCmd} ${serverArgs.join(' ')}`);
     }
 
     serverProcess = spawn(serverCmd, serverArgs, {
@@ -64,18 +64,18 @@ async function main() {
       console.error('❌ Failed to start Next.js server:', err);
     });
 
-    console.log('⏳ [Ultra Pack Desktop] Waiting for server to be ready...');
+    console.log('⏳ [Jin Engine Desktop] Waiting for server to be ready...');
     const ready = await waitForServer(URL, 45000);
     if (!ready) {
       console.warn('⚠️ Server took longer than expected to report ready, opening Electron window anyway...');
     } else {
-      console.log('✅ [Ultra Pack Desktop] Server is online and ready!');
+      console.log('✅ [Jin Engine Desktop] Server is online and ready!');
     }
   }
 
   // Find local electron executable
   const electronPath = require('electron');
-  console.log(`🖥️  [Ultra Pack Desktop] Launching Electron with V8 Engine...`);
+  console.log(`🖥️  [Jin Engine Desktop] Launching Electron with V8 Engine...`);
 
   const electronProcess = spawn(electronPath, [path.join(__dirname, 'main.js')], {
     cwd: path.join(__dirname, '..'),
@@ -84,9 +84,9 @@ async function main() {
   });
 
   electronProcess.on('close', (code) => {
-    console.log(`🛑 [Ultra Pack Desktop] Electron window closed (exit code ${code}).`);
+    console.log(`🛑 [Jin Engine Desktop] Electron window closed (exit code ${code}).`);
     if (serverProcess) {
-      console.log('🧹 [Ultra Pack Desktop] Terminating child Next.js server...');
+      console.log('🧹 [Jin Engine Desktop] Terminating child Next.js server...');
       if (process.platform === 'win32') {
         spawn('taskkill', ['/pid', String(serverProcess.pid), '/f', '/t']);
       } else {

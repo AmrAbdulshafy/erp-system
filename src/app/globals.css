@@ -9,7 +9,7 @@
    ========================================================================== */
 
 :root {
-  /* Ultra Pack Light Tokens */
+  /* Jin Engine Light Tokens */
   --background: #FFFFFF;
   --surface: #FFFFFF;
   --surface-hover: #F4F4F6;
@@ -50,7 +50,7 @@
 }
 
 .dark {
-  /* Ultra Pack Dark Tokens */
+  /* Jin Engine Dark Tokens */
   --background: #09090B;
   --surface: #121214;
   --surface-hover: #1A1A1E;

@@ -4,7 +4,7 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
   en: {
     translation: {
-      "welcome": "Welcome to Ultra Pack — ألترا باك",
+      "welcome": "Welcome to Jin Engine",
       "language": "Language",
       "sync_now": "Sync Now",
       "sync_successful": "Sync successful!",
@@ -291,7 +291,7 @@ const resources = {
       "production_entries": "Production Entries",
       "packaging_solutions": "Packaging Solutions",
       "packaging_solutions_system": "Packaging Solutions System",
-      "system_name": "Ultra Pack — ألترا باك",
+      "system_name": "Jin Engine",
       "report": "Report",
       "reports": "Reports",
       "settings": "Settings",
@@ -400,7 +400,7 @@ const resources = {
       "total_units_in_stock": "Total Units in Stock",
       "latest_high_value_sales": "Latest High-Value Sales",
       "customer_id": "Customer ID",
-      "report_footer_note": "This document is generated automatically by Ultra Pack — ألترا باك (Packaging Solutions System).",
+      "report_footer_note": "This document is generated automatically by Jin Engine (Packaging Solutions System).",
       "certified_internal_report": "Certified Internal Report",
       "system_settings": "System Settings",
       "local_device_database": "Local Device Database",
@@ -482,7 +482,7 @@ const resources = {
   },
   ar: {
     translation: {
-      "welcome": "مرحباً بك في نظام ألترا باك (Ultra Pack)",
+      "welcome": "مرحباً بك في نظام Jin Engine",
       "language": "اللغة",
       "sync_now": "مزامنة الآن",
       "sync_successful": "تمت المزامنة بنجاح!",
@@ -757,7 +757,7 @@ const resources = {
       "production_entries": "سجلات الإنتاج",
       "packaging_solutions": "حلول التعبئة والتغليف",
       "packaging_solutions_system": "نظام حلول التعبئة والتغليف",
-      "system_name": "نظام ألترا باك (Ultra Pack)",
+      "system_name": "نظام Jin Engine",
       "report": "تقرير",
       "reports": "التقارير",
       "settings": "الإعدادات",
@@ -865,7 +865,7 @@ const resources = {
       "total_units_in_stock": "إجمالي الوحدات بالمخزون",
       "latest_high_value_sales": "أحدث المبيعات الأعلى قيمة",
       "customer_id": "معرف العميل",
-      "report_footer_note": "تم إنشاء هذا المستند تلقائياً بواسطة نظام ألترا باك (Ultra Pack) لحلول التعبئة والتغليف.",
+      "report_footer_note": "تم إنشاء هذا المستند تلقائياً بواسطة نظام Jin Engine لحلول التعبئة والتغليف.",
       "certified_internal_report": "تقرير داخلي معتمد",
       "system_settings": "إعدادات النظام",
       "local_device_database": "قاعدة البيانات المحلية للجهاز",
@@ -949,7 +949,7 @@ const resources = {
 
 const getInitialLanguage = () => {
   if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('ultrapack-lang');
+    const saved = localStorage.getItem('jin-engine-lang');
     if (saved) return saved;
   }
   return 'ar'; // Master Global Default: Arabic
@@ -969,7 +969,7 @@ i18n
 if (typeof window !== 'undefined') {
   i18n.on('languageChanged', (lng) => {
     try {
-      localStorage.setItem('ultrapack-lang', lng);
+      localStorage.setItem('jin-engine-lang', lng);
       document.documentElement.lang = lng;
       document.documentElement.dir = lng === 'ar' ? 'rtl' : 'ltr';
       if (document.body) document.body.dir = lng === 'ar' ? 'rtl' : 'ltr';

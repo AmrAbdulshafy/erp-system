@@ -1,6 +1,6 @@
 <?php
 /**
- * Ultra Pack ERP - Server Connection & Health Verification API
+ * Jin Engine ERP - Server Connection & Health Verification API
  */
 require_once __DIR__ . '/db.php';
 

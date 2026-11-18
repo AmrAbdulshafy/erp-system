@@ -1,6 +1,6 @@
 <?php
 /**
- * Ultra Pack ERP - Secure Database Connector & Production Configuration
+ * Jin Engine ERP - Secure Database Connector & Production Configuration
  */
 
 // 1. Production Security Headers & CORS Lockdown

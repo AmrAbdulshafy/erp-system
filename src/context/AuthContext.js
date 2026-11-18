@@ -65,11 +65,11 @@ export function AuthProvider({ children }) {
           if (!hasAnyPassword) {
             setNeedsInitialSetup(true);
             setUser(null);
-            localStorage.removeItem('ultrapack_auth_user');
-            sessionStorage.removeItem('ultrapack_auth_user');
+            localStorage.removeItem('jin_engine_auth_user');
+            sessionStorage.removeItem('jin_engine_auth_user');
           } else {
             setNeedsInitialSetup(false);
-            const savedSession = localStorage.getItem('ultrapack_auth_user') || sessionStorage.getItem('ultrapack_auth_user');
+            const savedSession = localStorage.getItem('jin_engine_auth_user') || sessionStorage.getItem('jin_engine_auth_user');
             if (savedSession) {
               try {
                 const parsed = JSON.parse(savedSession);
@@ -79,8 +79,8 @@ export function AuthProvider({ children }) {
                 }
                 if (!dbUser || dbUser.deleted_at || dbUser.is_active === 0 || dbUser.is_active === false) {
                   setUser(null);
-                  localStorage.removeItem('ultrapack_auth_user');
-                  sessionStorage.removeItem('ultrapack_auth_user');
+                  localStorage.removeItem('jin_engine_auth_user');
+                  sessionStorage.removeItem('jin_engine_auth_user');
                 } else {
                   const defaultRole = (dbUser.id === 'usr-001-admin' || String(dbUser.username || '').toLowerCase() === 'admin') ? 'ADMIN' : 'ACCOUNTANT';
                   const verifiedSession = {
@@ -91,17 +91,17 @@ export function AuthProvider({ children }) {
                     loginAt: parsed.loginAt || new Date().toISOString()
                   };
                   setUser(verifiedSession);
-                  if (localStorage.getItem('ultrapack_auth_user')) {
-                    localStorage.setItem('ultrapack_auth_user', JSON.stringify(verifiedSession));
+                  if (localStorage.getItem('jin_engine_auth_user')) {
+                    localStorage.setItem('jin_engine_auth_user', JSON.stringify(verifiedSession));
                   } else {
-                    sessionStorage.setItem('ultrapack_auth_user', JSON.stringify(verifiedSession));
+                    sessionStorage.setItem('jin_engine_auth_user', JSON.stringify(verifiedSession));
                   }
                 }
               } catch (e) {
                 console.error('Invalid saved auth session', e);
                 setUser(null);
-                localStorage.removeItem('ultrapack_auth_user');
-                sessionStorage.removeItem('ultrapack_auth_user');
+                localStorage.removeItem('jin_engine_auth_user');
+                sessionStorage.removeItem('jin_engine_auth_user');
               }
             }
           }
@@ -117,15 +117,15 @@ export function AuthProvider({ children }) {
     // Re-verify active session user from DB whenever permissions or user records are updated
     const handleReverifySession = async () => {
       try {
-        const savedSession = localStorage.getItem('ultrapack_auth_user') || sessionStorage.getItem('ultrapack_auth_user');
+        const savedSession = localStorage.getItem('jin_engine_auth_user') || sessionStorage.getItem('jin_engine_auth_user');
         if (!savedSession) return;
         const parsed = JSON.parse(savedSession);
         if (!parsed?.id) return;
         const dbUser = await db.users.get(parsed.id);
         if (!dbUser || dbUser.deleted_at || dbUser.is_active === 0 || dbUser.is_active === false) {
           setUser(null);
-          localStorage.removeItem('ultrapack_auth_user');
-          sessionStorage.removeItem('ultrapack_auth_user');
+          localStorage.removeItem('jin_engine_auth_user');
+          sessionStorage.removeItem('jin_engine_auth_user');
           return;
         }
         const defaultRole = (dbUser.id === 'usr-001-admin' || String(dbUser.username || '').toLowerCase() === 'admin') ? 'ADMIN' : 'ACCOUNTANT';
@@ -138,10 +138,10 @@ export function AuthProvider({ children }) {
             full_name: dbUser.full_name || dbUser.username
           };
           setUser(verifiedSession);
-          if (localStorage.getItem('ultrapack_auth_user')) {
-            localStorage.setItem('ultrapack_auth_user', JSON.stringify(verifiedSession));
+          if (localStorage.getItem('jin_engine_auth_user')) {
+            localStorage.setItem('jin_engine_auth_user', JSON.stringify(verifiedSession));
           } else {
-            sessionStorage.setItem('ultrapack_auth_user', JSON.stringify(verifiedSession));
+            sessionStorage.setItem('jin_engine_auth_user', JSON.stringify(verifiedSession));
           }
         }
       } catch (e) {
@@ -270,9 +270,9 @@ export function AuthProvider({ children }) {
 
       setUser(sessionUser);
       if (remember) {
-        localStorage.setItem('ultrapack_auth_user', JSON.stringify(sessionUser));
+        localStorage.setItem('jin_engine_auth_user', JSON.stringify(sessionUser));
       } else {
-        sessionStorage.setItem('ultrapack_auth_user', JSON.stringify(sessionUser));
+        sessionStorage.setItem('jin_engine_auth_user', JSON.stringify(sessionUser));
       }
 
       return { success: true, user: sessionUser };
@@ -315,9 +315,9 @@ export function AuthProvider({ children }) {
 
       setUser(sessionUser);
       if (remember) {
-        localStorage.setItem('ultrapack_auth_user', JSON.stringify(sessionUser));
+        localStorage.setItem('jin_engine_auth_user', JSON.stringify(sessionUser));
       } else {
-        sessionStorage.setItem('ultrapack_auth_user', JSON.stringify(sessionUser));
+        sessionStorage.setItem('jin_engine_auth_user', JSON.stringify(sessionUser));
       }
 
       return { success: true, user: sessionUser };
@@ -330,8 +330,8 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setUser(null);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('ultrapack_auth_user');
-      sessionStorage.removeItem('ultrapack_auth_user');
+      localStorage.removeItem('jin_engine_auth_user');
+      sessionStorage.removeItem('jin_engine_auth_user');
     }
   };
 

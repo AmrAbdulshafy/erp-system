@@ -991,7 +991,7 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
               <span><kbd style={{ padding: '0.1rem 0.35rem', borderRadius: '3px', background: 'var(--surface)', border: '1px solid var(--border)' }}>↵</kbd> {t('select_item') || 'Open'}</span>
               <span><kbd style={{ padding: '0.1rem 0.35rem', borderRadius: '3px', background: 'var(--surface)', border: '1px solid var(--border)' }}>esc</kbd> {t('close') || 'Close'}</span>
             </div>
-            <div>{t('system_name') || 'Ultra Pack — ألترا باك'}</div>
+            <div>{t('system_name') || 'Jin Engine'}</div>
           </div>
         </div>
       </div>

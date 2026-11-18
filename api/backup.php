@@ -29,7 +29,7 @@ $tableMap = [
 
 $data = [
     '_meta' => [
-        'app' => 'ultrapack',
+        'app' => 'jin-engine',
         'version' => 20,
         'source' => 'online_mysql',
         'exported_at' => gmdate('Y-m-d\TH:i:s\Z')

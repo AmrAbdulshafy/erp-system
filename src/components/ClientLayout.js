@@ -61,15 +61,15 @@ export default function ClientLayout({ children }) {
 
       const data = {
         _meta: {
-          app: 'ultrapack',
+          app: 'jin-engine',
           schemaVersion: 1,
           exported_at: new Date().toISOString(),
           counts
         },
         settings: {
-          ultrapack_company_profile: safeParse(localStorage.getItem('ultrapack_company_profile')),
-          permissionMatrix: safeParse(localStorage.getItem('ultrapack_permission_matrix') ?? localStorage.getItem('permissionMatrix')),
-          'ultrapack-lang': localStorage.getItem('ultrapack-lang') || 'ar'
+          jin_engine_company_profile: safeParse(localStorage.getItem('jin_engine_company_profile')),
+          permissionMatrix: safeParse(localStorage.getItem('jin_engine_permission_matrix') ?? localStorage.getItem('permissionMatrix')),
+          'jin-engine-lang': localStorage.getItem('jin-engine-lang') || 'ar'
         },
         ...tableData
       };
@@ -78,7 +78,7 @@ export default function ClientLayout({ children }) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `UltraPack_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `JinEngine_Backup_${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
@@ -90,7 +90,7 @@ export default function ClientLayout({ children }) {
   useEffect(() => {
     setMounted(true);
     if (typeof window !== 'undefined') {
-      const savedLang = localStorage.getItem('ultrapack-lang') || 'ar';
+      const savedLang = localStorage.getItem('jin-engine-lang') || 'ar';
       if (i18n.language !== savedLang) {
         i18n.changeLanguage(savedLang);
       }
@@ -172,10 +172,10 @@ export default function ClientLayout({ children }) {
           </div>
           <div>
             <div style={{ fontSize: '1.45rem', fontWeight: 900, letterSpacing: '0.5px' }}>
-              ULTRA PACK ERP SYSTEM
+              JIN ENGINE ERP SYSTEM
             </div>
             <div style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: '0.25rem', fontWeight: 600 }}>
-              {i18n.language === 'ar' ? 'جاري التحقق من الجلسة وتجهيز النظام...' : 'Initializing Ultra Pack ERP & Checking Session...'}
+              {i18n.language === 'ar' ? 'جاري التحقق من الجلسة وتجهيز النظام...' : 'Initializing Jin Engine ERP & Checking Session...'}
             </div>
           </div>
         </div>
@@ -207,7 +207,7 @@ export default function ClientLayout({ children }) {
     const nextLang = i18n.language === 'ar' ? 'en' : 'ar';
     i18n.changeLanguage(nextLang);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('ultrapack-lang', nextLang);
+      localStorage.setItem('jin-engine-lang', nextLang);
       document.documentElement.lang = nextLang;
       if (document.body) document.body.dir = nextLang === 'ar' ? 'rtl' : 'ltr';
     }

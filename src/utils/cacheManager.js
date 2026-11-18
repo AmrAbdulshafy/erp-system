@@ -37,10 +37,10 @@ export async function clearAppCache(options = {}) {
   // 3. Clear temporary SessionStorage while preserving active auth session
   if (typeof window !== 'undefined' && window.sessionStorage) {
     try {
-      const savedAuth = window.sessionStorage.getItem('ultrapack_auth_user');
+      const savedAuth = window.sessionStorage.getItem('jin_engine_auth_user');
       window.sessionStorage.clear();
       if (savedAuth) {
-        window.sessionStorage.setItem('ultrapack_auth_user', savedAuth);
+        window.sessionStorage.setItem('jin_engine_auth_user', savedAuth);
       }
       details.sessionStorageCleared = true;
     } catch (err) {

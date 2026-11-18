@@ -1,7 +1,7 @@
 {
-  "name": "ultra-pack-erp",
+  "name": "jin-engine-erp",
   "version": "1.0.0",
-  "description": "Ultra Pack ERP System (ألترا باك) — Created by Jinnworx, Developed by Amr Abdulshafy",
+  "description": "Jin Engine ERP System — Created by Jinnworx, Developed by Amr Abdulshafy",
   "author": "Jinnworx — Developed by Amr Abdulshafy",
   "private": true,
   "main": "electron/main.js",
@@ -49,8 +49,8 @@
     "typescript": "^6.0.3"
   },
   "build": {
-    "appId": "com.jinnworx.ultrapack",
-    "productName": "Ultra Pack",
+    "appId": "com.jinnworx.jinengine",
+    "productName": "Jin Engine",
     "copyright": "Copyright © 2026 Jinnworx — Developed by Amr Abdulshafy",
     "directories": {
       "output": "dist-desktop",
@@ -76,7 +76,7 @@
         }
       ],
       "icon": "build/icon.ico",
-      "legalTrademarks": "Ultra Pack ERP System - Created by Jinnworx, Developed by Amr Abdulshafy",
+      "legalTrademarks": "Jin Engine ERP System - Created by Jinnworx, Developed by Amr Abdulshafy",
       "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
@@ -86,17 +86,17 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Ultra Pack",
+      "shortcutName": "Jin Engine",
       "menuCategory": "Jinnworx",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
       "installerHeader": "build/installerHeader.bmp",
       "installerHeaderIcon": "build/icon.ico",
       "installerSidebar": "build/installerSidebar.bmp",
-      "uninstallDisplayName": "Ultra Pack ERP System - Jinnworx (Developed by Amr Abdulshafy)",
+      "uninstallDisplayName": "Jin Engine ERP System - Jinnworx (Developed by Amr Abdulshafy)",
       "deleteAppDataOnUninstall": false,
       "runAfterFinish": true,
-      "artifactName": "Ultra-Pack-Setup-${version}.${ext}"
+      "artifactName": "Jin-Engine-Setup-${version}.${ext}"
     }
   }
 }

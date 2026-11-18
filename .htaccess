@@ -1,5 +1,5 @@
 # ===================================================================
-# Ultra Pack ERP - Production Apache Web Server Security & HTTPS
+# Jin Engine ERP - Production Apache Web Server Security & HTTPS
 # ===================================================================
 
 # 1. Protect Sensitive Files (.env, .git, package.json, logs, sql)

@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ultra Pack | ألترا باك - Packaging Solutions System",
-  description: "Ultra Pack ألترا باك - Enterprise Packaging & Corrugation Plant Management System",
+  title: "Jin Engine - Packaging Solutions System",
+  description: "Jin Engine - Enterprise Packaging & Corrugation Plant Management System",
 };
 
 export default function RootLayout({
@@ -33,7 +33,7 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="system"
           enableSystem={true}
-          storageKey="ultrapack-theme"
+          storageKey="jin-engine-theme"
           disableTransitionOnChange
         >
           <AuthProvider>

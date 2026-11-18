@@ -261,15 +261,15 @@ export default function SettingsPage() {
 
     return {
       _meta: {
-        app: 'ultrapack',
+        app: 'jin-engine',
         schemaVersion: 1,
         exported_at: new Date().toISOString(),
         counts
       },
       settings: {
-        ultrapack_company_profile: safeParse(localStorage.getItem('ultrapack_company_profile')),
-        permissionMatrix: safeParse(localStorage.getItem('ultrapack_permission_matrix') ?? localStorage.getItem('permissionMatrix')),
-        'ultrapack-lang': localStorage.getItem('ultrapack-lang') || 'ar'
+        jin_engine_company_profile: safeParse(localStorage.getItem('jin_engine_company_profile')),
+        permissionMatrix: safeParse(localStorage.getItem('jin_engine_permission_matrix') ?? localStorage.getItem('permissionMatrix')),
+        'jin-engine-lang': localStorage.getItem('jin-engine-lang') || 'ar'
       },
       ...tableData
     };
@@ -297,7 +297,7 @@ export default function SettingsPage() {
     }
     try {
       const data = await buildLocalBackupPayload();
-      triggerJsonDownload(data, `UltraPack_Offline_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      triggerJsonDownload(data, `JinEngine_Offline_Backup_${new Date().toISOString().split('T')[0]}.json`);
     } catch (error) {
       console.error('Offline Export failed:', error);
       dialog.alert({ variant: 'error', message: t('offline_backup_failed') || 'Failed to export local backup' });
@@ -317,10 +317,10 @@ export default function SettingsPage() {
     setIsImporting(true);
 
     const prevLocalStorage = {
-      ultrapack_company_profile: localStorage.getItem('ultrapack_company_profile'),
-      ultrapack_permission_matrix: localStorage.getItem('ultrapack_permission_matrix'),
+      jin_engine_company_profile: localStorage.getItem('jin_engine_company_profile'),
+      jin_engine_permission_matrix: localStorage.getItem('jin_engine_permission_matrix'),
       permissionMatrix: localStorage.getItem('permissionMatrix'),
-      'ultrapack-lang': localStorage.getItem('ultrapack-lang')
+      'jin-engine-lang': localStorage.getItem('jin-engine-lang')
     };
 
     try {
@@ -336,12 +336,12 @@ export default function SettingsPage() {
         throw new Error(isRTL ? 'بنية ملف النسخة الاحتياطية غير صالحة.' : 'Invalid backup file structure.');
       }
 
-      // 3. Validate _meta.app === "ultrapack"
-      if (!data._meta || data._meta.app !== 'ultrapack') {
+      // 3. Validate _meta.app === "jin-engine"
+      if (!data._meta || data._meta.app !== 'jin-engine') {
         throw new Error(
           isRTL
-            ? 'ملف غير معتمد: هذا الملف لا ينتمي لنظام Ultra Pack (_meta.app != "ultrapack").'
-            : 'Invalid backup file: Missing or mismatched _meta.app ("ultrapack" required).'
+            ? 'ملف غير معتمد: هذا الملف لا ينتمي لنظام Jin Engine (_meta.app != "jin-engine").'
+            : 'Invalid backup file: Missing or mismatched _meta.app ("jin-engine" required).'
         );
       }
 
@@ -417,20 +417,20 @@ export default function SettingsPage() {
 
       // 7. Apply localStorage settings ONLY after transaction succeeds, then reload
       if (data.settings && typeof data.settings === 'object') {
-        if (data.settings.ultrapack_company_profile !== undefined && data.settings.ultrapack_company_profile !== null) {
-          const val = typeof data.settings.ultrapack_company_profile === 'string'
-            ? data.settings.ultrapack_company_profile
-            : JSON.stringify(data.settings.ultrapack_company_profile);
-          localStorage.setItem('ultrapack_company_profile', val);
+        if (data.settings.jin_engine_company_profile !== undefined && data.settings.jin_engine_company_profile !== null) {
+          const val = typeof data.settings.jin_engine_company_profile === 'string'
+            ? data.settings.jin_engine_company_profile
+            : JSON.stringify(data.settings.jin_engine_company_profile);
+          localStorage.setItem('jin_engine_company_profile', val);
         }
-        const matrixVal = data.settings.permissionMatrix ?? data.settings.ultrapack_permission_matrix;
+        const matrixVal = data.settings.permissionMatrix ?? data.settings.jin_engine_permission_matrix;
         if (matrixVal !== undefined && matrixVal !== null) {
           const serialized = typeof matrixVal === 'string' ? matrixVal : JSON.stringify(matrixVal);
-          localStorage.setItem('ultrapack_permission_matrix', serialized);
+          localStorage.setItem('jin_engine_permission_matrix', serialized);
           localStorage.setItem('permissionMatrix', serialized);
         }
-        if (data.settings['ultrapack-lang']) {
-          localStorage.setItem('ultrapack-lang', String(data.settings['ultrapack-lang']));
+        if (data.settings['jin-engine-lang']) {
+          localStorage.setItem('jin-engine-lang', String(data.settings['jin-engine-lang']));
         }
       }
 
@@ -504,7 +504,7 @@ export default function SettingsPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `UltraPack_Online_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `JinEngine_Online_Backup_${new Date().toISOString().split('T')[0]}.json`;
       a.click();
     } catch (error) {
       console.error(error);
@@ -930,7 +930,7 @@ export default function SettingsPage() {
                     required
                     value={companyForm.company_name_ar || ''}
                     onChange={e => setCompanyForm(prev => ({ ...prev, company_name_ar: e.target.value }))}
-                    placeholder="مثال: ألترا باك لحلول التعبئة والتغليف"
+                    placeholder="مثال: Jin Engine لحلول التعبئة والتغليف"
                     style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-main)', fontSize: '0.88rem' }}
                   />
                 </div>
@@ -944,7 +944,7 @@ export default function SettingsPage() {
                     required
                     value={companyForm.company_name_en || ''}
                     onChange={e => setCompanyForm(prev => ({ ...prev, company_name_en: e.target.value }))}
-                    placeholder="e.g. Ultra Pack Packaging ERP"
+                    placeholder="e.g. Jin Engine Packaging ERP"
                     style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-main)', fontSize: '0.88rem' }}
                   />
                 </div>

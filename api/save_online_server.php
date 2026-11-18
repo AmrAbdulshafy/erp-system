@@ -1,6 +1,6 @@
 <?php
 /**
- * Ultra Pack ERP - Save and Test Online Server Credentials API
+ * Jin Engine ERP - Save and Test Online Server Credentials API
  */
 require_once 'db.php';
 
@@ -69,7 +69,7 @@ if ($action === 'save') {
     $envPath = __DIR__ . '/.env';
     $currentApiKey = getenv('ERP_API_KEY') ?: (isset($_ENV['ERP_API_KEY']) ? $_ENV['ERP_API_KEY'] : '');
     
-    $envContent = "# Ultra Pack ERP - Online Database Configuration\n";
+    $envContent = "# Jin Engine ERP - Online Database Configuration\n";
     $envContent .= "# Auto-generated at " . date('Y-m-d H:i:s') . "\n";
     $envContent .= "APP_ENV=production\n";
     $envContent .= "DB_HOST=" . addslashes($host) . "\n";

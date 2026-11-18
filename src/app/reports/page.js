@@ -353,7 +353,7 @@ export default function ReportsPage() {
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `UltraPack_Report_${selected}_${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute("download", `JinEngine_Report_${selected}_${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -1149,7 +1149,7 @@ export default function ReportsPage() {
         {/* Certified Footer */}
         <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem', borderTop: '1px solid var(--border)', paddingTop: '1.5rem', marginTop: '1rem' }}>
           <p style={{ margin: 0, fontWeight: 600 }}>
-            {t('report_footer_note') || (isRTL ? 'تم استخراج هذا التقرير آلياً عبر نظام ألترا باك لإدارة وتصنيع التعبئة والتغليف.' : 'This report is generated automatically by Ultra Pack ERP System.')}
+            {t('report_footer_note') || (isRTL ? 'تم استخراج هذا التقرير آلياً عبر نظام Jin Engine لإدارة وتصنيع التعبئة والتغليف.' : 'This report is generated automatically by Jin Engine ERP System.')}
           </p>
           <p style={{ margin: '0.25rem 0 0', fontSize: '0.78rem' }}>
             {t('certified_internal_report') || (isRTL ? 'مستند رقابي وتشغيلي معتمد' : 'Certified Enterprise Operations Document')} &copy; {new Date().getFullYear()}

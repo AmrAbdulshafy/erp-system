@@ -5,7 +5,7 @@ import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 export default function ErrorBoundary({ error, reset }) {
   useEffect(() => {
-    console.error('[UltraPack ErrorBoundary]', error);
+    console.error('[JinEngine ErrorBoundary]', error);
   }, [error]);
 
   return (

@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 echo ===================================================================
-echo   Ultra Pack ERP - Production Security & Hardening Setup
+echo   Jin Engine ERP - Production Security & Hardening Setup
 echo ===================================================================
 echo.
 
@@ -20,7 +20,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo [2/3] Writing secure configuration to api/.env...
 (
-echo # Ultra Pack ERP Production Config
+echo # Jin Engine ERP Production Config
 echo APP_ENV=production
 echo DB_HOST=127.0.0.1
 echo DB_PORT=3306

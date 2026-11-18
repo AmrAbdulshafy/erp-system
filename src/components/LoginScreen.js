@@ -27,7 +27,7 @@ export default function LoginScreen() {
     const nextLang = i18n.language === 'ar' ? 'en' : 'ar';
     i18n.changeLanguage(nextLang);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('ultrapack-lang', nextLang);
+      localStorage.setItem('jin-engine-lang', nextLang);
       document.documentElement.lang = nextLang;
       document.documentElement.dir = nextLang === 'ar' ? 'rtl' : 'ltr';
       if (document.body) document.body.dir = nextLang === 'ar' ? 'rtl' : 'ltr';

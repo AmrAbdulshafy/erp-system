@@ -42,11 +42,11 @@ function SystemScreenMockup({ route, title, isRTL, imageSrc, metrics = [], table
           </div>
           <div className="system-preview-url" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', background: 'var(--surface)', border: '1px solid var(--border)', padding: '0.15rem 0.65rem', borderRadius: '4px', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
             <Globe size={11} style={{ opacity: 0.6 }} />
-            <span>https://ultrapack-erp.local{route}</span>
+            <span>https://jin-engine-erp.local{route}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
             <span style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--text-muted)' }}>
-              Ultra Pack
+              Jin Engine
             </span>
           </div>
         </div>
@@ -94,7 +94,7 @@ function SystemScreenMockup({ route, title, isRTL, imageSrc, metrics = [], table
               gap: '0.35rem'
             }}>
               <span>📸</span>
-              <span>{isRTL ? 'لقطة شاشة حقيقية من نظام ألترا باك (انقر للتكبير)' : 'Live Ultra Pack Screen Capture (Click to expand)'}</span>
+              <span>{isRTL ? 'لقطة شاشة حقيقية من نظام Jin Engine (انقر للتكبير)' : 'Live Jin Engine Screen Capture (Click to expand)'}</span>
             </div>
           </div>
         ) : (
@@ -159,7 +159,7 @@ function SystemScreenMockup({ route, title, isRTL, imageSrc, metrics = [], table
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
               <div>
                 <div style={{ fontSize: '0.68rem', color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                  {isRTL ? 'شاشة النظام الحية — ألترا باك' : 'Live System View — Ultra Pack'}
+                  {isRTL ? 'شاشة النظام الحية — Jin Engine' : 'Live System View — Jin Engine'}
                 </div>
                 <div style={{ fontSize: '1.15rem', fontWeight: 900, color: 'var(--text-main)', margin: '0.1rem 0 0 0' }}>
                   {title}
@@ -267,7 +267,7 @@ function SystemScreenMockup({ route, title, isRTL, imageSrc, metrics = [], table
         >
           <div style={{ maxWidth: '96vw', maxHeight: '96vh', overflow: 'auto', borderRadius: '14px', background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.65rem 1rem', background: 'var(--surface-hover)', borderBottom: '1px solid var(--border)' }}>
-              <strong style={{ fontSize: '0.9rem' }}>{title} — Ultra Pack ألترا باك</strong>
+              <strong style={{ fontSize: '0.9rem' }}>{title} — Jin Engine</strong>
               <button 
                 type="button" 
                 onClick={(e) => { e.stopPropagation(); setIsZoomed(false); }}
@@ -290,7 +290,7 @@ export default function TutorialPage() {
   // Explicit language state for tutorial: 'ar' (RTL) | 'en' (LTR)
   const [tutorialLang, setTutorialLang] = useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('ultrapack-lang');
+      const saved = localStorage.getItem('jin-engine-lang');
       if (saved === 'ar' || saved === 'en') return saved;
     }
     return i18n?.language === 'en' ? 'en' : 'ar';
@@ -310,7 +310,7 @@ export default function TutorialPage() {
   // Synchronize language if global language changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedLang = localStorage.getItem('ultrapack-lang');
+      const savedLang = localStorage.getItem('jin-engine-lang');
       if (savedLang && (savedLang === 'ar' || savedLang === 'en')) {
         setTutorialLang(savedLang);
       } else if (i18n?.language && (i18n.language === 'ar' || i18n.language === 'en')) {
@@ -342,7 +342,7 @@ export default function TutorialPage() {
       i18n.changeLanguage(lang);
     }
     if (typeof window !== 'undefined') {
-      localStorage.setItem('ultrapack-lang', lang);
+      localStorage.setItem('jin-engine-lang', lang);
       document.documentElement.lang = lang;
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     }
@@ -353,13 +353,13 @@ export default function TutorialPage() {
   };
 
   const arabicNarration = `
-    مرحباً بكم في الدليل التدريبي الشامل لنظام ألترا باك (Ultra Pack) لإدارة مصانع التعبئة والتغليف والكرتون.
+    مرحباً بكم في الدليل التدريبي الشامل لنظام Jin Engine لإدارة مصانع التعبئة والتغليف والكرتون.
     يوضح هذا الدليل شرحاً تفصيلياً لكل شاشة وصفحة في النظام بالصور التوضيحية الحية من داخل النظام وكيفية استخدامها،
     ودورة العمل المتكاملة من الشراء حتى التسليم، الهيكل المحاسبي، معادلات الرواتب والغياب، وإعداد السيرفر السحابي.
   `;
 
   const englishNarration = `
-    Welcome to the Ultra Pack ERP comprehensive operational and financial manual for corrugated carton and packaging plants.
+    Welcome to the Jin Engine ERP comprehensive operational and financial manual for corrugated carton and packaging plants.
     This interactive manual covers detailed screen-by-screen system previews, step-by-step instructions,
     the complete manufacturing lifecycle, chart of accounts, payroll calculations with attendance deductions,
     and remote MySQL cloud server setup for seamless multi-device synchronization.
@@ -447,7 +447,7 @@ export default function TutorialPage() {
             <span className="badge-pill badge-pill-primary">
               VERIFIED 2026 ERP MANUAL
             </span>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Ultra Pack — ألترا باك</span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Jin Engine</span>
           </div>
           <h1 className="page-title" style={{ margin: '0 0 0.35rem 0', fontSize: '1.85rem', fontWeight: 900 }}>
             {isRTL ? 'الدليل التشغيلي والمحاسبي والربط السحابي (Illustrated Manual)' : 'Corrugated Packaging ERP: Illustrated Screen Manual & Architecture'}
@@ -522,8 +522,8 @@ export default function TutorialPage() {
           </button>
 
           <a 
-            href="/ultrapack_tutorial.mp4" 
-            download="UltraPack_Tutorial_Video.mp4"
+            href="/jin_engine_tutorial.mp4" 
+            download="JinEngine_Tutorial_Video.mp4"
             className="btn"
             style={{ 
               display: 'flex', 
@@ -738,7 +738,7 @@ export default function TutorialPage() {
       >
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 1rem', borderRadius: '999px', background: '#f4f4f5', border: '1px solid #e4e4e7', fontSize: '0.78rem', fontWeight: 800, marginBottom: '1.5rem', letterSpacing: '0.5px' }}>
           <ShieldCheck size={16} color="#10b981" />
-          <span>ULTRA PACK — ألترا باك — ENTERPRISE PACKAGING SYSTEM 2026</span>
+          <span>JIN ENGINE — ENTERPRISE PACKAGING SYSTEM 2026</span>
         </div>
         
         <h1 style={{ fontSize: '2.3rem', fontWeight: 900, margin: '0 0 1rem 0', lineHeight: 1.3, color: '#09090b' }}>
@@ -769,7 +769,7 @@ export default function TutorialPage() {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #e4e4e7', paddingTop: '1.25rem', fontSize: '0.85rem', color: '#71717a', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <span>{isRTL ? 'نظام ألترا باك لإدارة المصانع (Ultra Pack Enterprise ERP)' : 'Ultra Pack ERP System'}</span>
+          <span>{isRTL ? 'نظام Jin Engine لإدارة المصانع (Jin Engine Enterprise ERP)' : 'Jin Engine ERP System'}</span>
           <span>{isRTL ? 'اللغة: العربية (المعتمدة)' : 'Language: English Edition'}</span>
           <span>{new Date().getFullYear()} © All Rights Reserved</span>
         </div>
@@ -788,7 +788,7 @@ export default function TutorialPage() {
             </h2>
             <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>
               {isRTL 
-                ? 'استعراض دقيق لكل صفحة في نظام ألترا باك متضمناً صورة حية طبق الأصل من الشاشة، طريقة إدخال البيانات، الأزرار التفاعلية، والأثر المحاسبي والتشغيلي.' 
+                ? 'استعراض دقيق لكل صفحة في نظام Jin Engine متضمناً صورة حية طبق الأصل من الشاشة، طريقة إدخال البيانات، الأزرار التفاعلية، والأثر المحاسبي والتشغيلي.' 
                 : 'Detailed operational breakdown for all system screens, paired with high-fidelity system UI previews, field explanations, and accounting integration.'}
             </p>
           </div>
@@ -1152,7 +1152,7 @@ export default function TutorialPage() {
                   isRTL ? 'الأثر بالنظام' : 'System Scope'
                 ]}
                 tableRows={[
-                  ['Official Plant Name', 'Ultra Pack / ألترا باك للتعبئة والتغليف', 'Printed on all invoices & quotes headers'],
+                  ['Official Plant Name', 'Jin Engine للتعبئة والتغليف', 'Printed on all invoices & quotes headers'],
                   ['Tax Registration (TRN)', '100-234-567', 'Included in legal tax invoice barcodes'],
                   ['Remote MySQL Server', 'localhost:3306 (packerp)', 'Multi-workstation real-time synchronization']
                 ]}
@@ -1641,7 +1641,7 @@ export default function TutorialPage() {
               <p style={{ margin: 0, fontSize: '0.875rem', lineHeight: 1.7, color: 'var(--text-main)' }}>
                 {isRTL 
                   ? 'يعتمد النظام على معمارية Local-First Hybrid: يعمل كل جهاز في المصنع بسرعة فائقة على قاعدة بياناته المحلية (IndexedDB / Dexie) حتى في حال انقطاع الإنترنت تماماً. وعند توفر الاتصال، يقوم زر (مزامنة الآن / Sync Now) أو المزامنة التلقائية برفع وتنزيل البيانات من وإلى خادم MySQL المركزي السحابي.'
-                  : 'Ultra Pack employs a Local-First Hybrid design: every device works at lightning speed using its local database (IndexedDB via Dexie) even during internet blackouts. When connection is established, the "Sync Now" button or auto-sync handles bi-directional data exchange with the remote MySQL master.'}
+                  : 'Jin Engine employs a Local-First Hybrid design: every device works at lightning speed using its local database (IndexedDB via Dexie) even during internet blackouts. When connection is established, the "Sync Now" button or auto-sync handles bi-directional data exchange with the remote MySQL master.'}
               </p>
             </div>
 

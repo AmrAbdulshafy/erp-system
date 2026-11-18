@@ -1,5 +1,5 @@
 /**
- * Ultra Pack ERP - Roles & Permission Matrix Engine
+ * Jin Engine ERP - Roles & Permission Matrix Engine
  * 
  * Manages screen access rights, role definitions, and dynamic access control (RBAC).
  */
@@ -86,9 +86,9 @@ export const DEFAULT_PERMISSION_MATRIX = {
   ]
 };
 
-const MATRIX_STORAGE_KEY = 'ultrapack_permission_matrix';
-const ROLES_STORAGE_KEY = 'ultrapack_roles';
-const DEPARTMENTS_STORAGE_KEY = 'ultrapack_departments';
+const MATRIX_STORAGE_KEY = 'jin_engine_permission_matrix';
+const ROLES_STORAGE_KEY = 'jin_engine_roles';
+const DEPARTMENTS_STORAGE_KEY = 'jin_engine_departments';
 
 /**
  * Retrieve departments from localStorage or defaults

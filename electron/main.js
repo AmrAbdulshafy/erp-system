@@ -50,7 +50,7 @@ async function ensureServerRunning() {
     // Check if port 3000 is already listening (e.g. started by pnpm desktop / pnpm dev or existing service)
     const alreadyListening = await isPortListening(SERVER_PORT, '127.0.0.1');
     if (alreadyListening) {
-      console.log(`[Ultra Pack Desktop] Server already listening on 127.0.0.1:${SERVER_PORT}, reusing existing instance.`);
+      console.log(`[Jin Engine Desktop] Server already listening on 127.0.0.1:${SERVER_PORT}, reusing existing instance.`);
       return;
     }
 
@@ -63,7 +63,7 @@ async function ensureServerRunning() {
 
     for (const p of candidatePaths) {
       if (fs.existsSync(p)) {
-        console.log(`[Ultra Pack Desktop] Starting standalone server from: ${p}`);
+        console.log(`[Jin Engine Desktop] Starting standalone server from: ${p}`);
         embeddedServerProcess = spawn(process.execPath, [p], {
           cwd: path.dirname(p),
           env: {
@@ -78,12 +78,12 @@ async function ensureServerRunning() {
         });
 
         embeddedServerProcess.on('error', (err) => {
-          console.error('[Ultra Pack Desktop] Embedded server process error:', err);
+          console.error('[Jin Engine Desktop] Embedded server process error:', err);
           embeddedServerProcess = null;
         });
 
         embeddedServerProcess.on('exit', (code) => {
-          console.log(`[Ultra Pack Desktop] Embedded server process exited with code ${code}`);
+          console.log(`[Jin Engine Desktop] Embedded server process exited with code ${code}`);
           embeddedServerProcess = null;
         });
         break;
@@ -99,9 +99,9 @@ function createApplicationMenu() {
 
   const template = [
     ...(isMac ? [{
-      label: 'Ultra Pack',
+      label: 'Jin Engine',
       submenu: [
-        { role: 'about', label: 'About Ultra Pack / حول النظام' },
+        { role: 'about', label: 'About Jin Engine / حول النظام' },
         { type: 'separator' },
         { role: 'services' },
         { type: 'separator' },
@@ -128,8 +128,8 @@ function createApplicationMenu() {
           click: async () => {
             if (!mainWindow) return;
             const { filePath } = await dialog.showSaveDialog(mainWindow, {
-              title: 'Export PDF - Ultra Pack ألترا باك',
-              defaultPath: `UltraPack-Report-${Date.now()}.pdf`,
+              title: 'Export PDF - Jin Engine',
+              defaultPath: `JinEngine-Report-${Date.now()}.pdf`,
               filters: [{ name: 'PDF Document', extensions: ['pdf'] }]
             });
             if (filePath) {
@@ -276,8 +276,8 @@ function loadServerWithRetry(win, maxAttempts = 60) {
         clearInterval(interval);
         win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(`
           <div style="font-family:sans-serif;padding:40px;text-align:center;background:#0f172a;color:#f8fafc;height:100vh;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-            <h1 style="color:#f97316;font-size:2rem;margin-bottom:8px;">Ultra Pack — ألترا باك</h1>
-            <p style="color:#94a3b8;font-size:1.1rem;margin-bottom:24px;">Starting local Ultra Pack service at ${SERVER_URL}...</p>
+            <h1 style="color:#f97316;font-size:2rem;margin-bottom:8px;">Jin Engine</h1>
+            <p style="color:#94a3b8;font-size:1.1rem;margin-bottom:24px;">Starting local Jin Engine service at ${SERVER_URL}...</p>
             <button onclick="location.reload()" style="margin-top:20px;padding:12px 24px;background:#f97316;color:white;border:none;border-radius:8px;font-size:1rem;font-weight:bold;cursor:pointer;">
               Retry Connection / إعادة المحاولة
             </button>
@@ -609,7 +609,7 @@ function buildSplashHtml(initialDark = true) {
 <body>
   <div class="top-pill">
     <span class="top-dot"></span>
-    <span>Ultra Pack Enterprise ERP v1.0 &bull; Local-First Hybrid Architecture</span>
+    <span>Jin Engine Enterprise ERP v1.0 &bull; Local-First Hybrid Architecture</span>
   </div>
 
   <div class="center-card">
@@ -618,8 +618,8 @@ function buildSplashHtml(initialDark = true) {
       <div class="ring-inner"></div>
       <div class="core-badge">U</div>
     </div>
-    <h1 class="erp-title">ULTRA PACK <span>ERP SYSTEM</span></h1>
-    <p class="erp-subtitle">ألترا باك — المنظومة المتكاملة لإدارة وتخطيط مصانع التعبئة والتغليف والكرتون</p>
+    <h1 class="erp-title">JIN ENGINE <span>ERP SYSTEM</span></h1>
+    <p class="erp-subtitle">Jin Engine — المنظومة المتكاملة لإدارة وتخطيط مصانع التعبئة والتغليف والكرتون</p>
 
     <div class="modules-grid">
       <div id="mod0" class="mod-item active">
@@ -676,7 +676,7 @@ function buildSplashHtml(initialDark = true) {
       'جاري فحص وتجهيز وحدات التصنيع والمخزون... • Loading Manufacturing & BOM...',
       'جاري تحميل الدفاتر المالية والمبيعات والرواتب... • Loading Financial Ledgers...',
       'جاري التحقق من التشفير والصلاحيات... • Verifying Security & RBAC Matrix...',
-      'اكتمل التحميل — جاري فتح النظام... • Ready! Launching Ultra Pack ERP...'
+      'اكتمل التحميل — جاري فتح النظام... • Ready! Launching Jin Engine ERP...'
     ];
 
     let pct = 0;
@@ -738,7 +738,7 @@ function createWindow() {
     minimizable: true,
     autoHideMenuBar: true,
     backgroundColor: isDark ? '#09090B' : '#FFFFFF',
-    title: 'Ultra Pack ERP System — ألترا باك',
+    title: 'Jin Engine ERP System',
     ...(fs.existsSync(iconPath) ? { icon: iconPath } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -780,7 +780,7 @@ function createWindow() {
     }
   });
 
-  // Show the animated Ultra Pack ERP + Jinnworx splash screen briefly while starting the local server
+  // Show the animated Jin Engine ERP + Jinnworx splash screen briefly while starting the local server
   mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(buildSplashHtml(isDark))}`);
   ensureServerRunning();
 
@@ -834,8 +834,8 @@ ipcMain.handle('print-to-pdf', async (event, options = {}) => {
   if (!mainWindow) return { success: false, error: 'No active window' };
   try {
     const { filePath } = await dialog.showSaveDialog(mainWindow, {
-      title: options.title || 'Export PDF - Ultra Pack',
-      defaultPath: options.defaultPath || `UltraPack-${Date.now()}.pdf`,
+      title: options.title || 'Export PDF - Jin Engine',
+      defaultPath: options.defaultPath || `JinEngine-${Date.now()}.pdf`,
       filters: [{ name: 'PDF Document', extensions: ['pdf'] }]
     });
     if (!filePath) return { success: false, canceled: true };
@@ -883,7 +883,7 @@ ipcMain.handle('open-external', async (event, url) => {
 ipcMain.handle('show-notification', (event, { title, body }) => {
   if (Notification.isSupported()) {
     new Notification({
-      title: title || 'Ultra Pack — ألترا باك',
+      title: title || 'Jin Engine',
       body: body || ''
     }).show();
   }

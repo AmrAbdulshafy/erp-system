@@ -1,5 +1,5 @@
 -- ===================================================================
--- Ultra Pack ERP - Production Database Hardening Script
+-- Jin Engine ERP - Production Database Hardening Script
 -- ===================================================================
 
 -- 1. Create a dedicated application user with restricted privileges (instead of using root)

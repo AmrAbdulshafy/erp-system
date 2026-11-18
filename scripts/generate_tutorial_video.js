@@ -13,7 +13,7 @@ const slides = [
   {
     num: "1",
     tag: "مقدمة النظام",
-    title: "نظام Ultra Pack المتكامل",
+    title: "نظام Jin Engine المتكامل",
     subtitle: "الحل الشامل لإدارة مصانع الكرتون والتعبئة والتغليف",
     points: [
       "• يعمل بالكامل دون الحاجة لاتصال بالإنترنت (Offline-First)",
@@ -109,7 +109,7 @@ const slides = [
   {
     num: "9",
     tag: "الخاتمة",
-    title: "Ultra Pack — نظام متكامل لمصنعك",
+    title: "Jin Engine — نظام متكامل لمصنعك",
     subtitle: "كفاءة إنتاجية أعلى، أخطاء أقل، ووضوح مالي تام",
     points: [
       "• تم إعداد النظام للعمل الفوري بنجاح",
@@ -137,7 +137,7 @@ slides.forEach((slide, idx) => {
     `drawbox=x=80:y=60:w=1120:h=600:color=#121214:t=fill`,
     `drawbox=x=80:y=60:w=1120:h=600:color=#27272a:t=2`,
     // Brand header
-    `drawtext=fontfile='${fontPath}':text='ULTRA PACK ERP':fontcolor=#71717a:fontsize=20:x=120:y=95`,
+    `drawtext=fontfile='${fontPath}':text='JIN ENGINE ERP':fontcolor=#71717a:fontsize=20:x=120:y=95`,
     `drawtext=fontfile='${fontPath}':text='${slide.tag}':fontcolor=#10b981:fontsize=22:x=w-tw-120:y=95`,
     // Divider line
     `drawbox=x=120:y=135:w=1040:h=1:color=#27272a:t=fill`,
@@ -165,7 +165,7 @@ const listFile = path.join(tempDir, 'concat_list.txt');
 const listContent = segmentFiles.map(f => `file '${f.replace(/\\/g, '/')}'`).join('\n');
 fs.writeFileSync(listFile, listContent);
 
-const finalVideo = path.join(outputDir, 'ultrapack_tutorial.mp4');
+const finalVideo = path.join(outputDir, 'jin_engine_tutorial.mp4');
 console.log('Concatenating slides and generating background audio tone...');
 
 // Concatenate and add subtle ambient audio so it plays with audio

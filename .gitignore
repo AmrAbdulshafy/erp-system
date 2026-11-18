@@ -55,3 +55,4 @@ dist-desktop
 .env
 .env.local
 api/.env
+.htaccess

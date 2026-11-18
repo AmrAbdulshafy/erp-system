@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     title: "Jin Engine",
   },
   icons: {
-    icon: "/jinnworx-logo-512.png",
+    icon: "/jin-engine-logo.svg",
     apple: "/jinnworx-logo-512.png",
   },
 };

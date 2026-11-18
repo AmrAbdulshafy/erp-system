@@ -165,7 +165,7 @@ export default function LoginScreen() {
       >
         {/* Brand Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          {profile.logo && profile.logo.startsWith('data:') && (
+          {profile.logo && profile.logo.startsWith('data:') ? (
             <img 
               src={profile.logo} 
               alt={getDisplayName(isRTL)} 
@@ -177,6 +177,19 @@ export default function LoginScreen() {
                 margin: '0 auto 1.25rem auto',
                 display: 'block',
                 background: 'transparent'
+              }}
+            />
+          ) : (
+            <img
+              src="/jin-engine-logo.svg"
+              alt="Jin Engine"
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '14px',
+                margin: '0 auto 1.25rem auto',
+                display: 'block',
+                boxShadow: '0 8px 20px rgba(37, 99, 235, 0.25)'
               }}
             />
           )}

@@ -159,21 +159,17 @@ export default function ClientLayout({ children }) {
               borderTopColor: '#f97316',
               borderRightColor: 'var(--primary)'
             }} />
-            <div style={{
-              width: 56,
-              height: 56,
-              borderRadius: '16px',
-              background: 'linear-gradient(135deg, #f97316 0%, var(--primary) 100%)',
-              color: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 900,
-              fontSize: '1.5rem',
-              boxShadow: '0 10px 25px rgba(249, 115, 22, 0.3)'
-            }}>
-              {profile.logo_symbol || 'J'}
-            </div>
+            <img
+              src="/jin-engine-logo.svg"
+              alt="Jin Engine"
+              style={{
+                width: 56,
+                height: 56,
+                borderRadius: '16px',
+                boxShadow: '0 10px 25px rgba(37, 99, 235, 0.3)',
+                display: 'block'
+              }}
+            />
           </div>
           <div>
             <div style={{ fontSize: '1.45rem', fontWeight: 900, letterSpacing: '0.5px' }}>
@@ -312,7 +308,7 @@ export default function ClientLayout({ children }) {
           }}
           title={i18n.language === 'ar' ? 'الملفات الشاملة وإعدادات الشركة' : 'Entity Profiles & Company Management'}
         >
-          {profile.logo && profile.logo.startsWith('data:') && (
+          {profile.logo && profile.logo.startsWith('data:') ? (
             <img 
               src={profile.logo} 
               alt={getDisplayName(i18n.language === 'ar')} 
@@ -323,6 +319,18 @@ export default function ClientLayout({ children }) {
                 objectFit: 'contain', 
                 background: 'transparent',
                 flexShrink: 0 
+              }}
+            />
+          ) : (
+            <img
+              src="/jin-engine-logo.svg"
+              alt="Jin Engine"
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: '10px',
+                flexShrink: 0,
+                display: 'block'
               }}
             />
           )}

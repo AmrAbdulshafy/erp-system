@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="jinBg" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#1E40AF" />
+    </linearGradient>
+    <linearGradient id="jinAccent" x1="20" y1="15" x2="80" y2="85" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FB923C" />
+      <stop offset="100%" stop-color="#F97316" />
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="url(#jinBg)" />
+  <rect x="3" y="3" width="94" height="94" rx="19" stroke="rgba(255,255,255,0.18)" stroke-width="2" />
+  <!-- Geometric Engine Hex Ring -->
+  <path
+    d="M50 14L79 30.7V64.3L50 81L21 64.3V30.7L50 14Z"
+    stroke="rgba(255,255,255,0.22)"
+    stroke-width="3"
+    stroke-linejoin="round"
+  />
+  <!-- Stylized J Monogram -->
+  <path
+    d="M57 26V55.5C57 64.0604 50.0604 71 41.5 71C35.2 71 30.1 67.2 28 61.8L35.4 58.2C36.6 61.1 38.8 62.8 41.5 62.8C45.6421 62.8 49 59.4421 49 55.3V26H57Z"
+    fill="#FFFFFF"
+  />
+  <!-- Engine Spark / Node Accent -->
+  <circle cx="67" cy="30" r="6.5" fill="url(#jinAccent)" />
+  <path
+    d="M67 20V22.5M67 37.5V40M57 30H59.5M74.5 30H77"
+    stroke="#FDBA74"
+    stroke-width="2.4"
+    stroke-linecap="round"
+  />
+</svg>

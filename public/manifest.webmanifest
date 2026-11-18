@@ -13,6 +13,12 @@
   "categories": ["business", "productivity"],
   "icons": [
     {
+      "src": "/jin-engine-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
       "src": "/jinnworx-logo-512.png",
       "sizes": "512x512",
       "type": "image/png",

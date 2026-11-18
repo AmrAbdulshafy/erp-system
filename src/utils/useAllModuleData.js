@@ -1,7 +1,6 @@
 "use client";
 
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db';
+import { db, useLiveQuery } from '../db';
 import { SYSTEM_MODULES } from './systemModules';
 
 /**

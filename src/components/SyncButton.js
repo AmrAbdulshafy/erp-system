@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { RefreshCw, Cloud } from 'lucide-react';
-import { db } from '../db';
+import { db, useLiveQuery } from '../db';
 import { useDialog } from './DialogProvider';
 import { getApiHeaders } from '../utils/apiClient';
 

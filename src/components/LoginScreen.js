@@ -12,7 +12,7 @@ export default function LoginScreen() {
   const { resolvedTheme } = useTheme();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  const { login, loginWithPin } = useAuth();
+  const { login, loginWithPin, loginAsDemoAdmin } = useAuth();
   const { profile, getDisplayName, getTagline } = useCompanyProfile();
 
   const [mode, setMode] = useState('password'); // 'password' or 'pin'
@@ -485,6 +485,55 @@ export default function LoginScreen() {
             </button>
           </form>
         )}
+
+        {/* Demo / Test Admin Quick Login for Vercel & Client Evaluation */}
+        <div
+          style={{
+            marginTop: '1.25rem',
+            padding: '0.85rem',
+            borderRadius: '10px',
+            background: 'rgba(37, 99, 235, 0.06)',
+            border: '1px dashed rgba(37, 99, 235, 0.35)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.5rem',
+          }}
+        >
+          <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+            {isRTL
+              ? 'للتجربة السريعة: اضغط للدخول بحساب المدير التجريبي (صلاحيات كاملة)'
+              : 'Quick Evaluation: Sign in with Demo Admin (full access to all modules)'}
+          </div>
+          <button
+            type="button"
+            disabled={loading}
+            onClick={async () => {
+              setErrorMessage('');
+              setLoading(true);
+              await loginAsDemoAdmin();
+              setLoading(false);
+            }}
+            className="btn"
+            style={{
+              width: '100%',
+              padding: '0.65rem 0.9rem',
+              borderRadius: '8px',
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-main)',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.45rem',
+              cursor: loading ? 'not-allowed' : 'pointer',
+            }}
+          >
+            <ShieldCheck size={16} style={{ color: '#2563EB' }} />
+            <span>{isRTL ? 'دخول تجريبي كمدير النظام (Demo Admin)' : 'Demo Admin Login (1-Click)'}</span>
+          </button>
+        </div>
 
         {/* Security badge & Creator footer */}
         <div 

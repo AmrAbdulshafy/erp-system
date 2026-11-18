@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLiveQuery } from 'dexie-react-hooks';
+
 import { useRouter } from 'next/navigation';
-import { db } from '../../db';
+import { db, useLiveQuery } from '../../db';
 import { 
   Users, Briefcase, Truck, Shield, Search, Phone, Mail, 
   MapPin, DollarSign, Calendar, Clock, CheckCircle2, XCircle, 

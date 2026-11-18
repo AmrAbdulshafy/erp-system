@@ -2,8 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '../db';
+import { db, useLiveQuery } from '../db';
 import { Plus, X, Trash2, Edit3, Printer, Download, Search, Save, Sparkles, Filter, Check, FileText, Eye, Users, Briefcase } from 'lucide-react';
 import { useDialog } from './DialogProvider';
 import { formatAmount } from '../utils/format';

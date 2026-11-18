@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { db } from '../db';
+import { createClient } from '../lib/supabase/client';
 
 const AuthContext = createContext(null);
 
@@ -62,11 +63,47 @@ export function AuthProvider({ children }) {
             u => u.password_hash && String(u.password_hash).trim() !== ''
           );
 
+          // Check active Supabase Auth session first (when Supabase is configured)
+          const supabase = createClient();
+          if (supabase) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+              const sbUser = session.user;
+              const matchedDbUser = allUsers.find(
+                u => (u.email && u.email.toLowerCase() === String(sbUser.email || '').toLowerCase()) ||
+                     u.id === sbUser.id
+              );
+              const sessionUser = {
+                id: matchedDbUser?.id || sbUser.id,
+                username: matchedDbUser?.username || sbUser.email || 'admin',
+                email: sbUser.email || matchedDbUser?.email || '',
+                role: matchedDbUser?.role || sbUser.user_metadata?.role || 'ADMIN',
+                full_name: matchedDbUser?.full_name || sbUser.user_metadata?.full_name || sbUser.email || 'Admin',
+                loginAt: new Date().toISOString()
+              };
+              setNeedsInitialSetup(false);
+              setUser(sessionUser);
+              localStorage.setItem('jin_engine_auth_user', JSON.stringify(sessionUser));
+              setIsLoading(false);
+              return;
+            }
+          }
+
           if (!hasAnyPassword) {
-            setNeedsInitialSetup(true);
-            setUser(null);
-            localStorage.removeItem('jin_engine_auth_user');
-            sessionStorage.removeItem('jin_engine_auth_user');
+            // Allow LoginScreen with Demo Admin button instead of blocking behind setup wall
+            setNeedsInitialSetup(false);
+            const savedSession = localStorage.getItem('jin_engine_auth_user') || sessionStorage.getItem('jin_engine_auth_user');
+            if (savedSession) {
+              try {
+                const parsed = JSON.parse(savedSession);
+                if (parsed?.id) {
+                  setUser(parsed);
+                }
+              } catch {
+                localStorage.removeItem('jin_engine_auth_user');
+                sessionStorage.removeItem('jin_engine_auth_user');
+              }
+            }
           } else {
             setNeedsInitialSetup(false);
             const savedSession = localStorage.getItem('jin_engine_auth_user') || sessionStorage.getItem('jin_engine_auth_user');
@@ -216,6 +253,36 @@ export function AuthProvider({ children }) {
       const trimmedUser = (username || '').trim().toLowerCase();
       const trimmedPass = (password || '').trim();
 
+      // 1. Try Supabase Auth when input is an email and Supabase is configured
+      const supabase = createClient();
+      if (supabase && trimmedUser.includes('@')) {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: trimmedUser,
+          password: trimmedPass,
+        });
+        if (!error && data?.user) {
+          const allUsers = await db.users.filter(u => !u.deleted_at).toArray();
+          const matchedDbUser = allUsers.find(
+            u => (u.email && u.email.toLowerCase() === trimmedUser.toLowerCase()) || u.id === data.user.id
+          );
+          const sessionUser = {
+            id: matchedDbUser?.id || data.user.id,
+            username: matchedDbUser?.username || data.user.email,
+            email: data.user.email,
+            role: matchedDbUser?.role || data.user.user_metadata?.role || 'ADMIN',
+            full_name: matchedDbUser?.full_name || data.user.user_metadata?.full_name || data.user.email,
+            loginAt: new Date().toISOString()
+          };
+          setUser(sessionUser);
+          if (remember) {
+            localStorage.setItem('jin_engine_auth_user', JSON.stringify(sessionUser));
+          } else {
+            sessionStorage.setItem('jin_engine_auth_user', JSON.stringify(sessionUser));
+          }
+          return { success: true, user: sessionUser };
+        }
+      }
+
       const allUsers = await db.users.filter(u => !u.deleted_at).toArray();
       const hasAnyPassword = allUsers.some(u => u.password_hash && String(u.password_hash).trim() !== '');
       if (!hasAnyPassword) {
@@ -327,11 +394,36 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
+  const loginAsDemoAdmin = async () => {
+    const demoUser = {
+      id: 'usr-001-admin',
+      username: 'admin',
+      role: 'ADMIN',
+      full_name: 'Demo Admin (Jin Engine)',
+      isDemo: true,
+      loginAt: new Date().toISOString()
+    };
+    setNeedsInitialSetup(false);
+    setUser(demoUser);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('jin_engine_auth_user', JSON.stringify(demoUser));
+    }
+    return { success: true, user: demoUser };
+  };
+
+  const logout = async () => {
     setUser(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('jin_engine_auth_user');
       sessionStorage.removeItem('jin_engine_auth_user');
+    }
+    try {
+      const supabase = createClient();
+      if (supabase) {
+        await supabase.auth.signOut();
+      }
+    } catch (e) {
+      console.warn('Supabase signOut warning:', e);
     }
   };
 
@@ -344,6 +436,7 @@ export function AuthProvider({ children }) {
         needsInitialSetup,
         login,
         loginWithPin,
+        loginAsDemoAdmin,
         logout
       }}
     >

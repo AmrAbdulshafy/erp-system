@@ -2,10 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Package, Activity, ArrowDownLeft, ArrowUpRight, RefreshCw, Search, Printer } from 'lucide-react';
 import DynamicCRUD from '../../components/DynamicCRUD';
-import { db } from '../../db';
+import { db, useLiveQuery } from '../../db';
 import { formatAmount } from '../../utils/format';
 
 export default function Inventory() {

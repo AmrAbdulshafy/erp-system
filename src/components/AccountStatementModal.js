@@ -2,9 +2,8 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { X, Printer, Receipt, HandCoins, Calendar, CheckCircle2, FileText, Plus } from 'lucide-react';
-import { db } from '../db';
+import { db, useLiveQuery } from '../db';
 import { formatAmount } from '../utils/format';
 import { createOfficialVoucher } from '../utils/inventoryMovements';
 import { useCompanyProfile } from '../utils/companyProfile';

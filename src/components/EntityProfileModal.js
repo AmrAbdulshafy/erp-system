@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { useRouter } from 'next/navigation';
 import { 
   Users, Briefcase, Truck, Shield, ExternalLink, Printer, Edit3, Save, 
@@ -11,7 +10,7 @@ import {
   FileSpreadsheet, Phone, Mail, MapPin, HandCoins, ChevronRight, Activity,
   ShoppingBag, Receipt, ArrowUpRight, ArrowDownLeft, Box, X
 } from 'lucide-react';
-import { db } from '../db';
+import { db, useLiveQuery } from '../db';
 import { formatAmount } from '../utils/format';
 import { useCompanyProfile } from '../utils/companyProfile';
 import { TYPE_TABLE, TYPE_ROUTE, TABLE_TO_ENTITY_TYPE } from '../utils/profileConstants';

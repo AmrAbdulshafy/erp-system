@@ -1,10 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  ...(process.env.ELECTRON_BUILD === 'true' ? { output: 'standalone' } : {}),
   experimental: {
     proxyClientMaxBodySize: '100mb',
   },
   async rewrites() {
+    if (process.env.VERCEL === '1' || process.env.NODE_ENV === 'production') {
+      return [];
+    }
     return [
       {
         source: '/api/:path*',

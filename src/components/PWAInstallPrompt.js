@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Download, Share, X, Smartphone } from 'lucide-react';
+import { Download, Share, X, Smartphone, MoreVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function PWAInstallPrompt() {
@@ -9,7 +9,7 @@ export default function PWAInstallPrompt() {
   const isRTL = i18n?.language === 'ar';
 
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [showIOSGuide, setShowIOSGuide] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(false);
   const [isIOSDevice, setIsIOSDevice] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
@@ -43,7 +43,7 @@ export default function PWAInstallPrompt() {
     const handleAppInstalled = () => {
       setDeferredPrompt(null);
       setIsStandalone(true);
-      setShowIOSGuide(false);
+      setShowGuideModal(false);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -56,6 +56,7 @@ export default function PWAInstallPrompt() {
     };
   }, []);
 
+  // Hide only when already running as an installed standalone app
   if (isStandalone) return null;
 
   const handleInstallClick = async () => {
@@ -67,13 +68,8 @@ export default function PWAInstallPrompt() {
       }
       return;
     }
-    if (isIOSDevice) {
-      setShowIOSGuide(true);
-    }
+    setShowGuideModal(true);
   };
-
-  const canShowInstallButton = Boolean(deferredPrompt) || isIOSDevice;
-  if (!canShowInstallButton) return null;
 
   return (
     <>
@@ -89,21 +85,20 @@ export default function PWAInstallPrompt() {
           padding: '0.45rem 0.8rem',
           borderRadius: '8px',
           border: '1px solid rgba(37, 99, 235, 0.45)',
-          backgroundColor: 'rgba(37, 99, 235, 0.1)',
+          backgroundColor: 'rgba(37, 99, 235, 0.12)',
           color: '#2563eb',
-          fontSize: '0.84rem',
+          fontSize: '0.82rem',
           fontWeight: 700,
           cursor: 'pointer',
           whiteSpace: 'nowrap',
+          flexShrink: 0,
         }}
       >
         <Download size={15} />
-        <span className="hide-on-mobile">
-          {isRTL ? 'تثبيت التطبيق' : 'Install App'}
-        </span>
+        <span>{isRTL ? 'تثبيت التطبيق' : 'Install App'}</span>
       </button>
 
-      {showIOSGuide && (
+      {showGuideModal && (
         <div
           style={{
             position: 'fixed',
@@ -116,7 +111,7 @@ export default function PWAInstallPrompt() {
             padding: '1rem',
             paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
           }}
-          onClick={() => setShowIOSGuide(false)}
+          onClick={() => setShowGuideModal(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -133,32 +128,55 @@ export default function PWAInstallPrompt() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--text-main)' }}>
                 <Smartphone size={18} style={{ color: '#2563eb' }} />
-                <span>{isRTL ? 'تثبيت Jin Engine على iPhone / iPad' : 'Install Jin Engine on iOS'}</span>
+                <span>
+                  {isIOSDevice
+                    ? (isRTL ? 'تثبيت Jin Engine على iPhone / iPad' : 'Install Jin Engine on iOS')
+                    : (isRTL ? 'تثبيت Jin Engine على الهاتف / الكمبيوتر' : 'Install Jin Engine App')}
+                </span>
               </div>
               <button
                 type="button"
-                onClick={() => setShowIOSGuide(false)}
+                onClick={() => setShowGuideModal(false)}
                 className="icon-btn"
                 aria-label="Close"
               >
                 <X size={18} />
               </button>
             </div>
-            <ol style={{ margin: 0, paddingInlineStart: '1.25rem', fontSize: '0.88rem', lineHeight: 1.7, color: 'var(--text-muted)' }}>
-              <li>
-                {isRTL ? 'اضغط على أيقونة المشاركة' : 'Tap the Share button'}{' '}
-                <Share size={14} style={{ display: 'inline', verticalAlign: 'middle', color: '#2563eb' }} />{' '}
-                {isRTL ? 'في شريط متصفح Safari بالأسفل.' : 'in Safari’s toolbar.'}
-              </li>
-              <li>
-                {isRTL
-                  ? 'اختر "إضافة إلى الشاشة الرئيسية" (Add to Home Screen).'
-                  : 'Scroll down and tap "Add to Home Screen".'}
-              </li>
-              <li>
-                {isRTL ? 'اضغط "إضافة" (Add) لتشغيل النظام كتطبيق مستقل.' : 'Tap "Add" to launch Jin Engine as a full-screen app.'}
-              </li>
-            </ol>
+
+            {isIOSDevice ? (
+              <ol style={{ margin: 0, paddingInlineStart: '1.25rem', fontSize: '0.88rem', lineHeight: 1.7, color: 'var(--text-muted)' }}>
+                <li>
+                  {isRTL ? 'افتح الموقع في متصفح Safari واضغط على أيقونة المشاركة' : 'In Safari, tap the Share button'}{' '}
+                  <Share size={14} style={{ display: 'inline', verticalAlign: 'middle', color: '#2563eb' }} />.
+                </li>
+                <li>
+                  {isRTL
+                    ? 'اختر "إضافة إلى الشاشة الرئيسية" (Add to Home Screen).'
+                    : 'Scroll down and tap "Add to Home Screen".'}
+                </li>
+                <li>
+                  {isRTL ? 'اضغط "إضافة" (Add) لتشغيل النظام كتطبيق مستقل.' : 'Tap "Add" to launch Jin Engine as a full-screen app.'}
+                </li>
+              </ol>
+            ) : (
+              <ol style={{ margin: 0, paddingInlineStart: '1.25rem', fontSize: '0.88rem', lineHeight: 1.7, color: 'var(--text-muted)' }}>
+                <li>
+                  {isRTL ? 'في متصفح Chrome أو Edge اضغط على قائمة المتصفح' : 'In Chrome or Edge, tap the browser menu'}{' '}
+                  <MoreVertical size={14} style={{ display: 'inline', verticalAlign: 'middle', color: '#2563eb' }} />.
+                </li>
+                <li>
+                  {isRTL
+                    ? 'اختر "تثبيت التطبيق" (Install app) أو "الإضافة إلى الشاشة الرئيسية" (Add to Home screen).'
+                    : 'Select "Install app" or "Add to Home screen".'}
+                </li>
+                <li>
+                  {isRTL
+                    ? 'تأكد من فتح الرابط عبر HTTPS (رابط Vercel) حتى يظهر خيار التثبيت.'
+                    : 'Make sure you are visiting the HTTPS Vercel URL so native app installation is enabled.'}
+                </li>
+              </ol>
+            )}
           </div>
         </div>
       )}

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { Lock, User, KeyRound, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, Globe, Sun, Moon } from 'lucide-react';
 import { ModeToggle } from './mode-toggle';
+import PWAInstallPrompt from './PWAInstallPrompt';
 import { useCompanyProfile } from '../utils/companyProfile';
 import { useTheme } from 'next-themes';
 
@@ -146,6 +147,7 @@ export default function LoginScreen() {
           <Globe size={15} />
           {isRTL ? 'English' : 'العربية'}
         </button>
+        <PWAInstallPrompt />
         <ModeToggle />
       </div>
 

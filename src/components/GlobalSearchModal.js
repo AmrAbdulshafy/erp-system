@@ -66,7 +66,7 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
     }
   }, [isOpen]);
 
-  // Search logic across pages and DB with strict RBAC permission checks
+  // Search logic across pages and Supabase DB with parallel fetching and RBAC permission checks
   useEffect(() => {
     if (!isOpen) return;
 
@@ -74,42 +74,9 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
 
     const performSearch = async () => {
       const q = query.trim().toLowerCase();
-
-      if (!q) {
-        // Show default navigation shortcuts authorized for this role
-        if (isSubscribed) {
-          setResults(navigationPages.slice(0, 8).map(p => ({
-            id: p.path,
-            title: p.name,
-            subtitle: p.path,
-            category: p.category,
-            icon: p.icon,
-            link: p.path
-          })));
-          setSelectedIndex(0);
-        }
-        return;
-      }
-
       setIsLoading(true);
 
       try {
-        const matches = [];
-
-        // 1. Filter Navigation Pages (Already permitted)
-        navigationPages.forEach(p => {
-          if (p.name.toLowerCase().includes(q) || p.path.toLowerCase().includes(q)) {
-            matches.push({
-              id: p.path,
-              title: p.name,
-              subtitle: p.path,
-              category: t('page') || 'Page',
-              icon: p.icon,
-              link: p.path
-            });
-          }
-        });
-
         // RBAC Permissions for each database entity
         const canViewCustomers = canAccessScreen(user?.role, '/customers');
         const canViewInventory = canAccessScreen(user?.role, '/inventory');
@@ -123,24 +90,75 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
         const canViewExpenses = canAccessScreen(user?.role, '/expenses');
         const canViewShipping = canAccessScreen(user?.role, '/shipping');
 
-        // 2. Query Customers (Only if permitted)
-        if (canViewCustomers && db.customers) {
-          const customers = await db.customers
-            .filter(c => !c.deleted_at && (
-              (c.customer_name || '').toLowerCase().includes(q) ||
-              (c.company_name || '').toLowerCase().includes(q) ||
-              (c.mobile_number || '').toLowerCase().includes(q) ||
-              (c.phone || '').toLowerCase().includes(q) ||
-              (c.email || '').toLowerCase().includes(q)
-            ))
-            .limit(5)
-            .toArray();
+        // Fetch all permitted tables from Supabase in parallel
+        const [
+          allCustomers,
+          allMaterials,
+          allQuotes,
+          allSales,
+          allWorkOrders,
+          allPurchases,
+          allEmployees,
+          allSuppliers,
+          allLoans,
+          allExpenses,
+          allShipments,
+        ] = await Promise.all([
+          canViewCustomers && db.customers ? db.customers.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+          canViewInventory && db.raw_materials ? db.raw_materials.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+          canViewQuotations && db.quotations ? db.quotations.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+          canViewSales && db.sales_orders ? db.sales_orders.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+          canViewWorkOrders && db.work_orders ? db.work_orders.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+          canViewPurchases && db.purchase_orders ? db.purchase_orders.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+          canViewEmployees && db.employees ? db.employees.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+          canViewSuppliers && db.suppliers ? db.suppliers.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+          canViewLoans && db.employee_loans ? db.employee_loans.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+          canViewExpenses && db.expenses ? db.expenses.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+          canViewShipping && db.shipping_orders ? db.shipping_orders.filter(r => !r.deleted_at).toArray() : Promise.resolve([]),
+        ]);
+
+        const custMap = new Map(allCustomers.map(c => [c.id, c.customer_name || c.company_name || '']));
+        const suppMap = new Map(allSuppliers.map(s => [s.id, s.supplier_name || s.contact_person || '']));
+        const empMap = new Map(allEmployees.map(e => [e.id, e.full_name || '']));
+
+        const matches = [];
+
+        // 1. Filter Navigation Pages (Already permitted)
+        const navMatches = !q
+          ? navigationPages.slice(0, 5)
+          : navigationPages.filter(p => p.name.toLowerCase().includes(q) || p.path.toLowerCase().includes(q));
+
+        navMatches.forEach(p => {
+          matches.push({
+            id: p.path,
+            title: p.name,
+            subtitle: p.path,
+            category: t('page') || 'Page',
+            icon: p.icon,
+            link: p.path
+          });
+        });
+
+        // 2. Customers
+        if (canViewCustomers) {
+          const customers = (!q
+            ? allCustomers.slice(0, 3)
+            : allCustomers.filter(c =>
+                (c.customer_name || '').toLowerCase().includes(q) ||
+                (c.company_name || '').toLowerCase().includes(q) ||
+                (c.mobile_number || '').toLowerCase().includes(q) ||
+                (c.phone || '').toLowerCase().includes(q) ||
+                (c.email || '').toLowerCase().includes(q) ||
+                (c.address || '').toLowerCase().includes(q) ||
+                String(c.id || '').toLowerCase().includes(q)
+              ).slice(0, 5)
+          );
 
           customers.forEach(c => {
             matches.push({
               id: `customer-${c.id}`,
               title: c.customer_name,
-              subtitle: [c.company_name, c.mobile_number || c.phone, c.email].filter(Boolean).join(' • ') || (t('customer') || 'Customer'),
+              subtitle: [c.company_name, c.mobile_number || c.phone, c.address].filter(Boolean).join(' • ') || (t('customer') || 'Customer'),
               category: t('customer') || 'Customer',
               icon: Briefcase,
               link: '/customers',
@@ -152,17 +170,19 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
           });
         }
 
-        // 3. Query Raw Materials / Inventory (Only if permitted)
-        if (canViewInventory && db.raw_materials) {
-          const materials = await db.raw_materials
-            .filter(m => !m.deleted_at && (
-              (m.material_name || '').toLowerCase().includes(q) ||
-              (m.category || '').toLowerCase().includes(q) ||
-              (m.size || '').toLowerCase().includes(q) ||
-              (m.color_print || '').toLowerCase().includes(q)
-            ))
-            .limit(5)
-            .toArray();
+        // 3. Raw Materials / Inventory
+        if (canViewInventory) {
+          const materials = (!q
+            ? allMaterials.slice(0, 3)
+            : allMaterials.filter(m =>
+                (m.material_name || '').toLowerCase().includes(q) ||
+                (m.category || '').toLowerCase().includes(q) ||
+                (m.size || '').toLowerCase().includes(q) ||
+                (m.thickness_gsm || '').toLowerCase().includes(q) ||
+                (m.color_print || '').toLowerCase().includes(q) ||
+                String(m.id || '').toLowerCase().includes(q)
+              ).slice(0, 5)
+          );
 
           materials.forEach(m => {
             const unitCost = m.unit_price ?? m.price_per_unit ?? 0;
@@ -193,23 +213,25 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
           });
         }
 
-        // 4. Query Quotations (Only if permitted)
-        if (canViewQuotations && db.quotations) {
-          const quotes = await db.quotations
-            .filter(r => !r.deleted_at && (
-              (r.quotation_number || '').toLowerCase().includes(q) ||
-              (r.quote_code || '').toLowerCase().includes(q) ||
-              (r.notes || '').toLowerCase().includes(q) ||
-              String(r.id || '').toLowerCase().includes(q)
-            ))
-            .limit(4)
-            .toArray();
+        // 4. Quotations
+        if (canViewQuotations) {
+          const quotes = (!q
+            ? []
+            : allQuotes.filter(r =>
+                (r.quotation_number || '').toLowerCase().includes(q) ||
+                (r.quote_code || '').toLowerCase().includes(q) ||
+                (custMap.get(r.customer_id) || '').toLowerCase().includes(q) ||
+                (r.notes || '').toLowerCase().includes(q) ||
+                String(r.id || '').toLowerCase().includes(q)
+              ).slice(0, 4)
+          );
 
           quotes.forEach(r => {
             const code = r.quotation_number || r.quote_code || String(r.id || '').slice(0, 8);
+            const cName = custMap.get(r.customer_id);
             matches.push({
               id: `quote-${r.id}`,
-              title: `${t('quotation') || 'Quotation'} #${code}`,
+              title: `${t('quotation') || 'Quotation'} #${code}${cName ? ` — ${cName}` : ''}`,
               subtitle: `${t('status') || 'Status'}: ${r.status || 'DRAFT'} • ${r.total_amount ? r.total_amount + ' EGP' : ''}`,
               category: t('quotation') || 'Quotation',
               icon: FileText,
@@ -232,22 +254,24 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
           });
         }
 
-        // 5. Query Sales Orders (Only if permitted)
-        if (canViewSales && db.sales_orders) {
-          const orders = await db.sales_orders
-            .filter(r => !r.deleted_at && (
-              (r.order_number || '').toLowerCase().includes(q) ||
-              (r.notes || '').toLowerCase().includes(q) ||
-              String(r.id || '').toLowerCase().includes(q)
-            ))
-            .limit(4)
-            .toArray();
+        // 5. Sales Orders
+        if (canViewSales) {
+          const orders = (!q
+            ? allSales.slice(0, 2)
+            : allSales.filter(r =>
+                (r.order_number || '').toLowerCase().includes(q) ||
+                (custMap.get(r.customer_id) || '').toLowerCase().includes(q) ||
+                (r.notes || '').toLowerCase().includes(q) ||
+                String(r.id || '').toLowerCase().includes(q)
+              ).slice(0, 4)
+          );
 
           orders.forEach(r => {
             const code = r.order_number || String(r.id || '').slice(0, 8);
+            const cName = custMap.get(r.customer_id);
             matches.push({
               id: `sale-${r.id}`,
-              title: `${t('sales_order') || 'Sales Order'} #${code}`,
+              title: `${t('sales_order') || 'Sales Order'} #${code}${cName ? ` — ${cName}` : ''}`,
               subtitle: `${t('payment') || 'Payment'}: ${r.payment_status || 'PENDING'} • ${r.total_amount ? r.total_amount + ' EGP' : ''}`,
               category: t('sales_order') || 'Sales Order',
               icon: ShoppingCart,
@@ -272,18 +296,19 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
           });
         }
 
-        // 6. Query Work Orders (Only if permitted)
-        if (canViewWorkOrders && db.work_orders) {
-          const wos = await db.work_orders
-            .filter(r => !r.deleted_at && (
-              (r.order_number || '').toLowerCase().includes(q) ||
-              (r.product_name || '').toLowerCase().includes(q) ||
-              (r.item_name || '').toLowerCase().includes(q) ||
-              (r.status || '').toLowerCase().includes(q) ||
-              String(r.id || '').toLowerCase().includes(q)
-            ))
-            .limit(4)
-            .toArray();
+        // 6. Work Orders
+        if (canViewWorkOrders) {
+          const wos = (!q
+            ? []
+            : allWorkOrders.filter(r =>
+                (r.order_number || '').toLowerCase().includes(q) ||
+                (r.product_name || '').toLowerCase().includes(q) ||
+                (r.item_name || '').toLowerCase().includes(q) ||
+                (r.status || '').toLowerCase().includes(q) ||
+                (r.notes || '').toLowerCase().includes(q) ||
+                String(r.id || '').toLowerCase().includes(q)
+              ).slice(0, 4)
+          );
 
           wos.forEach(r => {
             const prod = r.product_name || r.item_name || '';
@@ -316,22 +341,24 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
           });
         }
 
-        // 7. Query Purchase Orders (Only if permitted)
-        if (canViewPurchases && db.purchase_orders) {
-          const pos = await db.purchase_orders
-            .filter(r => !r.deleted_at && (
-              (r.order_number || '').toLowerCase().includes(q) ||
-              (r.notes || '').toLowerCase().includes(q) ||
-              String(r.id || '').toLowerCase().includes(q)
-            ))
-            .limit(4)
-            .toArray();
+        // 7. Purchase Orders
+        if (canViewPurchases) {
+          const pos = (!q
+            ? []
+            : allPurchases.filter(r =>
+                (r.order_number || '').toLowerCase().includes(q) ||
+                (suppMap.get(r.supplier_id) || '').toLowerCase().includes(q) ||
+                (r.notes || '').toLowerCase().includes(q) ||
+                String(r.id || '').toLowerCase().includes(q)
+              ).slice(0, 4)
+          );
 
           pos.forEach(r => {
             const code = r.order_number || String(r.id || '').slice(0, 8);
+            const sName = suppMap.get(r.supplier_id);
             matches.push({
               id: `po-${r.id}`,
-              title: `${t('purchase_order') || 'Purchase Order'} #${code}`,
+              title: `${t('purchase_order') || 'Purchase Order'} #${code}${sName ? ` — ${sName}` : ''}`,
               subtitle: `${t('status') || 'Status'}: ${r.payment_status || 'PENDING'} • ${r.total_amount ? r.total_amount + ' EGP' : ''}`,
               category: t('purchase_order') || 'Purchase Order',
               icon: ShoppingBag,
@@ -353,18 +380,19 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
           });
         }
 
-        // 8. Query Employees (Only if permitted)
-        if (canViewEmployees && db.employees) {
-          const employees = await db.employees
-            .filter(e => !e.deleted_at && (
-              (e.full_name || '').toLowerCase().includes(q) ||
-              (e.job_title || '').toLowerCase().includes(q) ||
-              (e.department || '').toLowerCase().includes(q) ||
-              (e.mobile_number || '').toLowerCase().includes(q) ||
-              (e.role || '').toLowerCase().includes(q)
-            ))
-            .limit(4)
-            .toArray();
+        // 8. Employees
+        if (canViewEmployees) {
+          const employees = (!q
+            ? allEmployees.slice(0, 2)
+            : allEmployees.filter(e =>
+                (e.full_name || '').toLowerCase().includes(q) ||
+                (e.job_title || '').toLowerCase().includes(q) ||
+                (e.department || '').toLowerCase().includes(q) ||
+                (e.mobile_number || '').toLowerCase().includes(q) ||
+                (e.role || '').toLowerCase().includes(q) ||
+                String(e.id || '').toLowerCase().includes(q)
+              ).slice(0, 4)
+          );
 
           employees.forEach(e => {
             matches.push({
@@ -382,17 +410,19 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
           });
         }
 
-        // 9. Query Suppliers (Only if permitted)
-        if (canViewSuppliers && db.suppliers) {
-          const suppliers = await db.suppliers
-            .filter(s => !s.deleted_at && (
-              (s.supplier_name || '').toLowerCase().includes(q) ||
-              (s.contact_person || '').toLowerCase().includes(q) ||
-              (s.mobile_number || '').toLowerCase().includes(q) ||
-              (s.phone || '').toLowerCase().includes(q)
-            ))
-            .limit(4)
-            .toArray();
+        // 9. Suppliers
+        if (canViewSuppliers) {
+          const suppliers = (!q
+            ? allSuppliers.slice(0, 2)
+            : allSuppliers.filter(s =>
+                (s.supplier_name || '').toLowerCase().includes(q) ||
+                (s.contact_person || '').toLowerCase().includes(q) ||
+                (s.mobile_number || '').toLowerCase().includes(q) ||
+                (s.phone || '').toLowerCase().includes(q) ||
+                (s.address || '').toLowerCase().includes(q) ||
+                String(s.id || '').toLowerCase().includes(q)
+              ).slice(0, 4)
+          );
 
           suppliers.forEach(s => {
             matches.push({
@@ -410,23 +440,24 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
           });
         }
 
-        // 10. Query Employee Loans (Only if permitted)
-        if (canViewLoans && db.employee_loans) {
-          const loans = await db.employee_loans
-            .filter(r => !r.deleted_at && (
+        // 10. Employee Loans
+        if (canViewLoans && q) {
+          const loans = allLoans
+            .filter(r =>
+              (empMap.get(r.employee_id) || '').toLowerCase().includes(q) ||
               (r.notes || '').toLowerCase().includes(q) ||
               (r.reason || '').toLowerCase().includes(q) ||
               (r.status || '').toLowerCase().includes(q) ||
               String(r.id || '').toLowerCase().includes(q)
-            ))
-            .limit(4)
-            .toArray();
+            )
+            .slice(0, 4);
 
           loans.forEach(r => {
             const rem = r.remaining_amount ?? r.remaining_balance ?? 0;
+            const eName = empMap.get(r.employee_id);
             matches.push({
               id: `loan-${r.id}`,
-              title: `${t('employee_loan') || 'Employee Loan'} #${String(r.id || '').slice(0, 8)}`,
+              title: `${t('employee_loan') || 'Employee Loan'} #${String(r.id || '').slice(0, 8)}${eName ? ` — ${eName}` : ''}`,
               subtitle: `${t('amount') || 'Amount'}: ${r.loan_amount || 0} EGP • ${t('remaining') || 'Remaining'}: ${rem} EGP`,
               category: t('employee_loan') || 'Employee Loan',
               icon: HandCoins,
@@ -449,17 +480,16 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
           });
         }
 
-        // 11. Query Expenses (Only if permitted)
-        if (canViewExpenses && db.expenses) {
-          const expenses = await db.expenses
-            .filter(r => !r.deleted_at && (
+        // 11. Expenses
+        if (canViewExpenses && q) {
+          const expenses = allExpenses
+            .filter(r =>
               (r.category || r.expense_type || '').toLowerCase().includes(q) ||
               (r.description || '').toLowerCase().includes(q) ||
               (r.notes || '').toLowerCase().includes(q) ||
               String(r.id || '').toLowerCase().includes(q)
-            ))
-            .limit(4)
-            .toArray();
+            )
+            .slice(0, 4);
 
           expenses.forEach(r => {
             const catLabel = r.category || r.expense_type || '';
@@ -484,18 +514,17 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
           });
         }
 
-        // 12. Query Shipping Orders (Only if permitted)
-        if (canViewShipping && db.shipping_orders) {
-          const shipments = await db.shipping_orders
-            .filter(r => !r.deleted_at && (
+        // 12. Shipping Orders
+        if (canViewShipping && q) {
+          const shipments = allShipments
+            .filter(r =>
               (r.shipping_company || '').toLowerCase().includes(q) ||
               (r.driver_name || '').toLowerCase().includes(q) ||
               (r.bill_of_lading_number || r.vehicle_number || '').toLowerCase().includes(q) ||
               (r.delivery_address || r.destination_address || '').toLowerCase().includes(q) ||
               String(r.id || '').toLowerCase().includes(q)
-            ))
-            .limit(4)
-            .toArray();
+            )
+            .slice(0, 4);
 
           shipments.forEach(r => {
             const bol = r.bill_of_lading_number || r.vehicle_number || '';
@@ -537,8 +566,15 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
 
     performSearch();
 
+    if (typeof window !== 'undefined') {
+      window.addEventListener('jin-engine-db-changed', performSearch);
+    }
+
     return () => {
       isSubscribed = false;
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('jin-engine-db-changed', performSearch);
+      }
     };
   }, [query, isOpen]);
 

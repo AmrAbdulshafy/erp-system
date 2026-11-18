@@ -172,7 +172,7 @@ export default function ClientLayout({ children }) {
               fontSize: '1.5rem',
               boxShadow: '0 10px 25px rgba(249, 115, 22, 0.3)'
             }}>
-              {profile.logo_symbol || 'U'}
+              {profile.logo_symbol || 'J'}
             </div>
           </div>
           <div>
@@ -312,7 +312,7 @@ export default function ClientLayout({ children }) {
           }}
           title={i18n.language === 'ar' ? 'الملفات الشاملة وإعدادات الشركة' : 'Entity Profiles & Company Management'}
         >
-          {profile.logo && profile.logo.startsWith('data:') ? (
+          {profile.logo && profile.logo.startsWith('data:') && (
             <img 
               src={profile.logo} 
               alt={getDisplayName(i18n.language === 'ar')} 
@@ -325,22 +325,6 @@ export default function ClientLayout({ children }) {
                 flexShrink: 0 
               }}
             />
-          ) : (
-            <div style={{
-              width: 36,
-              height: 36,
-              borderRadius: '10px',
-              background: 'var(--primary)',
-              color: 'var(--primary-foreground)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 900,
-              fontSize: '1rem',
-              flexShrink: 0
-            }}>
-              {profile.logo_symbol || 'U'}
-            </div>
           )}
           <div style={{ display: 'flex', flexDirection: 'column', opacity: (isSidebarHovered || isMobileMenuOpen) ? 1 : 0, transition: 'opacity 0.2s', overflow: 'hidden' }}>
             <h2 style={{ fontSize: '1.02rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.2, margin: 0, textOverflow: 'ellipsis', overflow: 'hidden' }}>

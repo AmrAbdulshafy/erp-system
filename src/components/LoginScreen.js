@@ -165,7 +165,7 @@ export default function LoginScreen() {
       >
         {/* Brand Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          {profile.logo && profile.logo.startsWith('data:') ? (
+          {profile.logo && profile.logo.startsWith('data:') && (
             <img 
               src={profile.logo} 
               alt={getDisplayName(isRTL)} 
@@ -179,22 +179,6 @@ export default function LoginScreen() {
                 background: 'transparent'
               }}
             />
-          ) : (
-            <div style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '14px',
-              background: 'var(--primary)',
-              color: 'var(--primary-foreground)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 900,
-              fontSize: '1.4rem',
-              margin: '0 auto 1.25rem auto'
-            }}>
-              {profile.logo_symbol || 'U'}
-            </div>
           )}
           <h1 style={{ fontSize: '1.45rem', fontWeight: 800, margin: '0 0 0.35rem 0', color: 'var(--text-main)' }}>
             {getDisplayName(isRTL)}

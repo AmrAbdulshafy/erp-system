@@ -18,7 +18,7 @@ export const DEFAULT_COMPANY_PROFILE = {
   tagline_ar: 'نظام متكامل لإدارة وتخطيط مصانع الكرتون والتعبئة والتغليف',
   tagline_en: 'Packaging Solutions & Factory Management ERP',
   logo: '',
-  logo_symbol: 'U',
+  logo_symbol: 'J',
   phone: '',
   mobile: '',
   email: '',
@@ -68,7 +68,7 @@ export function getCompanyProfile() {
       merged.company_name_en = 'Jin Engine';
       merged.company_name_ar = 'Jin Engine';
       merged.logo = '';
-      merged.logo_symbol = 'U';
+      merged.logo_symbol = 'J';
     }
     if (merged.logo && String(merged.logo).includes('jinnworx-logo')) {
       merged.logo = '';

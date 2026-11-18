@@ -816,7 +816,7 @@ export default function SettingsPage() {
                   />
                 ) : (
                   <div style={{ width: 42, height: 42, borderRadius: '10px', background: 'var(--primary)', color: 'var(--primary-foreground)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.1rem', flexShrink: 0 }}>
-                    {companyForm.logo_symbol || 'U'}
+                    {companyForm.logo_symbol || 'J'}
                   </div>
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25 }}>

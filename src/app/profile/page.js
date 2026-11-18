@@ -244,15 +244,6 @@ export default function ProfilesDirectoryPage() {
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }} className="hide-on-print">
           <button 
             type="button" 
-            onClick={() => router.push('/settings')} 
-            className="btn"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', padding: '0.55rem 1rem', background: 'var(--surface-hover)', border: '1px solid var(--border)', fontSize: '0.85rem' }}
-          >
-            <Building2 size={16} />
-            <span>{isRTL ? 'إعدادات الشركة والشعار' : 'Company Branding'}</span>
-          </button>
-          <button 
-            type="button" 
             onClick={() => window.print()} 
             className="btn btn-primary"
             style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', padding: '0.55rem 1.25rem', fontWeight: 700, fontSize: '0.85rem' }}

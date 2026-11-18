@@ -6,6 +6,16 @@ import { NextResponse } from 'next/server';
  * Gracefully passes through if Supabase environment variables are not configured.
  */
 export async function proxy(request) {
+  const { pathname } = request.nextUrl;
+  if (
+    pathname === '/tutorial' ||
+    pathname.startsWith('/tutorial/') ||
+    pathname === '/settings' ||
+    pathname.startsWith('/settings/')
+  ) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

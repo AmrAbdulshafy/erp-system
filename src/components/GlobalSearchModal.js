@@ -48,7 +48,6 @@ export default function GlobalSearchModal({ isOpen, onClose }) {
     { name: t('production') || 'Production', path: '/production', category: 'Page', icon: Package },
     { name: t('attendance') || 'Attendance', path: '/attendance', category: 'Page', icon: Clock },
     { name: t('inventory') || 'Inventory', path: '/inventory', category: 'Page', icon: Box },
-    { name: t('settings') || 'Settings', path: '/settings', category: 'Page', icon: Settings },
   ];
 
   // Filter navigation pages by current user role permission

@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, dialog, shell, Menu, Notification, screen, 
 const path = require('path');
 const v8 = require('v8');
 const http = require('http');
+const https = require('https');
 const net = require('net');
 const fs = require('fs');
 const { spawn } = require('child_process');
@@ -20,7 +21,9 @@ let mainWindow = null;
 let embeddedServerProcess = null;
 let isStartingServer = false;
 const SERVER_PORT = parseInt(process.env.PORT || '3000', 10);
-const SERVER_URL = `http://127.0.0.1:${SERVER_PORT}`;
+const ONLINE_URL = (process.env.DESKTOP_ONLINE_URL || 'https://erp-system-eight.vercel.app').replace(/\/+$/, '');
+const USE_LOCAL = process.env.DESKTOP_LOCAL === 'true';
+const SERVER_URL = USE_LOCAL ? `http://127.0.0.1:${SERVER_PORT}` : ONLINE_URL;
 
 function isPortListening(port, host = '127.0.0.1') {
   return new Promise((resolve) => {
@@ -43,6 +46,7 @@ function isPortListening(port, host = '127.0.0.1') {
 }
 
 async function ensureServerRunning() {
+  if (!USE_LOCAL) return;
   if (embeddedServerProcess || isStartingServer) return;
   isStartingServer = true;
 
@@ -243,13 +247,15 @@ function createApplicationMenu() {
 }
 
 function checkServerReady(url, callback) {
-  const req = http.get(url, (res) => {
+  const client = url.startsWith('https') ? https : http;
+  const req = client.get(url, (res) => {
+    res.resume();
     callback(true);
   });
   req.on('error', () => {
     callback(false);
   });
-  req.setTimeout(1500, () => {
+  req.setTimeout(3500, () => {
     req.destroy();
     callback(false);
   });

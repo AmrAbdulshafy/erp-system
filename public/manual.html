@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jinn Worx ERP — Comprehensive Illustrated Manual (الدليل المصور الشامل)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --accent: #f59e0b;
+      --success: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Cairo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0;
+      margin: 0;
+    }
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-container img {
+      height: 36px;
+      width: auto;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .btn {
+      padding: 0.5rem 1.15rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .btn:hover {
+      background: var(--border);
+    }
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    .main-wrapper {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 4rem 1.5rem;
+    }
+    .lang-section {
+      display: none;
+    }
+    .lang-section.active {
+      display: block;
+    }
+    .manual-h1 {
+      font-size: 2.1rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .manual-h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 2.5rem 0 1rem 0;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid rgba(245, 158, 11, 0.25);
+    }
+    .manual-h3 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #93c5fd;
+      margin: 2rem 0 0.75rem 0;
+    }
+    .manual-h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin: 1.25rem 0 0.5rem 0;
+    }
+    .manual-p {
+      margin-bottom: 1rem;
+      color: #cbd5e1;
+      font-size: 0.98rem;
+    }
+    .manual-li {
+      margin-bottom: 0.5rem;
+      margin-inline-start: 1.5rem;
+      color: #cbd5e1;
+    }
+    .manual-step {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.65rem;
+      color: #e2e8f0;
+    }
+    .manual-hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+    .manual-figure {
+      margin: 1.75rem 0;
+    }
+    .manual-window {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.6);
+    }
+    .manual-window-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.45rem 0.85rem;
+      background: #1e293b;
+      border-bottom: 1px solid var(--border);
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot.red { background: #ef4444; }
+    .dot.yellow { background: #f59e0b; }
+    .dot.green { background: #10b981; }
+    .manual-window-title {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-inline-start: 8px;
+      font-family: 'Inter', sans-serif;
+    }
+    .manual-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-top: 1px solid #111827;
+    }
+    .manual-caption {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-weight: 600;
+    }
+    .table-container {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .manual-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      background: var(--card-bg);
+    }
+    .manual-table th {
+      background: #0f172a;
+      padding: 0.75rem 1rem;
+      font-weight: 800;
+      color: #f1f5f9;
+      text-align: inherit;
+      border-bottom: 1px solid var(--border);
+    }
+    .manual-table td {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: #cbd5e1;
+    }
+    .manual-table tr:last-child td {
+      border-bottom: none;
+    }
+    .manual-code {
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.88em;
+    }
+    .manual-link {
+      color: #38bdf8;
+      text-decoration: none;
+    }
+    .manual-link:hover {
+      text-decoration: underline;
+    }
+
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      .top-nav {
+        display: none !important;
+      }
+      .main-wrapper {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .manual-window {
+        border: 1px solid #cccccc !important;
+        box-shadow: none !important;
+      }
+      .manual-h1 {
+        color: #000000 !important;
+        -webkit-text-fill-color: initial !important;
+      }
+      .manual-h2 {
+        color: #b45309 !important;
+      }
+      .manual-p, .manual-li, .manual-table td {
+        color: #1e293b !important;
+      }
+      .manual-window-bar {
+        background: #f1f5f9 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation & Controls -->
+  <header class="top-nav">
+    <div class="logo-container">
+      <img src="/jinnworx-logo-dark.png" alt="Jinn Worx" />
+      <div>
+        <div style="font-size: 1.05rem; font-weight: 900; letter-spacing: -0.3px;">Jinn Worx ERP</div>
+        <div style="font-size: 0.72rem; color: var(--text-muted);">Illustrated Enterprise Manual 2026</div>
+      </div>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn" onclick="toggleLanguage('ar')">🇸🇦 العربية</button>
+      <button class="btn" onclick="toggleLanguage('en')">🇬🇧 English</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨️ طباعة / تصدير PDF</button>
+    </div>
+  </header>
+
+  <!-- Content Wrapper -->
+  <main class="main-wrapper">
+    <div id="section-ar" class="lang-section active" dir="rtl">
+      <h1 class="manual-h1">دليل التشغيل والمحاسبة والربط السحابي الشامل لمنظومة Jinn Worx ERP</h1>
+<p class="manual-p"><strong>الإصدار المعتمد 2026 — الدليل الفني والمحاسبي والتشغيلي المصور</strong></p>
+<hr class="manual-hr" />
+<h2 class="manual-h2">فهرس محتويات الدليل</h2>
+<div class="manual-step"><strong>1.</strong> <a href="#1-نظرة-عامة" class="manual-link">نظرة عامة على منظومة Jinn Worx لإدارة مصانع الكرتون والتعبئة والتغليف</a></div>
+<div class="manual-step"><strong>2.</strong> <a href="#2-دليل-شاشات-النظام-المصور" class="manual-link">دليل شاشات النظام المصور (لقطات حية من المنظومة)</a></div>
+<p class="manual-p">   - <a href="#شاشة-1-لوحة-التحكم-والقيادة-التنفيذية" class="manual-link">الشاشة 1: لوحة التحكم والقيادة التنفيذية (/)</a></p>
+<p class="manual-p">   - <a href="#شاشة-2-مستودع-المواد-الخام-والمخزون" class="manual-link">الشاشة 2: مستودع المواد الخام والمخزون (/inventory)</a></p>
+<p class="manual-p">   - <a href="#شاشة-3-حاسبة-وعروض-الأسعار-الهندسية" class="manual-link">الشاشة 3: حاسبة وعروض الأسعار الهندسية للكرتون (/quotations)</a></p>
+<p class="manual-p">   - <a href="#شاشة-4-أوامر-البيع-وفواتير-العملاء" class="manual-link">الشاشة 4: أوامر البيع وفواتير العملاء (/sales)</a></p>
+<p class="manual-p">   - <a href="#شاشة-5-أوامر-الشغل-وخطوط-الإنتاج-والتصنيع" class="manual-link">الشاشة 5: أوامر الشغل وخطوط الإنتاج والتصنيع (/work-orders)</a></p>
+<p class="manual-p">   - <a href="#شاشة-6-إدارة-العاملين-والإنتاج-بالقطعة" class="manual-link">الشاشة 6: إدارة العاملين والإنتاج بالقطعة (/employees)</a></p>
+<p class="manual-p">   - <a href="#شاشة-7-إعدادات-المصنع-والصلاحيات" class="manual-link">الشاشة 7: إعدادات المصنع والصلاحيات والبيانات الضريبية (/settings)</a></p>
+<p class="manual-p">   - <a href="#شاشة-8-التقارير-التنفيذية-والمالية" class="manual-link">الشاشة 8: التقارير التنفيذية والتحليلات المالية والتدفقات (/reports)</a></p>
+<p class="manual-p">   - <a href="#شاشة-9-مشتريات-الخامات-وحسابات-الموردين" class="manual-link">الشاشة 9: مشتريات الخامات وحسابات الموردين (/purchases)</a></p>
+<div class="manual-step"><strong>3.</strong> <a href="#3-دورة-حياة-أمر-الشغل-والتصنيع" class="manual-link">دورة حياة أمر الشغل والتصنيع خطوة بخطوة</a></div>
+<div class="manual-step"><strong>4.</strong> <a href="#4-الدليل-المحاسبي-الشامل-والقيود-الآلية" class="manual-link">الدليل المحاسبي الشامل والقيود المحاسبية الآلية</a></div>
+<div class="manual-step"><strong>5.</strong> <a href="#5-معادلات-الرواتب-والإنتاج-بالقطعة" class="manual-link">معادلات الرواتب والإنتاج بالقطعة وساعات العمل الإضافي</a></div>
+<div class="manual-step"><strong>6.</strong> <a href="#6-البنية-التقنية-والمزامنة-السحابية" class="manual-link">البنية التقنية والمزامنة السحابية المتقدمة (Offline-First & Cloud Sync)</a></div>
+<hr class="manual-hr" />
+<h2 class="manual-h2">1. نظرة عامة</h2>
+<p class="manual-p">تم تصميم وتطوير منظومة <strong>Jinn Worx ERP</strong> خصيصاً لتلبية المتطلبات الهندسية والمحاسبية الدقيقة لمصانع وشركات تصنيع الكرتون المضلع ومواد التعبئة والتغليف الحديثة.</p>
+<h3 class="manual-h3">الركائز الأساسية للمنظومة:</h3>
+<li class="manual-li"><strong>حسابات هندسية فورية (3D Carton Math):</strong> احتساب مسطحات ألواح الكرتون، أوزان الورق، استهلاك الغراء والأحبار، وهوامش الربح وفق أبعاد الكرتونة (الطول × العرض × الارتفاع).</li>
+<li class="manual-li"><strong>إدارة وتخصيم الخامات آلياً (Automated BOM):</strong> خصم رولات الكرافت والدوبلكس والغراء لحظياً فور إتمام كل أمر شغل (Work Order).</li>
+<li class="manual-li"><strong>محاسبة مالية متكاملة (Double-Entry Engine):</strong> قيود آلية متطورة لكافة العمليات من مبيعات، مشتريات خامات، مصروفات تشغيلية، أجور عمال، ومسحوبات الملاك.</li>
+<li class="manual-li"><strong>العمل المستقل دون إنترنت مع مزامنة سحابية (Offline-First Architecture):</strong> استمرار العمل الكامل للمصنع عبر قاعدة بيانات محلية (IndexedDB) مع مزامنة آنية ذكية لخادم MySQL السحابي عند توفر الاتصال دون فقدان أي بيانات.</li>
+<hr class="manual-hr" />
+<h2 class="manual-h2">2. دليل شاشات النظام المصور</h2>
+<h3 class="manual-h3">شاشة 1: لوحة التحكم والقيادة التنفيذية</h3>
+<p class="manual-p"><strong>المسار في النظام:</strong> <code class="manual-code">https://jinnworx-erp.local/</code></p>
+<p class="manual-p"><strong>الغرض التشغيلي:</strong> المركز القيادي الفوري للمدير العام ومديري الأقسام لمراقبة مؤشرات الأداء الحيوية (KPIs)، الإيرادات، الأرباح النقدية، المصروفات، وأوامر الإنتاج النشطة.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — لوحة التحكم والقيادة التنفيذية لمصنع جن ووركس</span>
+            </div>
+            <img src="/tutorials/screens/dashboard.png" alt="لوحة التحكم والقيادة التنفيذية لمصنع جن ووركس" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 لوحة التحكم والقيادة التنفيذية لمصنع جن ووركس</figcaption>
+        </div>
+      
+<h4 class="manual-h4">عناصر الشاشة والمؤشرات:</h4>
+<div class="table-container"><table class="manual-table">
+<thead><tr><th>العنصر</th><th>الوصف التشغيلي والأثر المحاسبي</th></tr></thead><tbody>
+<tr><td><strong>إجمالي المبيعات الكلية</strong></td><td>إجمالي قيمة عقود التوريد وأوامر البيع المعتمدة مع بيان المحصل نقداً منها</td></tr>
+<tr><td><strong>صافي الربح التقديري والفعلي</strong></td><td>ناتج الإيرادات مخصوماً منها تكاليف خامات الكرتون والمصروفات التشغيلية</td></tr>
+<tr><td><strong>أوامر الشراء ومستحقات الموردين</strong></td><td>قيمة الخامات المشتراة والمبالغ المتبقية للدفع للموردين</td></tr>
+<tr><td><strong>أوامر الشغل والتصنيع النشطة</strong></td><td>عدد أوامر الإنتاج الجارية على خطوط التضليع والطباعة والتكسير</td></tr>
+<tr><td><strong>تنبيهات نقص الخامات بالمخزن</strong></td><td>تحذيرات فورية بألوان مميزة للخامات التي هبطت دون حد الطلب الأدنى</td></tr>
+<tr><td><strong>أزرار الإجراء السريع</strong></td><td>وصول فوري لإنشاء: عرض سعر، طلب بيع، أمر تصنيع، تسجيل إنتاج، خامة جديدة</td></tr>
+</tbody></table></div>
+<hr class="manual-hr" />
+<h3 class="manual-h3">شاشة 2: مستودع المواد الخام والمخزون</h3>
+<p class="manual-p"><strong>المسار في النظام:</strong> <code class="manual-code">https://jinnworx-erp.local/inventory</code></p>
+<p class="manual-p"><strong>الغرض التشغيلي:</strong> إدارة ومراقبة أرصدة مستودع الخامات من رولات ورق الكرافت، الدوبلكس، الفلوتنج، الغراء الصناعي، وأحبار الطباعة، وتحديد حدود الأمان التنبيهية.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — إدارة المخزون والمواد الخام لمصنع جن ووركس</span>
+            </div>
+            <img src="/tutorials/screens/inventory.png" alt="إدارة المخزون والمواد الخام لمصنع جن ووركس" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 إدارة المخزون والمواد الخام لمصنع جن ووركس</figcaption>
+        </div>
+      
+<h4 class="manual-h4">حقول وميزات إدارة المخزون:</h4>
+<li class="manual-li"><strong>تنوع وحدات القياس:</strong> دعم كامل لوحدات (طن، كجم، رول، لتر، برميل، عبوة).</li>
+<li class="manual-li"><strong>الربط التلقائي بأوامر الشراء:</strong> عند استلام شحنة خامات، يتم زيادة رصيد الخامة ومتوسط التكلفة آلياً.</li>
+<li class="manual-li"><strong>الخصم الآلي عبر الـ BOM:</strong> عند إغلاق أمر شغل، تُحسب كميات الورق المستهلك وتُخصم فورياً من المخزن.</li>
+<li class="manual-li"><strong>تقارير الجرد والتصدير:</strong> تصدير كشوفات الجرد بضغطة زر إلى ملفات Excel (CSV) أو الطباعة الورقية.</li>
+<hr class="manual-hr" />
+<h3 class="manual-h3">شاشة 3: حاسبة وعروض الأسعار الهندسية</h3>
+<p class="manual-p"><strong>المسار في النظام:</strong> <code class="manual-code">https://jinnworx-erp.local/quotations</code></p>
+<p class="manual-p"><strong>الغرض التشغيلي:</strong> حاسبة فنية لتسعير علب وكراتين التعبئة والتغليف بدقة متناهية بناءً على أبعاد المنتج ونوع الورق وطبقات التضليع، مع تصدير عروض أسعار PDF رسمية للعملاء.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — حاسبة وعروض الأسعار الهندسية</span>
+            </div>
+            <img src="/tutorials/screens/quotations.png" alt="حاسبة وعروض الأسعار الهندسية" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 حاسبة وعروض الأسعار الهندسية</figcaption>
+        </div>
+      
+<h4 class="manual-h4">الميزات الهندسية لعروض الأسعار:</h4>
+<div class="manual-step"><strong>1.</strong> <strong>حساب المسطح الصافي والإجمالي:</strong> احتساب مساحة لوح الكرتون اللازم للكرتونة شاملة اللسان (Glue Tab) وتفريغ التكسير.</div>
+<div class="manual-step"><strong>2.</strong> <strong>تحديد درجات التضليع:</strong> دعم فئات الفلوت (Single Wall B, C, E Flute / Double Wall BC, EE).</div>
+<div class="manual-step"><strong>3.</strong> <strong>تسعير تكلفة الورق + التصنيع + الهامش:</strong> تحديد تكلفة الكيلوجرام واحتساب سعر بيع القطعة والكمية الإجمالية.</div>
+<div class="manual-step"><strong>4.</strong> <strong>التحويل الفوري لأمر بيع:</strong> بنقرة واحدة، يتحول العرض المقبول إلى أمر بيع (Sales Order) دون إعادة إدخال البيانات.</div>
+<hr class="manual-hr" />
+<h3 class="manual-h3">شاشة 4: أوامر البيع وفواتير العملاء</h3>
+<p class="manual-p"><strong>المسار في النظام:</strong> <code class="manual-code">https://jinnworx-erp.local/sales</code></p>
+<p class="manual-p"><strong>الغرض التشغيلي:</strong> تسجيل عقود التوريد مع العملاء، تحصيل الدفعات المقدمة، وتوليد الفواتير الضريبية ذات الـ Barcode والـ QR Code المتوافقة مع متطلبات الفوترة القانونية.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — أوامر البيع وفواتير العملاء</span>
+            </div>
+            <img src="/tutorials/screens/sales.png" alt="أوامر البيع وفواتير العملاء" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 أوامر البيع وفواتير العملاء</figcaption>
+        </div>
+      
+<h4 class="manual-h4">الميزات المالية والتشغيلية:</h4>
+<li class="manual-li"><strong>تتبع حالة السداد:</strong> (مدفوع بالكامل، مدفوع جزئياً، غير مدفوع).</li>
+<li class="manual-li"><strong>إصدار أمر الشغل:</strong> زر مخصص لإنشاء أمر تصنيع مرتبط بهذا الطلب فوراً لخط الإنتاج.</li>
+<li class="manual-li"><strong>الطباعة الفاخرة:</strong> طباعة فواتير رسمية متضمنة شعار المصنع، السجل التجاري، والبطاقة الضريبية.</li>
+<hr class="manual-hr" />
+<h3 class="manual-h3">شاشة 5: أوامر الشغل وخطوط الإنتاج والتصنيع</h3>
+<p class="manual-p"><strong>المسار في النظام:</strong> <code class="manual-code">https://jinnworx-erp.local/work-orders</code></p>
+<p class="manual-p"><strong>الغرض التشغيلي:</strong> المتابعة الميدانية لخطوط الإنتاج في المصنع، وتوزيع الشغل على ماكينات التضليع، الطباعة الفليكسو، التكسير الدوار أو المسطح، وتجميع الكراتين، مع تسجيل كميات التالف والمقبول.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — أوامر الشغل وخطوط الإنتاج والتصنيع</span>
+            </div>
+            <img src="/tutorials/screens/work_orders.png" alt="أوامر الشغل وخطوط الإنتاج والتصنيع" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 أوامر الشغل وخطوط الإنتاج والتصنيع</figcaption>
+        </div>
+      
+<h4 class="manual-h4">مراحل العمل في أمر الشغل:</h4>
+<li class="manual-li"><strong>الحالة التشغيلية:</strong> (قيد الانتظار Pending ➔ قيد التصنيع In Progress ➔ مكتمل Completed ➔ ملغي).</li>
+<li class="manual-li"><strong>حساب الهالك والتالف (Scrap Rate):</strong> حصر نسبة التالف أثناء بدء التشغيل واحتساب تكلفتها ضمن مصاريف التشغيل.</li>
+<li class="manual-li"><strong>التخصيم المخزني التلقائي:</strong> تحديث سجلات الإنتاج وإيداع الكراتين التامة في مخزن المنتج الجاهز للشحن.</li>
+<hr class="manual-hr" />
+<h3 class="manual-h3">شاشة 6: إدارة العاملين والإنتاج بالقطعة</h3>
+<p class="manual-p"><strong>المسار في النظام:</strong> <code class="manual-code">https://jinnworx-erp.local/employees</code></p>
+<p class="manual-p"><strong>الغرض التشغيلي:</strong> متابعة عمال الإنتاج والفنيين والإداريين، تسجيل الحضور والانصراف، احتساب الإنتاجية بالقطعة على الماكينات، وتصفية السلف والأجور الشهرية.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — إدارة العاملين والإنتاج بالقطعة</span>
+            </div>
+            <img src="/tutorials/screens/employees.png" alt="إدارة العاملين والإنتاج بالقطعة" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 إدارة العاملين والإنتاج بالقطعة</figcaption>
+        </div>
+      
+<hr class="manual-hr" />
+<h3 class="manual-h3">شاشة 7: إعدادات المصنع والصلاحيات</h3>
+<p class="manual-p"><strong>المسار في النظام:</strong> <code class="manual-code">https://jinnworx-erp.local/settings</code></p>
+<p class="manual-p"><strong>الغرض التشغيلي:</strong> تهيئة بيانات المنشأة الرسمية (الاسم التجاري، الشعار، الرقم الضريبي، الهاتف)، ضبط مصفوفة صلاحيات المستخدمين (RBAC)، وإدارة خادم المزامنة السحابي وقواعد بيانات MySQL.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — إعدادات المصنع والصلاحيات والربط السحابي</span>
+            </div>
+            <img src="/tutorials/screens/settings.png" alt="إعدادات المصنع والصلاحيات والربط السحابي" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 إعدادات المصنع والصلاحيات والربط السحابي</figcaption>
+        </div>
+      
+<hr class="manual-hr" />
+<h3 class="manual-h3">شاشة 8: التقارير التنفيذية والمالية</h3>
+<p class="manual-p"><strong>المسار في النظام:</strong> <code class="manual-code">https://jinnworx-erp.local/reports</code></p>
+<p class="manual-p"><strong>الغرض التشغيلي:</strong> المركز التحليلي المالي المتكامل للمصنع: التدفقات النقدية، صافي الأرباح، قائمة الدخل، حسابات العملاء والموردين، وتصدير التقارير الرسمية لـ Excel والطباعة.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — التقارير التنفيذية والتحليلات المالية الشاملة</span>
+            </div>
+            <img src="/tutorials/screens/reports.png" alt="التقارير التنفيذية والتحليلات المالية الشاملة" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 التقارير التنفيذية والتحليلات المالية الشاملة</figcaption>
+        </div>
+      
+<hr class="manual-hr" />
+<h3 class="manual-h3">شاشة 9: مشتريات الخامات وحسابات الموردين</h3>
+<p class="manual-p"><strong>المسار في النظام:</strong> <code class="manual-code">https://jinnworx-erp.local/purchases</code></p>
+<p class="manual-p"><strong>الغرض التشغيلي:</strong> تسجيل عقود شراء رولات الورق والغراء ومستلزمات الإنتاج، جدولة دفعات الموردين، وإدارة المديونيات المستحقة.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — مشتريات الخامات وحسابات الموردين</span>
+            </div>
+            <img src="/tutorials/screens/purchases.png" alt="مشتريات الخامات وحسابات الموردين" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 مشتريات الخامات وحسابات الموردين</figcaption>
+        </div>
+      
+<hr class="manual-hr" />
+<h2 class="manual-h2">3. دورة حياة أمر الشغل والتصنيع</h2>
+<p class="manual-p">توضح الخريطة التالية المسار المتكامل للعمليات من لحظة استفسار العميل وحتى إغلاق الحساب البنكي:</p>
+<p class="manual-p">graph TD</p>
+<p class="manual-p">    A["1. استفسار العميل وأبعاد الكرتونة"] --> B["2. حاسبة التسعير وعرض السعر (Quotations)"]</p>
+<p class="manual-p">    B -->|موافقة العميل| C["3. أمر البيع وتحصيل الدفعة المقدمة (Sales)"]</p>
+<p class="manual-p">    C --> D{"4. فحص كفاية مخزون الخامات (Inventory)"}</p>
+<p class="manual-p">    D -- "رصيد غير كافٍ" --> E["إصدار أمر شراء خامات (Purchases)"]</p>
+<p class="manual-p">    E --> F["استلام الخامات وزيادة المخزن"]</p>
+<p class="manual-p">    F --> G["5. إصدار أمر الشغل لخط الإنتاج (Work Order)"]</p>
+<p class="manual-p">    D -- "رصيد كافٍ" --> G</p>
+<p class="manual-p">    G --> H["6. مراحل الإنتاج: التضليع ➔ الطباعة ➔ التكسير ➔ اللصق"]</p>
+<p class="manual-p">    H --> I["7. تطبيق الخصم الآلي للخامات (BOM) وحصر التالف"]</p>
+<p class="manual-p">    I --> J["8. فحص الجودة والتسليم لمخزن المنتج التام"]</p>
+<p class="manual-p">    J --> K["9. إصدار إذن الشحن وفاتورة التسليم (Shipping)"]</p>
+<p class="manual-p">    K --> L["10. تحصيل المتبقي وإقفال القيد المحاسبي"]</p>
+<h3 class="manual-h3">تفاصيل المراحل التشغيلية:</h3>
+<div class="manual-step"><strong>1.</strong> <strong>استلام المواصفات:</strong> إدخال الأبعاد بالملليمتر (الطول × العرض × الارتفاع)، نوع التضليع (B أو C أو BC)، وعدد ألوان الطباعة.</div>
+<div class="manual-step"><strong>2.</strong> <strong>تسعير عرض السعر:</strong> احتساب وزن الكرتونة = المسطح الإجمالي × أوزان طبقات الورق بالجرام (GSM) + نسبة الغراء.</div>
+<div class="manual-step"><strong>3.</strong> <strong>أمر البيع:</strong> تحديد شروط الدفع، موقع التسليم، ومواعيد التوريد وجدولة الدفعات.</div>
+<div class="manual-step"><strong>4.</strong> <strong>أمر الشغل:</strong> استخراج كرت تشغيل ورقي أو رقمي يوضح للماكينة: عرض الرول المطلوب، سكاكين التقطيع، وقوالب التكسير (Dies).</div>
+<div class="manual-step"><strong>5.</strong> <strong>إنهاء التشغيل:</strong> إدخال الكمية الفعلية المنتجة، حساب إنتاجية كل عامل لتسجيل استحقاقات القطعة، وإصدار إذن الشحن.</div>
+<hr class="manual-hr" />
+<h2 class="manual-h2">4. الدليل المحاسبي الشامل والقيود الآلية</h2>
+<p class="manual-p">تعتمد منظومة Jinn Worx دليلاً محاسبياً قياسياً للصناعات التحويلية يقوم بإنشاء قيود اليومية آلياً وفق معايير المحاسبة المزدوجة (Double-Entry Bookkeeping).</p>
+<h3 class="manual-h3">دليل الحسابات القياسي للمصنع:</h3>
+<li class="manual-li"><strong>1000 - الأصول (Assets):</strong></li>
+<p class="manual-p">  * <code class="manual-code">1110</code> النقدية في الخزينة والصناديق</p>
+<p class="manual-p">  * <code class="manual-code">1120</code> الحسابات البنكية والمدفوعات الإلكترونية</p>
+<p class="manual-p">  * <code class="manual-code">1130</code> حسابات العملاء والمدينون (Accounts Receivable)</p>
+<p class="manual-p">  * <code class="manual-code">1140</code> مخزون المواد الخام (ورق، غراء، أحبار)</p>
+<p class="manual-p">  * <code class="manual-code">1150</code> إنتاج تحت التشغيل (Work-in-Progress - WIP)</p>
+<p class="manual-p">  * <code class="manual-code">1160</code> مخزون المنتجات التامة الصنع (Finished Goods)</p>
+<p class="manual-p">  * <code class="manual-code">1200</code> الأصول الثابتة (خطوط إنتاج، ماكينات طباعة، سيارات شحن)</p>
+<li class="manual-li"><strong>2000 - الخصوم والالتزامات (Liabilities):</strong></li>
+<p class="manual-p">  * <code class="manual-code">2110</code> حسابات الموردين والدائنون (Accounts Payable)</p>
+<p class="manual-p">  * <code class="manual-code">2120</code> ضريبة القيمة المضافة المستحقة (VAT Output)</p>
+<p class="manual-p">  * <code class="manual-code">2130</code> مستحقات الرواتب والأجور غير المدفوعة</p>
+<li class="manual-li"><strong>3000 - حقوق الملكية (Equity):</strong></li>
+<p class="manual-p">  * <code class="manual-code">3110</code> رأس المال العامل للمصنع</p>
+<p class="manual-p">  * <code class="manual-code">3120</code> الأرباح المحتجزة / المرحلة</p>
+<p class="manual-p">  * <code class="manual-code">3130</code> جاري وحسابات مسحوبات الشركاء والمالكين (Owner Withdrawals)</p>
+<li class="manual-li"><strong>4000 - الإيرادات (Revenues):</strong></li>
+<p class="manual-p">  * <code class="manual-code">4110</code> إيرادات مبيعات كراتين التعبئة والتغليف</p>
+<p class="manual-p">  * <code class="manual-code">4120</code> إيرادات خدمات شحن ونقل المنتجات</p>
+<p class="manual-p">  * <code class="manual-code">4130</code> إيرادات بيع عوادم وتالف الورق والكرتون (Scrap Sales)</p>
+<li class="manual-li"><strong>5000 - المصروفات وتكاليف الإنتاج (Expenses & COGS):</strong></li>
+<p class="manual-p">  * <code class="manual-code">5110</code> تكلفة البضاعة المباعة (خامات كرتون مستهلكة)</p>
+<p class="manual-p">  * <code class="manual-code">5120</code> أجور عمال الإنتاج المباشرة (Direct Labor)</p>
+<p class="manual-p">  * <code class="manual-code">5210</code> مصاريف الطاقة والكهرباء والوقود الصناعي</p>
+<p class="manual-p">  * <code class="manual-code">5220</code> صيانة الماكينات وقطع الغيار</p>
+<p class="manual-p">  * <code class="manual-code">5310</code> إيجار مبنى المصنع والمستودعات</p>
+<p class="manual-p">  * <code class="manual-code">5320</code> الرواتب الإدارية والمصاريف العمومية</p>
+<hr class="manual-hr" />
+<h3 class="manual-h3">جدول القيود المحاسبية الآلية الرئيسية:</h3>
+<div class="table-container"><table class="manual-table">
+<thead><tr><th>العملية</th><th>الطرف المدين (Debit)</th><th>الطرف الدائن (Credit)</th><th>الأثر المالي والمحاسبي</th></tr></thead><tbody>
+<tr><td><strong>شراء خامات كرتون بالآجل</strong></td><td>ح/ مخزون المواد الخام (<code class="manual-code">1140</code>)</td><td>ح/ الموردين (<code class="manual-code">2110</code>)</td><td>زيادة أصول المخزن وزيادة التزامات الموردين</td></tr>
+<tr><td><strong>سداد دفعة للمورد</strong></td><td>ح/ الموردين (<code class="manual-code">2110</code>)</td><td>ح/ النقدية أو البنك (<code class="manual-code">1110</code>/<code class="manual-code">1120</code>)</td><td>تخفيض التزامات المورد وتخفيض النقدية</td></tr>
+<tr><td><strong>صرف خامات لأمر الشغل (BOM)</strong></td><td>ح/ إنتاج تحت التشغيل WIP (<code class="manual-code">1150</code>)</td><td>ح/ مخزون المواد الخام (<code class="manual-code">1140</code>)</td><td>تحويل الخامات إلى خط الإنتاج</td></tr>
+<tr><td><strong>إتمام أمر الشغل وتخزينه</strong></td><td>ح/ مخزون تام الصنع (<code class="manual-code">1160</code>)</td><td>ح/ إنتاج تحت التشغيل WIP (<code class="manual-code">1150</code>)</td><td>رسملة تكلفة التشغيل كمنتج تام</td></tr>
+<tr><td><strong>بيع كرتون وتحصيل دفعة نقدية</strong></td><td>ح/ الخزينة (<code class="manual-code">1110</code>) + ح/ العملاء (<code class="manual-code">1130</code>)</td><td>ح/ إيرادات المبيعات (<code class="manual-code">4110</code>) + ح/ ضريبة القيمة المضافة (<code class="manual-code">2120</code>)</td><td>إثبات إيراد المبيعات والمديونية والنقدية</td></tr>
+<tr><td><strong>إثبات تكلفة البضاعة المسلمة</strong></td><td>ح/ تكلفة البضاعة المباعة COGS (<code class="manual-code">5110</code>)</td><td>ح/ مخزون تام الصنع (<code class="manual-code">1160</code>)</td><td>تحميل التكلفة ومقابلة الإيراد في قائمة الدخل</td></tr>
+<tr><td><strong>تسجيل مسحوبات المالك</strong></td><td>ح/ مسحوبات المالك (<code class="manual-code">3130</code>)</td><td>ح/ الخزينة أو البنك (<code class="manual-code">1110</code>/<code class="manual-code">1120</code>)</td><td>تخفيض سيولة المصنع دون التأثير على صافي أرباح التشغيل</td></tr>
+</tbody></table></div>
+<hr class="manual-hr" />
+<h2 class="manual-h2">5. معادلات الرواتب والإنتاج بالقطعة</h2>
+<p class="manual-p">توفر المنظومة نظامين متطورين لاحتساب أجور العاملين:</p>
+<h3 class="manual-h3">أ) نظام الإنتاج بالقطعة (Piece-Rate Payroll)</h3>
+<p class="manual-p">يستخدم لعمال ماكينات التكسير، الطباعة، وطي الكراتين:</p>
+<p class="manual-p">$$\text{الاستحقاق اليومي} = \sum (\text{عدد الكراتين الصالحة المنجزة} \times \text{سعر القطعة المحدد للماكينة})$$</p>
+<h3 class="manual-h3">ب) نظام الراتب الشهري وساعات العمل الإضافي</h3>
+<p class="manual-p">$$\text{صافي الراتب} = \text{الراتب الأساسي} + \text{بدل الإضافي} - \text{خصم الغياب والتأخير} - \text{السلف المستردة}$$</p>
+<li class="manual-li"><strong>ساعة العمل العادية:</strong> $\text{الراتب الأساسي} \div (30 \times 8) = \text{أجر الساعة}$</li>
+<li class="manual-li"><strong>ساعة العمل الإضافي:</strong> $\text{أجر الساعة} \times 1.5$ (أو $2.0$ في أيام العطلات الرسمية).</li>
+<li class="manual-li"><strong>خصم الغياب:</strong> $\text{أيام الغياب بدون إذن} \times (\text{الراتب الأساسي} \div 30) \times 1.5$.</li>
+<hr class="manual-hr" />
+<h2 class="manual-h2">6. البنية التقنية والمزامنة السحابية</h2>
+<li class="manual-li"><strong>قاعدة بيانات العميل (Dexie IndexedDB):</strong> يتم حفظ وتشفير كافة العمليات محلياً على جهاز المستخدم لضمان سرعة استجابة فائقة والعمل عند انقطاع الإنترنت.</li>
+<li class="manual-li"><strong>محرك المزامنة الذكي (Smart Cloud Sync Engine):</strong></li>
+<p class="manual-p">  - فحص دوري لحالة الاتصال بالسيرفر المركزي.</p>
+<p class="manual-p">  - إرسال العمليات المنفذة في طابور مهام (Sync Queue) مع حل التعارضات آلياً (Server Timestamp Wins).</p>
+<p class="manual-p">  - إمكانية أخذ نسخة احتياطية محلية بصيغة JSON بضغطة زر وتصديرها للأمان.</p>
+<hr class="manual-hr" />
+<p class="manual-p"><strong>نهاية الدليل التشغيلي والمحاسبي المصور — جن ووركس (Jinn Worx Enterprise)</strong></p>
+    </div>
+
+    <div id="section-en" class="lang-section" dir="ltr" style="font-family: 'Inter', sans-serif;">
+      <h1 class="manual-h1">Complete Illustrated Operations, Accounting & Cloud Sync Manual for Jinn Worx ERP</h1>
+<p class="manual-p"><strong>Certified 2026 Enterprise Edition — Comprehensive Visual & Technical System Guide</strong></p>
+<hr class="manual-hr" />
+<h2 class="manual-h2">Table of Contents</h2>
+<div class="manual-step"><strong>1.</strong> <a href="#1-system-overview" class="manual-link">System Overview: Jinn Worx for Corrugated Packaging Plants</a></div>
+<div class="manual-step"><strong>2.</strong> <a href="#2-visual-screen-by-screen-guide" class="manual-link">Visual Screen-by-Screen Guide (Authentic System Captures)</a></div>
+<p class="manual-p">   - <a href="#screen-1-executive-dashboard" class="manual-link">Screen 1: Executive Dashboard (/)</a></p>
+<p class="manual-p">   - <a href="#screen-2-raw-materials--warehouse-inventory" class="manual-link">Screen 2: Raw Materials & Warehouse Inventory (/inventory)</a></p>
+<p class="manual-p">   - <a href="#screen-3-engineering-quotations--packaging-estimator" class="manual-link">Screen 3: Engineering Quotations & Packaging Estimator (/quotations)</a></p>
+<p class="manual-p">   - <a href="#screen-4-sales-orders--customer-billing" class="manual-link">Screen 4: Sales Orders & Customer Billing (/sales)</a></p>
+<p class="manual-p">   - <a href="#screen-5-factory-work-orders--production-lines" class="manual-link">Screen 5: Factory Work Orders & Production Lines (/work-orders)</a></p>
+<p class="manual-p">   - <a href="#screen-6-employees--piece-rate-production" class="manual-link">Screen 6: Employees & Piece-Rate Production (/employees)</a></p>
+<p class="manual-p">   - <a href="#screen-7-plant-configuration-rbac--tax-settings" class="manual-link">Screen 7: Plant Configuration, RBAC & Tax Settings (/settings)</a></p>
+<p class="manual-p">   - <a href="#screen-8-executive-financial--operational-reports" class="manual-link">Screen 8: Executive Financial & Operational Reports (/reports)</a></p>
+<p class="manual-p">   - <a href="#screen-9-raw-material-purchasing--vendor-accounts" class="manual-link">Screen 9: Raw Material Purchasing & Vendor Accounts (/purchases)</a></p>
+<div class="manual-step"><strong>3.</strong> <a href="#3-factory-production-lifecycle--order-journey" class="manual-link">Factory Production Lifecycle & Order Journey (Step-by-Step)</a></div>
+<div class="manual-step"><strong>4.</strong> <a href="#4-double-entry-accounting-engine--automatic-ledger-postings" class="manual-link">Double-Entry Accounting Engine & Automatic Ledger Postings</a></div>
+<div class="manual-step"><strong>5.</strong> <a href="#5-payroll-piece-rate--overtime-computational-formulas" class="manual-link">Payroll, Piece-Rate & Overtime Computational Formulas</a></div>
+<div class="manual-step"><strong>6.</strong> <a href="#6-offline-first-architecture--smart-cloud-sync-engine" class="manual-link">Offline-First Architecture & Smart Cloud Sync Engine</a></div>
+<hr class="manual-hr" />
+<h2 class="manual-h2">1. System Overview</h2>
+<p class="manual-p"><strong>Jinn Worx ERP</strong> is an industry-grade manufacturing execution and enterprise resource planning system engineered exclusively for corrugated carton plants, packaging converters, and folding carton manufacturers.</p>
+<h3 class="manual-h3">Key Functional Pillars:</h3>
+<li class="manual-li"><strong>Real-Time Packaging Geometry (3D Carton Math):</strong> Instant calculation of sheet blank sizes, paper GSM requirements, adhesive/ink volume consumption, and gross margin per box based on custom (Length × Width × Height) inputs.</li>
+<li class="manual-li"><strong>Automated Bill of Materials (BOM) Deductions:</strong> Instant decrementing of raw paper rolls (Kraft, Duplex, Fluting), adhesives, and printing inks upon completion of plant work orders.</li>
+<li class="manual-li"><strong>Integrated Double-Entry Accounting Engine:</strong> Real-time ledger entries for sales transactions, raw material procurement, direct labor allocation, factory overheads, and owner equity withdrawals.</li>
+<li class="manual-li"><strong>Resilient Offline-First Architecture:</strong> Plant floor operations continue uninterrupted with client-side IndexedDB persistence, syncing automatically with cloud MySQL servers whenever connectivity is detected.</li>
+<hr class="manual-hr" />
+<h2 class="manual-h2">2. Visual Screen-by-Screen Guide</h2>
+<h3 class="manual-h3">Screen 1: Executive Dashboard</h3>
+<p class="manual-p"><strong>Route:</strong> <code class="manual-code">https://jinnworx-erp.local/</code></p>
+<p class="manual-p"><strong>Purpose:</strong> Real-time plant command center providing directors and plant managers with consolidated performance metrics (KPIs), gross revenue, net cash margins, operating expenditures, and active work orders.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — Executive Plant Dashboard</span>
+            </div>
+            <img src="/tutorials/screens/dashboard.png" alt="Executive Plant Dashboard" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 Executive Plant Dashboard</figcaption>
+        </div>
+      
+<h4 class="manual-h4">Live KPIs & Features:</h4>
+<div class="table-container"><table class="manual-table">
+<thead><tr><th>Card / Metric</th><th>Operational Role & Accounting Impact</th></tr></thead><tbody>
+<tr><td><strong>Gross Sales Orders</strong></td><td>Total confirmed sales contract value along with cash collected to date</td></tr>
+<tr><td><strong>Net Cash Profit</strong></td><td>Realized net operating income after deducting raw materials & operating expenses</td></tr>
+<tr><td><strong>Procurement & Payables</strong></td><td>Aggregate value of purchase orders and remaining accounts payable (A/P)</td></tr>
+<tr><td><strong>Active Production Orders</strong></td><td>Active work orders currently queued or executing on corrugators and die-cutters</td></tr>
+<tr><td><strong>Low-Stock Inventory Alerts</strong></td><td>Visual alerts for raw materials approaching or below safety buffer thresholds</td></tr>
+<tr><td><strong>Quick Action Triggers</strong></td><td>Instant shortcuts to create quotes, sales orders, work orders, log production, and add materials</td></tr>
+</tbody></table></div>
+<hr class="manual-hr" />
+<h3 class="manual-h3">Screen 2: Raw Materials & Warehouse Inventory</h3>
+<p class="manual-p"><strong>Route:</strong> <code class="manual-code">https://jinnworx-erp.local/inventory</code></p>
+<p class="manual-p"><strong>Purpose:</strong> Warehouse stock control for paper reels (Kraft, Duplex, Testliner), starch adhesives, and flexographic inks, with automated reorder warnings.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — Raw Materials & Warehouse Inventory</span>
+            </div>
+            <img src="/tutorials/screens/inventory.png" alt="Raw Materials & Warehouse Inventory" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 Raw Materials & Warehouse Inventory</figcaption>
+        </div>
+      
+<h4 class="manual-h4">Key Inventory Capabilities:</h4>
+<li class="manual-li"><strong>Multi-Unit Precision:</strong> Full support for Tons, Kilograms, Rolls, Liters, Barrels, and Units.</li>
+<li class="manual-li"><strong>Procurement Linkage:</strong> Automatically updates inventory levels and weighted-average cost when vendor shipments arrive.</li>
+<li class="manual-li"><strong>Automated BOM Deductions:</strong> Work order completion calculates consumed paper reels and decrements inventory in real time.</li>
+<li class="manual-li"><strong>Instant Stock Exports:</strong> One-click CSV and printable stock audit reports for plant controllers.</li>
+<hr class="manual-hr" />
+<h3 class="manual-h3">Screen 3: Engineering Quotations & Packaging Estimator</h3>
+<p class="manual-p"><strong>Route:</strong> <code class="manual-code">https://jinnworx-erp.local/quotations</code></p>
+<p class="manual-p"><strong>Purpose:</strong> Parametric estimator calculating precise sheet dimensions, fluting grade combinations, and material costs to produce official customer PDF proposals in seconds.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — Packaging Engineering Quotations</span>
+            </div>
+            <img src="/tutorials/screens/quotations.png" alt="Packaging Engineering Quotations" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 Packaging Engineering Quotations</figcaption>
+        </div>
+      
+<h4 class="manual-h4">Engineering Features:</h4>
+<div class="manual-step"><strong>1.</strong> <strong>Net & Gross Blank Geometry:</strong> Computes carton board surface areas including glue tab allowances and trimming slots.</div>
+<div class="manual-step"><strong>2.</strong> <strong>Fluting Profiles:</strong> Tailored calculations for Single Wall (B, C, E) and Double Wall (BC, EE) fluting.</div>
+<div class="manual-step"><strong>3.</strong> <strong>Transparent Cost Build-up:</strong> Detailed breakdown of paper weight, ink coverage, labor overhead, and targeted profit margins.</div>
+<div class="manual-step"><strong>4.</strong> <strong>Seamless Sales Conversion:</strong> Approved proposals convert into live Sales Orders with a single click.</div>
+<hr class="manual-hr" />
+<h3 class="manual-h3">Screen 4: Sales Orders & Customer Billing</h3>
+<p class="manual-p"><strong>Route:</strong> <code class="manual-code">https://jinnworx-erp.local/sales</code></p>
+<p class="manual-p"><strong>Purpose:</strong> Manages client supply agreements, tracks advance deposits, and issues compliant tax invoices complete with machine-readable QR codes.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — Sales Orders & Customer Invoices</span>
+            </div>
+            <img src="/tutorials/screens/sales.png" alt="Sales Orders & Customer Invoices" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 Sales Orders & Customer Invoices</figcaption>
+        </div>
+      
+<hr class="manual-hr" />
+<h3 class="manual-h3">Screen 5: Factory Work Orders & Production Lines</h3>
+<p class="manual-p"><strong>Route:</strong> <code class="manual-code">https://jinnworx-erp.local/work-orders</code></p>
+<p class="manual-p"><strong>Purpose:</strong> Real-time job routing across corrugators, flexo printers, die-cutters, and carton gluer-stitchers, tracking scrap rates and output batches.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — Factory Work Orders & Machinery Tracking</span>
+            </div>
+            <img src="/tutorials/screens/work_orders.png" alt="Factory Work Orders & Machinery Tracking" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 Factory Work Orders & Machinery Tracking</figcaption>
+        </div>
+      
+<hr class="manual-hr" />
+<h3 class="manual-h3">Screen 6: Employees & Piece-Rate Production</h3>
+<p class="manual-p"><strong>Route:</strong> <code class="manual-code">https://jinnworx-erp.local/employees</code></p>
+<p class="manual-p"><strong>Purpose:</strong> Plant workforce management, machine shift tracking, piece-rate earnings computation, overtime logs, and salary disbursements.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — Employees & Piece-Rate Production Management</span>
+            </div>
+            <img src="/tutorials/screens/employees.png" alt="Employees & Piece-Rate Production Management" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 Employees & Piece-Rate Production Management</figcaption>
+        </div>
+      
+<hr class="manual-hr" />
+<h3 class="manual-h3">Screen 7: Plant Configuration, RBAC & Tax Settings</h3>
+<p class="manual-p"><strong>Route:</strong> <code class="manual-code">https://jinnworx-erp.local/settings</code></p>
+<p class="manual-p"><strong>Purpose:</strong> Configures company metadata, tax registration numbers (TRN), user access roles (RBAC), and cloud synchronization credentials.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — Plant Configuration, RBAC & Cloud Settings</span>
+            </div>
+            <img src="/tutorials/screens/settings.png" alt="Plant Configuration, RBAC & Cloud Settings" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 Plant Configuration, RBAC & Cloud Settings</figcaption>
+        </div>
+      
+<hr class="manual-hr" />
+<h3 class="manual-h3">Screen 8: Executive Financial & Operational Reports</h3>
+<p class="manual-p"><strong>Route:</strong> <code class="manual-code">https://jinnworx-erp.local/reports</code></p>
+<p class="manual-p"><strong>Purpose:</strong> Executive financial intelligence dashboard: real-time cash flow velocities, gross margins, accounts receivable aging, and audited financial statements.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — Executive Financial & Operational Reports</span>
+            </div>
+            <img src="/tutorials/screens/reports.png" alt="Executive Financial & Operational Reports" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 Executive Financial & Operational Reports</figcaption>
+        </div>
+      
+<hr class="manual-hr" />
+<h3 class="manual-h3">Screen 9: Raw Material Purchasing & Vendor Accounts</h3>
+<p class="manual-p"><strong>Route:</strong> <code class="manual-code">https://jinnworx-erp.local/purchases</code></p>
+<p class="manual-p"><strong>Purpose:</strong> Procurement contracts for paper rolls, adhesives, and spare parts, with scheduled installment tracking and accounts payable (A/P) ledgers.</p>
+
+        <div class="manual-figure">
+          <div class="manual-window">
+            <div class="manual-window-bar">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="manual-window-title">Jinn Worx ERP — Raw Material Purchasing & Vendor Accounts</span>
+            </div>
+            <img src="/tutorials/screens/purchases.png" alt="Raw Material Purchasing & Vendor Accounts" class="manual-img" />
+          </div>
+          <figcaption class="manual-caption">📸 Raw Material Purchasing & Vendor Accounts</figcaption>
+        </div>
+      
+<hr class="manual-hr" />
+<h2 class="manual-h2">3. Factory Production Lifecycle & Order Journey</h2>
+<p class="manual-p">graph TD</p>
+<p class="manual-p">    A["1. Customer Specs (L x W x H mm)"] --> B["2. Engineering Quotation & Costing"]</p>
+<p class="manual-p">    B -->|Customer Acceptance| C["3. Confirmed Sales Order & Deposit"]</p>
+<p class="manual-p">    C --> D{"4. Raw Material Inventory Check"}</p>
+<p class="manual-p">    D -- "Insufficient Stock" --> E["Issue Purchase Order (Purchases)"]</p>
+<p class="manual-p">    E --> F["Receive Paper Rolls & Starch"]</p>
+<p class="manual-p">    F --> G["5. Issue Factory Work Order (Production)"]</p>
+<p class="manual-p">    D -- "Stock Ready" --> G</p>
+<p class="manual-p">    G --> H["6. Operations: Corrugating ➔ Printing ➔ Die-Cutting ➔ Stitching"]</p>
+<p class="manual-p">    H --> I["7. Automated BOM Stock Deduction & Scrap Log"]</p>
+<p class="manual-p">    I --> J["8. Quality Control & Transfer to Finished Goods"]</p>
+<p class="manual-p">    J --> K["9. Dispatch & Shipping Note Generation"]</p>
+<p class="manual-p">    K --> L["10. Final Invoicing, Payment Collection & Ledger Reconciliation"]</p>
+<hr class="manual-hr" />
+<h2 class="manual-h2">4. Double-Entry Accounting Engine & Automatic Ledger Postings</h2>
+<p class="manual-p">Jinn Worx ERP maintains a standard manufacturing chart of accounts with fully automated double-entry postings:</p>
+<h3 class="manual-h3">Chart of Accounts:</h3>
+<li class="manual-li"><strong>1000 - Assets:</strong></li>
+<p class="manual-p">  * <code class="manual-code">1110</code> Plant Petty Cash & Vaults</p>
+<p class="manual-p">  * <code class="manual-code">1120</code> Commercial Bank Accounts</p>
+<p class="manual-p">  * <code class="manual-code">1130</code> Accounts Receivable (A/R) - Trade Debtors</p>
+<p class="manual-p">  * <code class="manual-code">1140</code> Raw Materials Inventory (Paper Rolls, Starch, Inks)</p>
+<p class="manual-p">  * <code class="manual-code">1150</code> Work-in-Progress Inventory (WIP)</p>
+<p class="manual-p">  * <code class="manual-code">1160</code> Finished Goods Inventory</p>
+<p class="manual-p">  * <code class="manual-code">1200</code> Plant Machinery & Fixed Assets</p>
+<li class="manual-li"><strong>2000 - Liabilities:</strong></li>
+<p class="manual-p">  * <code class="manual-code">2110</code> Accounts Payable (A/P) - Raw Material Vendors</p>
+<p class="manual-p">  * <code class="manual-code">2120</code> Output Value Added Tax (VAT Payable)</p>
+<p class="manual-p">  * <code class="manual-code">2130</code> Accrued Factory Payroll</p>
+<li class="manual-li"><strong>3000 - Equity:</strong></li>
+<p class="manual-p">  * <code class="manual-code">3110</code> Contributed Capital</p>
+<p class="manual-p">  * <code class="manual-code">3120</code> Retained Earnings</p>
+<p class="manual-p">  * <code class="manual-code">3130</code> Owner Equity Withdrawals</p>
+<li class="manual-li"><strong>4000 - Revenues:</strong></li>
+<p class="manual-p">  * <code class="manual-code">4110</code> Packaging Sales Revenue</p>
+<p class="manual-p">  * <code class="manual-code">4120</code> Freight & Dispatch Service Income</p>
+<p class="manual-p">  * <code class="manual-code">4130</code> Scrap & Paper Trim Sales</p>
+<li class="manual-li"><strong>5000 - Operating Expenses & COGS:</strong></li>
+<p class="manual-p">  * <code class="manual-code">5110</code> Cost of Goods Sold (Raw Paper Consumed)</p>
+<p class="manual-p">  * <code class="manual-code">5120</code> Direct Machine Operator Labor</p>
+<p class="manual-p">  * <code class="manual-code">5210</code> Industrial Electricity & Gas</p>
+<p class="manual-p">  * <code class="manual-code">5220</code> Tooling & Machinery Maintenance</p>
+<p class="manual-p">  * <code class="manual-code">5310</code> Factory Facility Lease</p>
+<hr class="manual-hr" />
+<h3 class="manual-h3">Core Automated Double-Entry Journal Table:</h3>
+<div class="table-container"><table class="manual-table">
+<thead><tr><th>Event Trigger</th><th>Debit Account</th><th>Credit Account</th><th>Accounting Impact</th></tr></thead><tbody>
+<tr><td><strong>Credit Raw Material Purchase</strong></td><td><code class="manual-code">1140</code> Raw Materials Inventory</td><td><code class="manual-code">2110</code> Accounts Payable (A/P)</td><td>Increases inventory asset; increases supplier liability</td></tr>
+<tr><td><strong>Supplier Payment</strong></td><td><code class="manual-code">2110</code> Accounts Payable (A/P)</td><td><code class="manual-code">1110</code>/<code class="manual-code">1120</code> Cash / Bank</td><td>Decreases supplier liability; decreases cash asset</td></tr>
+<tr><td><strong>Raw Material Issue to Work Order</strong></td><td><code class="manual-code">1150</code> Work-in-Progress (WIP)</td><td><code class="manual-code">1140</code> Raw Materials Inventory</td><td>Capitalizes raw materials into active production</td></tr>
+<tr><td><strong>Work Order Completion</strong></td><td><code class="manual-code">1160</code> Finished Goods Inventory</td><td><code class="manual-code">1150</code> Work-in-Progress (WIP)</td><td>Reclassifies completed orders into finished inventory</td></tr>
+<tr><td><strong>Sales Order & Down Payment</strong></td><td><code class="manual-code">1110</code> Cash Vault + <code class="manual-code">1130</code> A/R</td><td><code class="manual-code">4110</code> Sales Revenue + <code class="manual-code">2120</code> VAT</td><td>Recognizes revenue, tax payable, cash, and receivables</td></tr>
+<tr><td><strong>Delivery & Cost of Goods Sold</strong></td><td><code class="manual-code">5110</code> Cost of Goods Sold (COGS)</td><td><code class="manual-code">1160</code> Finished Goods Inventory</td><td>Matches product costs directly against sales period</td></tr>
+<tr><td><strong>Owner Equity Withdrawal</strong></td><td><code class="manual-code">3130</code> Owner Withdrawals</td><td><code class="manual-code">1110</code>/<code class="manual-code">1120</code> Cash Vault / Bank</td><td>Reduces cash reserves without distorting net operating margins</td></tr>
+</tbody></table></div>
+<hr class="manual-hr" />
+<h2 class="manual-h2">5. Payroll, Piece-Rate & Overtime Computational Formulas</h2>
+<h3 class="manual-h3">A) Piece-Rate Factory Wage Calculation</h3>
+<p class="manual-p">For die-cutting, flexo printing, and box folder-gluer operators:</p>
+<p class="manual-p">$$\text{Gross Daily Piece Earnings} = \sum (\text{Certified Good Units Produced} \times \text{Rate Per Carton Piece})$$</p>
+<h3 class="manual-h3">B) Monthly Salaried Staff & Overtime Computation</h3>
+<p class="manual-p">$$\text{Net Pay} = \text{Base Salary} + \text{Overtime Pay} - \text{Absence Deductions} - \text{Loan Repayments}$$</p>
+<li class="manual-li"><strong>Standard Hourly Wage:</strong> $\text{Base Salary} \div (30 \times 8) = \text{Hourly Rate}$</li>
+<li class="manual-li"><strong>Overtime Hourly Multiplier:</strong> $\text{Hourly Rate} \times 1.5$ (or $2.0\times$ on statutory public holidays).</li>
+<li class="manual-li"><strong>Unexcused Absence Penalty:</strong> $\text{Absence Days} \times (\text{Base Salary} \div 30) \times 1.5$.</li>
+<hr class="manual-hr" />
+<h2 class="manual-h2">6. Offline-First Architecture & Smart Cloud Sync Engine</h2>
+<li class="manual-li"><strong>Local Dexie IndexedDB Cache:</strong> Complete zero-latency offline operation for plant staff regardless of internet connectivity.</li>
+<li class="manual-li"><strong>Smart Synchronization Queue:</strong> Transparent background syncing to remote MySQL instances with automatic conflict resolution.</li>
+<li class="manual-li"><strong>Encrypted Snapshot Backups:</strong> One-click JSON database backups for audit compliance and disaster recovery.</li>
+<hr class="manual-hr" />
+<p class="manual-p"><strong>End of Certified Operations & Accounting Illustrated Manual — Jinn Worx Enterprise</strong></p>
+    </div>
+  </main>
+
+  <script>
+    function toggleLanguage(lang) {
+      const arSec = document.getElementById('section-ar');
+      const enSec = document.getElementById('section-en');
+      if (lang === 'ar') {
+        arSec.classList.add('active');
+        enSec.classList.remove('active');
+        document.documentElement.lang = 'ar';
+        document.documentElement.dir = 'rtl';
+      } else {
+        enSec.classList.add('active');
+        arSec.classList.remove('active');
+        document.documentElement.lang = 'en';
+        document.documentElement.dir = 'ltr';
+      }
+    }
+  </script>
+
+</body>
+</html>

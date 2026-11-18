@@ -1,0 +1,1252 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cairo:wght@300;400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Monochrome Zinc / Black & White Theme System
+   ========================================================================== */
+
+:root {
+  /* Ultra Pack Light Tokens */
+  --background: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-hover: #F4F4F6;
+  --text-main: #09090B;
+  --text-muted: #71717A;
+  --border: #E4E4E7;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --secondary: #F4F4F6;
+  --secondary-foreground: #09090B;
+  --accent: #F4F4F6;
+  --accent-foreground: #09090B;
+  --danger: #DC2626;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: #E4E4E7;
+
+  /* macOS Table Shades Tokens (Light Mode) */
+  --table-header-bg: #F8FAFC;
+  --table-row-even: #FFFFFF;
+  --table-row-odd: #F9FAFB;
+  --table-row-hover: #EDF2F7;
+  --table-border: #E5E7EB;
+
+  /* shadcn/ui Standard Variables */
+  --foreground: #09090B;
+  --card: #FFFFFF;
+  --card-foreground: #09090B;
+  --popover: #FFFFFF;
+  --popover-foreground: #09090B;
+  --primary-foreground: #ffffff;
+  --muted: #F4F4F6;
+  --muted-foreground: #71717A;
+  --destructive: #DC2626;
+  --destructive-foreground: #FAFAFA;
+  --input: #E4E4E7;
+  --ring: #2563eb;
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Ultra Pack Dark Tokens */
+  --background: #09090B;
+  --surface: #121214;
+  --surface-hover: #1A1A1E;
+  --text-main: #FAFAFA;
+  --text-muted: #A1A1AA;
+  --border: #27272A;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --secondary: #1F1F23;
+  --secondary-foreground: #FAFAFA;
+  --accent: #1F1F23;
+  --accent-foreground: #FAFAFA;
+  --danger: #EF4444;
+  --glass-bg: rgba(18, 18, 20, 0.85);
+  --glass-border: #27272A;
+
+  /* macOS Table Shades Tokens (Dark Mode) */
+  --table-header-bg: #161619;
+  --table-row-even: #121214;
+  --table-row-odd: #18181B;
+  --table-row-hover: #222227;
+  --table-border: #27272A;
+
+  /* shadcn/ui Dark Variables */
+  --foreground: #FAFAFA;
+  --card: #121214;
+  --card-foreground: #FAFAFA;
+  --popover: #121214;
+  --popover-foreground: #FAFAFA;
+  --primary-foreground: #ffffff;
+  --muted: #1F1F23;
+  --muted-foreground: #A1A1AA;
+  --destructive: #EF4444;
+  --destructive-foreground: #FAFAFA;
+  --input: #27272A;
+  --ring: #2563eb;
+}
+
+/* Enhanced Modal Cards Contrast in Dark Mode (Screen Display) */
+.dark .profile-stat-box,
+.dark .detail-attr-card {
+  background-color: #18181b !important;
+  border-color: #2e2e33 !important;
+  color: #fafafa !important;
+}
+
+.dark .profile-overview-box,
+.dark .detail-attr-grid {
+  background-color: #131316 !important;
+  border-color: #27272a !important;
+}
+
+.dark .profile-stat-label {
+  color: #a1a1aa !important;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--background);
+  color: var(--text-main);
+  line-height: 1.5;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* RTL Support for Arabic */
+[dir="rtl"],
+[dir="rtl"] body,
+[dir="rtl"] input,
+[dir="rtl"] select,
+[dir="rtl"] textarea,
+[dir="rtl"] button {
+  font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* RTL Dropdown & Form Controls */
+[dir="rtl"] select {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Cairo', sans-serif;
+}
+
+[dir="rtl"] select option {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Cairo', sans-serif;
+}
+
+/* RTL Table Header Rows & Tables */
+[dir="rtl"] table {
+  direction: rtl;
+}
+
+[dir="rtl"] thead th {
+  text-align: right;
+  font-family: 'Cairo', sans-serif;
+}
+
+[dir="rtl"] thead th.text-center,
+[dir="rtl"] thead th[style*="center"] {
+  text-align: center !important;
+}
+
+/* ==========================================================================
+   macOS Table Grid Shades & Clean Hover System
+   ========================================================================== */
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+/* macOS Frosted Header */
+thead th {
+  background-color: var(--table-header-bg) !important;
+  color: var(--text-muted) !important;
+  font-size: 0.825rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border) !important;
+  vertical-align: middle;
+}
+
+/* macOS Zebra Striping (Alternating Row Shades) */
+tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--table-row-odd);
+}
+
+tbody tr:nth-child(odd) {
+  background-color: var(--table-row-even);
+}
+
+/* macOS Row Hover Highlight: Soft highlight, never dark */
+tbody tr:hover {
+  background-color: var(--table-row-hover) !important;
+}
+
+tbody tr:hover td {
+  color: var(--text-main);
+}
+
+tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  transition: color 0.15s ease;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.clickable-row:hover {
+  background-color: var(--table-row-hover) !important;
+}
+
+/* macOS Table Card Wrapper */
+.table-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+}
+
+.table-card table {
+  margin: 0;
+}
+
+/* Table Footer / Summary Rows (Grand Totals) */
+tfoot tr {
+  background-color: var(--table-header-bg) !important;
+}
+
+tfoot tr:hover {
+  background-color: var(--table-row-hover) !important;
+}
+
+tfoot td {
+  border-top: 2px solid var(--border) !important;
+  border-bottom: none !important;
+  padding: 0.85rem 1rem;
+  font-weight: 700;
+  color: var(--text-main) !important;
+}
+
+/* Document & Printable Paper Isolation:
+   Never apply dark-mode striping or dark-mode hover to document invoices or print previews */
+.print-doc,
+.print-doc table {
+  background-color: #ffffff !important;
+  color: #09090b !important;
+}
+
+.print-doc table thead tr th {
+  background-color: #18181b !important;
+  color: #ffffff !important;
+  border-color: #27272a !important;
+}
+
+.print-doc table tbody tr:nth-child(even) {
+  background-color: #f9f9fb !important;
+}
+
+.print-doc table tbody tr:nth-child(odd) {
+  background-color: #ffffff !important;
+}
+
+.print-doc table tbody tr:hover {
+  background-color: #f1f1f4 !important;
+}
+
+.print-doc table tbody tr td,
+.print-doc table tbody tr:hover td {
+  color: #09090b !important;
+}
+
+/* Layout */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  max-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+/* Custom Sleek Scrollbars */
+.sidebar-nav::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
+.modal-body-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track,
+.main-content::-webkit-scrollbar-track,
+.modal-body-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb,
+.modal-body-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover,
+.main-content::-webkit-scrollbar-thumb:hover,
+.modal-body-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.header {
+  height: 70px;
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  z-index: 10;
+}
+
+.page-content {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Common App Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.btn:hover {
+  background-color: var(--surface-hover);
+}
+
+.btn-primary {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 1px 2px 0 rgba(37, 99, 235, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: var(--primary-foreground) !important;
+  box-shadow: 0 4px 12px 0 rgba(37, 99, 235, 0.35);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 6px;
+  color: var(--text-muted);
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.icon-btn:hover {
+  background-color: var(--surface-hover);
+  color: var(--text-main);
+}
+
+.sidebar-link {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar-link:hover {
+  background-color: var(--surface-hover) !important;
+  color: var(--text-main) !important;
+}
+
+.chip-btn {
+  transition: all 0.15s ease;
+}
+
+.chip-btn:hover:not(.active) {
+  background-color: var(--surface-hover) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border) !important;
+}
+
+.glass-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modern-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.modern-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  border-color: rgba(37, 99, 235, 0.35);
+}
+
+/* ==========================================================================
+   Modern Modal & Form Controls Design System
+   ========================================================================== */
+
+/* Universal Modern Form Controls (Inputs, Selects, Textareas) */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+input[type="time"],
+input[type="search"],
+select,
+textarea,
+.form-input,
+.modern-input {
+  background-color: var(--surface) !important;
+  color: var(--text-main) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 10px !important;
+  padding: 0.72rem 1rem !important;
+  font-size: 0.9rem !important;
+  font-family: inherit !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  box-sizing: border-box !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  outline: none !important;
+}
+
+/* Hover state */
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="date"]:hover,
+input[type="time"]:hover,
+input[type="search"]:hover,
+select:hover,
+textarea:hover,
+.form-input:hover,
+.modern-input:hover {
+  border-color: rgba(37, 99, 235, 0.45) !important;
+}
+
+/* Focus state */
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="date"]:focus,
+input[type="time"]:focus,
+input[type="search"]:focus,
+select:focus,
+textarea:focus,
+.form-input:focus,
+.modern-input:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.18), 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  background-color: var(--surface) !important;
+}
+
+/* Dark mode specific enhancements */
+.dark input[type="text"],
+.dark input[type="number"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="search"],
+.dark select,
+.dark textarea,
+.dark .form-input,
+.dark .modern-input {
+  background-color: #161619 !important;
+  color: #fafafa !important;
+  border-color: #2e2e34 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+}
+
+.dark input[type="text"]:hover,
+.dark input[type="number"]:hover,
+.dark input[type="email"]:hover,
+.dark input[type="password"]:hover,
+.dark input[type="date"]:hover,
+.dark input[type="time"]:hover,
+.dark input[type="search"]:hover,
+.dark select:hover,
+.dark textarea:hover,
+.dark .form-input:hover,
+.dark .modern-input:hover {
+  border-color: rgba(99, 102, 241, 0.55) !important;
+  background-color: #1a1a1e !important;
+}
+
+.dark input[type="text"]:focus,
+.dark input[type="number"]:focus,
+.dark input[type="email"]:focus,
+.dark input[type="password"]:focus,
+.dark input[type="date"]:focus,
+.dark input[type="time"]:focus,
+.dark input[type="search"]:focus,
+.dark select:focus,
+.dark textarea:focus,
+.dark .form-input:focus,
+.dark .modern-input:focus {
+  border-color: var(--primary) !important;
+  background-color: #18181c !important;
+  box-shadow: 0 0 0 3.5px rgba(37, 99, 235, 0.28) !important;
+}
+
+/* Dropdown option elements in Dark Mode */
+select option {
+  background-color: var(--surface);
+  color: var(--text-main);
+  padding: 8px;
+}
+
+.dark select option {
+  background-color: #18181b !important;
+  color: #fafafa !important;
+}
+
+/* Placeholder styling */
+::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 0.8 !important;
+}
+
+/* Modern Modal Overlay & Dialogs */
+.modern-modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background-color: rgba(0, 0, 0, 0.72) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 10000 !important;
+  padding: clamp(0.75rem, 2vh, 1.5rem) clamp(0.75rem, 2.5vw, 2rem) !important;
+  box-sizing: border-box !important;
+}
+
+.modern-modal-dialog {
+  background: var(--surface) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 25px 65px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: min(94vw, 960px) !important;
+  max-width: min(94vw, 960px) !important;
+  max-height: min(88vh, 860px) !important;
+  box-sizing: border-box !important;
+  animation: dialog-pop-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+
+.dark .modern-modal-dialog {
+  background: #121214 !important;
+  border-color: #27272a !important;
+  box-shadow: 0 25px 70px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.07) !important;
+}
+
+.modern-modal-header {
+  background: var(--surface) !important;
+  padding: clamp(1rem, 2vh, 1.25rem) clamp(1.25rem, 2.5vw, 1.75rem) !important;
+  border-bottom: 1.5px solid var(--border) !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.75rem !important;
+  flex-shrink: 0 !important;
+}
+
+.dark .modern-modal-header {
+  background: #121214 !important;
+  border-color: #27272a !important;
+}
+
+.modern-modal-footer {
+  padding: clamp(0.9rem, 1.8vh, 1.15rem) clamp(1.25rem, 2.5vw, 1.75rem) !important;
+  border-top: 1.5px solid var(--border) !important;
+  background: var(--surface) !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 0.85rem !important;
+  flex-shrink: 0 !important;
+}
+
+.dark .modern-modal-footer {
+  background: #121214 !important;
+  border-color: #27272a !important;
+}
+
+.modern-card-section {
+  background: var(--surface-hover) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: 14px !important;
+  padding: clamp(1rem, 2vw, 1.35rem) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.2s ease !important;
+}
+
+.dark .modern-card-section {
+  background: #18181b !important;
+  border-color: #27272a !important;
+}
+
+.modern-modal-close-btn {
+  padding: 0.5rem !important;
+  border-radius: 10px !important;
+  border: 1.5px solid var(--border) !important;
+  background: var(--surface-hover) !important;
+  color: var(--text-muted) !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.modern-modal-close-btn:hover {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  transform: rotate(90deg) scale(1.05) !important;
+}
+
+.modern-submit-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  padding: 0.7rem 1.85rem !important;
+  border-radius: 10px !important;
+  font-weight: 800 !important;
+  font-size: 0.92rem !important;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.modern-submit-btn:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45) !important;
+}
+
+.modern-submit-btn:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+/* System Screen Preview Mockup Frame */
+.system-preview-window {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  margin: 1.25rem 0;
+  transition: all 0.2s ease;
+}
+
+.system-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  background: var(--surface-hover);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+
+.system-traffic-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.system-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.system-dot-red { background-color: #ef4444; }
+.system-dot-yellow { background-color: #f59e0b; }
+.system-dot-green { background-color: #10b981; }
+
+.system-preview-url {
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: var(--text-muted);
+  background: var(--surface);
+  padding: 0.2rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.system-preview-body {
+  padding: 1.25rem;
+  background: var(--background);
+}
+
+/* Modern Status Badges */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.badge-pill-success {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-pill-warning {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-pill-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-pill-primary {
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+.language-switch {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* ============================================
+   Professional Print Engine (Executive Grade)
+   ============================================ */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 10mm;
+  }
+
+  /* Force pure light theme variables on all roots when printing, even if dark mode is active */
+  :root,
+  html,
+  body,
+  .dark,
+  html.dark,
+  body.dark,
+  [data-theme="dark"],
+  .print-area,
+  .print-area * {
+    --background: #ffffff !important;
+    --surface: #ffffff !important;
+    --surface-hover: #f8fafc !important;
+    --text-main: #09090b !important;
+    --text-muted: #52525b !important;
+    --border: #e4e4e7 !important;
+    --table-header-bg: #f4f4f5 !important;
+    --table-row-even: #ffffff !important;
+    --table-row-odd: #fbfbfb !important;
+    --table-row-hover: #f4f4f5 !important;
+    --table-border: #e4e4e7 !important;
+    --card: #ffffff !important;
+    --card-foreground: #09090b !important;
+    --foreground: #09090b !important;
+    --popover: #ffffff !important;
+    --popover-foreground: #09090b !important;
+    --muted: #f4f4f5 !important;
+    --muted-foreground: #52525b !important;
+    --secondary: #f4f4f5 !important;
+    --secondary-foreground: #09090b !important;
+    --glass-bg: #ffffff !important;
+    --glass-border: #e4e4e7 !important;
+    color-scheme: light !important;
+  }
+
+  html, body {
+    background: #ffffff !important;
+    color: #09090b !important;
+    font-size: 10pt;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Unhide modal overlay container in print and remove dark backdrop */
+  div[role="dialog"] {
+    position: static !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    backdrop-filter: none !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .print-area,
+  .print-area * {
+    visibility: visible;
+  }
+
+  .print-area {
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #09090b !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Force all headings and titles in print to be sharp dark charcoal */
+  .print-area h1,
+  .print-area h2,
+  .print-area h3,
+  .print-area h4,
+  .print-area h5,
+  .print-area h6,
+  .print-area .profile-section-title {
+    color: #09090b !important;
+  }
+
+  /* Ensure card backgrounds inside modals are crisp soft light backgrounds instead of dark mode blacks */
+  .print-area .profile-stat-box,
+  .print-area .profile-overview-box,
+  .print-area .profile-recent-box,
+  .print-area .detail-attr-card,
+  .print-area .detail-attr-grid {
+    background: #f8fafc !important;
+    background-color: #f8fafc !important;
+    color: #09090b !important;
+    border: 1px solid #e4e4e7 !important;
+  }
+
+  .print-area .profile-stat-label,
+  .print-area [style*="color: var(--text-muted)"],
+  .print-area [style*="color:var(--text-muted)"] {
+    color: #52525b !important;
+  }
+
+  .print-area [style*="color: var(--text-main)"],
+  .print-area [style*="color:var(--text-main)"] {
+    color: #09090b !important;
+  }
+
+  .print-area [style*="background: var(--surface)"],
+  .print-area [style*="background:var(--surface)"],
+  .print-area [style*="background-color: var(--surface)"],
+  .print-area [style*="background-color:var(--surface)"] {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #09090b !important;
+  }
+
+  .print-area [style*="background: var(--surface-hover)"],
+  .print-area [style*="background:var(--surface-hover)"],
+  .print-area [style*="background-color: var(--surface-hover)"],
+  .print-area [style*="background-color:var(--surface-hover)"] {
+    background: #f8fafc !important;
+    background-color: #f8fafc !important;
+    color: #09090b !important;
+  }
+
+  .print-area [style*="border: 1px solid var(--border)"],
+  .print-area [style*="border:1px solid var(--border)"],
+  .print-area [style*="border-color: var(--border)"],
+  .print-area [style*="border-color:var(--border)"] {
+    border-color: #e4e4e7 !important;
+  }
+
+  .hide-on-print,
+  .hide-on-print *,
+  .sidebar,
+  .sidebar-nav,
+  .header,
+  .modal-actions,
+  button:not(.allow-print) {
+    display: none !important;
+  }
+
+  /* When printing a modal card, completely hide any background data tables or metric cards */
+  body:has(div[role="dialog"]) .glass-card:not(div[role="dialog"] .glass-card),
+  body:has(div[role="dialog"]) table.crud-table,
+  body:has(div[role="dialog"]) .page-title,
+  body:has(div[role="dialog"]) .metric-cards-grid {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Professional Header */
+  .print-header {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 2px solid #09090b !important;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+  }
+  .print-header .company-name {
+    font-size: 22pt !important;
+    font-weight: 900 !important;
+    color: #09090b !important;
+    margin: 0 0 2px 0;
+    letter-spacing: -0.5px;
+  }
+  .print-header .report-title {
+    font-size: 13pt !important;
+    font-weight: 700 !important;
+    color: #18181b !important;
+    margin: 4px 0 0 0;
+  }
+  .print-header .print-meta {
+    text-align: right;
+    font-size: 9pt !important;
+    color: #52525b !important;
+    line-height: 1.4;
+  }
+
+  /* Professional Multi-page Table */
+  .print-area table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 9.5pt !important;
+    margin-top: 12px;
+    border: 1px solid #d4d4d8 !important;
+  }
+
+  .print-area thead {
+    display: table-header-group;
+  }
+
+  .print-area th {
+    background-color: #f4f4f5 !important;
+    color: #09090b !important;
+    font-weight: 700 !important;
+    border-top: 1px solid #d4d4d8 !important;
+    border-bottom: 2px solid #09090b !important;
+    border-inline-end: 1px solid #e4e4e7 !important;
+    padding: 8px 10px !important;
+    font-size: 9pt !important;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .print-area td {
+    border-bottom: 1px solid #e4e4e7 !important;
+    border-inline-end: 1px solid #f4f4f5 !important;
+    padding: 7px 10px !important;
+    color: #09090b !important;
+    font-size: 9pt !important;
+  }
+
+  .print-area tbody tr:nth-child(even) {
+    background-color: #fafafa !important;
+  }
+
+  .print-area tbody tr:nth-child(odd) {
+    background-color: #ffffff !important;
+  }
+
+  /* Professional Grand Total Footer */
+  .print-area tfoot {
+    display: table-footer-group;
+  }
+
+  .print-area tfoot tr {
+    background-color: #f4f4f5 !important;
+    border-top: 2px solid #09090b !important;
+  }
+
+  .print-area tfoot td {
+    border-top: 2px solid #09090b !important;
+    border-bottom: 2px solid #09090b !important;
+    padding: 9px 10px !important;
+    font-weight: 800 !important;
+    font-size: 10pt !important;
+    color: #09090b !important;
+  }
+
+  .print-area tr {
+    page-break-inside: avoid;
+  }
+
+  .print-area .table-card {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+}
+
+.print-header {
+  display: none;
+}
+
+/* ============================================
+   App Dialog (confirm / alert replacement)
+   ============================================ */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: dialog-fade-in 0.18s ease-out both;
+}
+
+.dialog-overlay.is-closing {
+  animation: dialog-fade-out 0.16s ease-in both;
+}
+
+.dialog {
+  --dialog-accent: var(--primary);
+  --dialog-accent-soft: rgba(0, 0, 0, 0.05);
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem 1.75rem 1.5rem;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  animation: dialog-pop-in 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+}
+
+.is-closing .dialog {
+  animation: dialog-pop-out 0.16s ease-in both;
+}
+
+.dialog--danger,
+.dialog--error {
+  --dialog-accent: var(--danger);
+  --dialog-accent-soft: rgba(220, 38, 38, 0.1);
+}
+
+.dialog-close {
+  position: absolute;
+  top: 0.85rem;
+  inset-inline-end: 0.85rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.dialog-close:hover {
+  background: var(--surface-hover);
+  color: var(--text-main);
+}
+
+.dialog-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1.1rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dialog-accent);
+  background: var(--dialog-accent-soft);
+}
+
+.dialog-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.dialog-message {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 0.25rem;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.dialog-actions > * {
+  flex: 1;
+}
+
+.dialog-btn {
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+
+.dialog-btn--ghost {
+  background: var(--surface);
+  color: var(--text-main);
+}
+
+.dialog-btn--ghost:hover {
+  background: var(--surface-hover);
+}
+
+.dialog-btn--solid {
+  background: var(--dialog-accent);
+  color: var(--primary-foreground);
+  border-color: var(--dialog-accent);
+}
+
+@keyframes dialog-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dialog-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes dialog-pop-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes dialog-pop-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.96); }
+}
+
+/* Universal Clickable Table Row with Sleek Hover Effect */
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+
+.clickable-row:hover {
+  background-color: rgba(37, 99, 235, 0.07) !important;
+}
+
+[data-theme="dark"] .clickable-row:hover,
+.dark .clickable-row:hover {
+  background-color: rgba(37, 99, 235, 0.14) !important;
+}
+
+.clickable-row td {
+  user-select: text;
+}
+
+/* Modal headerbars & tab bars flex-shrink protection */
+.profile-tabs-headerbar {
+  flex-shrink: 0 !important;
+  min-height: 52px !important;
+}
+
+.profile-tabs-headerbar button {
+  flex-shrink: 0 !important;
+  min-height: 38px !important;
+  height: 38px !important;
+  box-sizing: border-box !important;
+}
+

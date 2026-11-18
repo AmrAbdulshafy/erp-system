@@ -1,0 +1,31 @@
+# ===================================================================
+# Ultra Pack ERP - Production Apache Web Server Security & HTTPS
+# ===================================================================
+
+# 1. Protect Sensitive Files (.env, .git, package.json, logs, sql)
+<FilesMatch "^\.(env|git|htaccess)|(composer\.(json|lock)|package\.(json|lock)|pnpm-lock\.yaml|.*\.(sql|log|md|ts|tsx))$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# 2. Prevent Directory Browsing
+Options -Indexes
+
+# 3. Security Headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# 4. HTTPS Redirection (Optional/Enabled when SSL is configured on Apache port 443)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Check if HTTPS is off and host is not local development test
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP_HOST} !^localhost [NC]
+    RewriteCond %{HTTP_HOST} !^127\.0\.0\.1 [NC]
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>

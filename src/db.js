@@ -59,25 +59,91 @@ class SupabaseTable {
     return data || [];
   }
 
-  filter(predicate) {
+  _createCollection(fetchRows) {
     const self = this;
-    return {
+    const buildChain = (getRows) => ({
+      filter(predicate) {
+        return buildChain(async () => {
+          const rows = await getRows();
+          return rows.filter(predicate);
+        });
+      },
+      limit(count) {
+        return buildChain(async () => {
+          const rows = await getRows();
+          return rows.slice(0, count);
+        });
+      },
+      offset(skip) {
+        return buildChain(async () => {
+          const rows = await getRows();
+          return rows.slice(skip);
+        });
+      },
+      reverse() {
+        return buildChain(async () => {
+          const rows = await getRows();
+          return [...rows].reverse();
+        });
+      },
+      async sortBy(key) {
+        const rows = await getRows();
+        return [...rows].sort((a, b) => {
+          if (a?.[key] < b?.[key]) return -1;
+          if (a?.[key] > b?.[key]) return 1;
+          return 0;
+        });
+      },
       async toArray() {
-        const rows = await self.toArray();
-        return rows.filter(predicate);
+        return getRows();
       },
       async first() {
-        const rows = await self.toArray();
-        return rows.find(predicate);
+        const rows = await getRows();
+        return rows[0];
       },
-    };
+      async count() {
+        const rows = await getRows();
+        return rows.length;
+      },
+      async modify(updater) {
+        const rows = await getRows();
+        for (const row of rows) {
+          const patch =
+            typeof updater === 'function'
+              ? (() => {
+                  const copy = { ...row };
+                  updater(copy);
+                  return copy;
+                })()
+              : updater;
+          if (row.id !== undefined) {
+            await self.update(row.id, patch);
+          }
+        }
+        return rows.length;
+      },
+    });
+
+    return buildChain(fetchRows);
+  }
+
+  toCollection() {
+    return this._createCollection(() => this.toArray());
+  }
+
+  limit(count) {
+    return this.toCollection().limit(count);
+  }
+
+  filter(predicate) {
+    return this.toCollection().filter(predicate);
   }
 
   where(column) {
     const self = this;
     return {
       equals(value) {
-        const fetchMatching = async () => {
+        return self._createCollection(async () => {
           const supabase = self._client();
           if (!supabase) {
             return (memoryStore[self.name] || []).filter((r) => r?.[column] === value);
@@ -91,43 +157,7 @@ class SupabaseTable {
             return [];
           }
           return data || [];
-        };
-
-        return {
-          async toArray() {
-            return fetchMatching();
-          },
-          async first() {
-            const rows = await fetchMatching();
-            return rows[0];
-          },
-          filter(predicate) {
-            return {
-              async toArray() {
-                const rows = await fetchMatching();
-                return rows.filter(predicate);
-              },
-              async first() {
-                const rows = await fetchMatching();
-                return rows.find(predicate);
-              },
-            };
-          },
-          async modify(updater) {
-            const rows = await fetchMatching();
-            for (const row of rows) {
-              const patch = typeof updater === 'function' ? (() => {
-                const copy = { ...row };
-                updater(copy);
-                return copy;
-              })() : updater;
-              if (row.id !== undefined) {
-                await self.update(row.id, patch);
-              }
-            }
-            return rows.length;
-          },
-        };
+        });
       },
     };
   }

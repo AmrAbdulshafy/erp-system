@@ -59,12 +59,11 @@ export default function TransactionCRUD({
     setInventory(inv);
 
     const rels = {};
-    if (headerTable === 'sales') {
-      rels.customers = await db.customers.filter(r => !r.deleted_at).toArray();
-    } else if (headerTable === 'purchases') {
-      rels.suppliers = await db.suppliers.filter(r => !r.deleted_at).toArray();
-    } else if (headerTable === 'quotations') {
-      rels.customers = await db.customers.filter(r => !r.deleted_at).toArray();
+    for (const field of headerSchema) {
+      if (field.type === 'relation') {
+        const data = await db[field.relationTable].filter(r => !r.deleted_at).toArray();
+        rels[field.key] = data;
+      }
     }
     setRelations(rels);
   };
@@ -81,14 +80,6 @@ export default function TransactionCRUD({
     }, 0);
     return () => clearTimeout(timer);
   }, []);
-    for (const field of headerSchema) {
-      if (field.type === 'relation') {
-        const data = await db[field.relationTable].filter(r => !r.deleted_at).toArray();
-        rels[field.key] = data;
-      }
-    }
-    setRelations(rels);
-  };
 
   const getRelationLabel = (field, id) => {
     if (!relations[field.key]) return id;

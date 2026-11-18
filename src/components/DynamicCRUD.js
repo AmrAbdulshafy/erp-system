@@ -37,13 +37,13 @@ const PACKAGING_PALETTE = [
 ];
 
 // schema: [{ key, label, type (text, number, select, checkbox, relation, date, textarea, dimensions, thickness, color_palette), required, options, relationTable, relationLabel, isCurrency, allowCustom }]
-export default function DynamicCRUD({ 
-  tableName, 
-  title, 
-  schema, 
-  customActions = [], 
-  onFieldChange, 
-  customModalRender, 
+export default function DynamicCRUD({
+  tableName,
+  title,
+  schema,
+  customActions = [],
+  onFieldChange,
+  customModalRender,
   defaultValues = {},
   metricCards
 }) {
@@ -51,17 +51,17 @@ export default function DynamicCRUD({
   const isRTL = i18n.language === 'ar';
   const dialog = useDialog();
   const { getDisplayName } = useCompanyProfile();
-  
+
   // Dynamically load the main table data
   const data = useLiveQuery(() => db[tableName].filter(r => !r.deleted_at).toArray(), [tableName]);
-  
+
   // We need to fetch all tables that might be relations to populate dropdowns
   // To avoid complex hooks, we'll just fetch the entire db context dynamically for relations
   const relationKeys = Array.from(new Set([
     ...schema.filter(f => f.type === 'relation').map(f => f.relationTable),
     ...(schema.some(f => f.relationTable === 'sales_orders') ? ['customers'] : [])
   ]));
-  
+
   // Unfortunately useLiveQuery can't be called conditionally or in a loop.
   // But we can fetch all related tables in one query:
   const relationsData = useLiveQuery(async () => {
@@ -100,25 +100,23 @@ export default function DynamicCRUD({
     onFieldChangeRef.current = onFieldChange;
   }, [onFieldChange]);
 
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
+
   const updateField = (key, value) => {
+    let nextData = null;
     setFormData(prev => {
-      const next = { ...prev, [key]: value };
-      formDataRef.current = next;
-      return next;
+      nextData = { ...prev, [key]: value };
+      return nextData;
     });
 
-    if (onFieldChangeRef.current) {
+    if (onFieldChange) {
       setTimeout(() => {
-        if (onFieldChangeRef.current) {
-          const current = { ...formDataRef.current, [key]: value };
-          onFieldChangeRef.current(key, value, current, (updatedFields) => {
-            setFormData(curr => {
-              const merged = { ...curr, ...updatedFields };
-              formDataRef.current = merged;
-              return merged;
-            });
-          });
-        }
+        const current = nextData || { [key]: value };
+        onFieldChange(key, value, current, (updatedFields) => {
+          setFormData(curr => ({ ...curr, ...updatedFields }));
+        });
       }, 0);
     }
   };
@@ -127,7 +125,7 @@ export default function DynamicCRUD({
     setDimensionStates(prev => {
       const current = prev[fieldKey] || { length: '', width: '', height: '', unit: 'cm', mode: '3d' };
       const next = { ...current, [part]: val };
-      
+
       if (next.mode === '3d') {
         const parts = [];
         if (next.length !== '') parts.push(next.length);
@@ -170,7 +168,7 @@ export default function DynamicCRUD({
     setColorPaletteStates(prev => {
       const current = prev[fieldKey] || { hex: '#B8860B', name: '', printType: 'plain' };
       const next = { ...current, ...updates };
-      
+
       let formatted = (next.name || '').trim();
       if (formatted && next.hex) {
         if (!formatted.includes(next.hex)) {
@@ -315,425 +313,425 @@ export default function DynamicCRUD({
     isSavingRef.current = true;
     setIsSaving(true);
     try {
-    const now = new Date().toISOString();
-    
-    // Clean payload according to schema types
-    const payload = { ...formData };
-    schema.forEach(field => {
-      if (field.type === 'number') payload[field.key] = parseFloat(payload[field.key]) || 0;
-      if (field.type === 'checkbox') payload[field.key] = payload[field.key] ? 1 : 0;
-    });
+      const now = new Date().toISOString();
 
-    // Handle special calculation triggers
-    if (payload.quantity !== undefined && payload.rate_per_piece !== undefined) {
-      payload.total_amount = (payload.quantity || 0) * (payload.rate_per_piece || 0);
-    }
-    if (payload.quantity !== undefined && payload.unit_price !== undefined) {
-      payload.total_price = (payload.quantity || 0) * (payload.unit_price || 0);
-    }
-    if (tableName === 'payroll') {
-      payload.net_pay = Math.round(((Number(payload.base_salary) || 0) + (Number(payload.production_bonus) || 0) - (Number(payload.deductions) || 0) - (Number(payload.loan_deductions) || 0)) * 100) / 100;
+      // Clean payload according to schema types
+      const payload = { ...formData };
+      schema.forEach(field => {
+        if (field.type === 'number') payload[field.key] = parseFloat(payload[field.key]) || 0;
+        if (field.type === 'checkbox') payload[field.key] = payload[field.key] ? 1 : 0;
+      });
 
-      // Prevent overlapping payroll records for the same employee (allow editing the same record id)
-      const empId = payload.employee_id;
-      const newStart = payload.period_start || payload.period_end || '';
-      const newEnd = payload.period_end || payload.period_start || '';
-      if (empId && newStart && newEnd) {
-        const s1 = newStart <= newEnd ? newStart : newEnd;
-        const e1 = newStart <= newEnd ? newEnd : newStart;
-        const empPayrolls = await db.payroll
-          .filter(r => !r.deleted_at && r.employee_id === empId && (!payload.id || r.id !== payload.id))
-          .toArray();
-        const overlappingRecord = empPayrolls.find(r => {
-          const rStart = r.period_start || r.period_end || '';
-          const rEnd = r.period_end || r.period_start || '';
-          if (!rStart || !rEnd) return false;
-          const s2 = rStart <= rEnd ? rStart : rEnd;
-          const e2 = rStart <= rEnd ? rEnd : rStart;
-          return s1 <= e2 && e1 >= s2;
-        });
+      // Handle special calculation triggers
+      if (payload.quantity !== undefined && payload.rate_per_piece !== undefined) {
+        payload.total_amount = (payload.quantity || 0) * (payload.rate_per_piece || 0);
+      }
+      if (payload.quantity !== undefined && payload.unit_price !== undefined) {
+        payload.total_price = (payload.quantity || 0) * (payload.unit_price || 0);
+      }
+      if (tableName === 'payroll') {
+        payload.net_pay = Math.round(((Number(payload.base_salary) || 0) + (Number(payload.production_bonus) || 0) - (Number(payload.deductions) || 0) - (Number(payload.loan_deductions) || 0)) * 100) / 100;
 
-        if (overlappingRecord) {
-          await dialog.alert({
-            variant: 'danger',
-            title: isRTL ? 'فترة راتب متداخلة' : 'Overlapping Payroll Period',
-            message: `فيه راتب مسجّل للموظف ده في الفترة من ${overlappingRecord.period_start} إلى ${overlappingRecord.period_end}`
+        // Prevent overlapping payroll records for the same employee (allow editing the same record id)
+        const empId = payload.employee_id;
+        const newStart = payload.period_start || payload.period_end || '';
+        const newEnd = payload.period_end || payload.period_start || '';
+        if (empId && newStart && newEnd) {
+          const s1 = newStart <= newEnd ? newStart : newEnd;
+          const e1 = newStart <= newEnd ? newEnd : newStart;
+          const empPayrolls = await db.payroll
+            .filter(r => !r.deleted_at && r.employee_id === empId && (!payload.id || r.id !== payload.id))
+            .toArray();
+          const overlappingRecord = empPayrolls.find(r => {
+            const rStart = r.period_start || r.period_end || '';
+            const rEnd = r.period_end || r.period_start || '';
+            if (!rStart || !rEnd) return false;
+            const s2 = rStart <= rEnd ? rStart : rEnd;
+            const e2 = rStart <= rEnd ? rEnd : rStart;
+            return s1 <= e2 && e1 >= s2;
           });
-          return;
-        }
-      }
-    }
-    if (tableName === 'employee_loans') {
-      const loanAmt = Number(payload.loan_amount) || 0;
-      const totalPaid = Number(payload.total_paid) || 0;
-      payload.remaining_amount = Math.max(0, loanAmt - totalPaid);
-      if (payload.remaining_amount <= 0 && loanAmt > 0) {
-        payload.status = 'PAID';
-      } else if (!payload.status) {
-        payload.status = 'ACTIVE';
-      }
-    }
 
-    const originalRecord = payload.id ? await db[tableName].get(payload.id) : null;
-
-    if (tableName === 'purchase_items' || tableName === 'purchase_order_items' || tableName === 'sales_items' || tableName === 'sales_order_items') {
-      const isPurchaseItem = tableName === 'purchase_items' || tableName === 'purchase_order_items';
-      const matId = payload.raw_material_id || payload.material_id || originalRecord?.raw_material_id || originalRecord?.material_id;
-      if (matId) {
-        const material = await db.raw_materials.get(matId);
-        if (material) {
-          const rate = isPurchaseItem ? 1 : getEffectiveMaterialRate(material, payload.consumption_per_unit);
-          const oldRate = isPurchaseItem ? 1 : getEffectiveMaterialRate(material, originalRecord?.consumption_per_unit);
-          let diff = (Number(payload.quantity) || 0) * rate;
-          if (originalRecord && !originalRecord.deleted_at) {
-            diff -= ((Number(originalRecord.quantity) || 0) * oldRate);
-          }
-          if (Math.abs(diff) > 0.0001) {
-            const stockDir = isPurchaseItem ? 1 : -1;
-            const netDelta = diff * stockDir;
-            const prevStock = Number(material.stock_quantity) || 0;
-            const newStock = prevStock + netDelta;
-            await db.raw_materials.update(material.id, {
-              stock_quantity: newStock,
-              sync_status: 'MODIFIED',
-              updated_at: now
+          if (overlappingRecord) {
+            await dialog.alert({
+              variant: 'danger',
+              title: isRTL ? 'فترة راتب متداخلة' : 'Overlapping Payroll Period',
+              message: `فيه راتب مسجّل للموظف ده في الفترة من ${overlappingRecord.period_start} إلى ${overlappingRecord.period_end}`
             });
-            await recordStockMovement({
-              material_id: material.id,
-              material_name: material.material_name,
-              movement_type: netDelta >= 0 ? 'IN' : 'OUT',
-              source: isPurchaseItem ? 'purchase_order' : 'sales_order',
-              reference_type: isPurchaseItem ? 'purchase_order' : 'sales_order',
-              reference_id: payload.purchase_order_id || payload.sales_order_id || payload.id || null,
-              quantity: Math.abs(netDelta),
-              direction: netDelta >= 0 ? 1 : -1,
-              stock_before: prevStock,
-              stock_after: newStock,
-              unit_cost: Number(material.unit_price) || 0,
-              movement_date: now.split('T')[0],
-              notes: isPurchaseItem ? 'تعديل مباشر في بنود المشتريات' : 'تعديل مباشر في بنود المبيعات'
-            });
+            return;
           }
         }
       }
-    }
-
-    if (payload.id) {
-      // Update
-      for (const field of schema) {
-        if (field.type === 'password' || field.key === 'password_hash') {
-          const val = String(payload[field.key] || '').trim();
-          if (!val && originalRecord) {
-            const origVal = String(originalRecord[field.key] || '');
-            payload[field.key] = origVal && !isSha256Hex(origVal) ? await hashPassword(origVal) : origVal;
-          } else if (val) {
-            payload[field.key] = isSha256Hex(val) ? val : await hashPassword(val);
-          }
-        }
-      }
-      if (tableName === 'users' && (payload.id === 'usr-001-admin' || String(originalRecord?.username || '').toLowerCase() === 'admin')) {
-        payload.role = 'ADMIN';
-        payload.is_active = 1;
-      }
-      payload.updated_at = now;
-      payload.sync_status = 'MODIFIED';
-      await db[tableName].update(payload.id, payload);
-      if (tableName === 'users' && typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('permission-matrix-updated'));
-      }
-
-      if (tableName === 'raw_materials' && originalRecord) {
-        const oldStock = Number(originalRecord.stock_quantity) || 0;
-        const newStock = Number(payload.stock_quantity) || 0;
-        const diff = newStock - oldStock;
-        if (Math.abs(diff) > 0.0001) {
-          await recordStockMovement({
-            material_id: payload.id,
-            material_name: payload.material_name || originalRecord.material_name || '',
-            movement_type: 'ADJUSTMENT',
-            source: 'manual_adjustment',
-            reference_type: 'manual',
-            reference_id: payload.id,
-            quantity: Math.abs(diff),
-            direction: diff >= 0 ? 1 : -1,
-            stock_before: oldStock,
-            stock_after: newStock,
-            unit_cost: Number(payload.unit_price) || 0,
-            movement_date: now.split('T')[0],
-            notes: 'تسوية جردية يدوية لرصيد الخامة'
-          });
-        }
-      }
-    } else {
-      // Create
-      for (const field of schema) {
-        if (field.type === 'password' || field.key === 'password_hash') {
-          const val = String(payload[field.key] || '').trim();
-          if (val && !isSha256Hex(val)) {
-            payload[field.key] = await hashPassword(val);
-          }
-        }
-      }
-      payload.id = uuidv7();
-      payload.created_at = now;
-      payload.updated_at = now;
-      payload.deleted_at = null;
-      payload.sync_status = 'PENDING';
-      await db[tableName].add(payload);
-
-      if (tableName === 'raw_materials' && (Number(payload.stock_quantity) || 0) > 0) {
-        const initQty = Number(payload.stock_quantity) || 0;
-        await recordStockMovement({
-          material_id: payload.id,
-          material_name: payload.material_name || '',
-          movement_type: 'IN',
-          source: 'initial_stock',
-          reference_type: 'manual',
-          reference_id: payload.id,
-          quantity: initQty,
-          direction: 1,
-          stock_before: 0,
-          stock_after: initQty,
-          unit_cost: Number(payload.unit_price) || 0,
-          movement_date: now.split('T')[0],
-          notes: 'رصيد افتتاحي عند إضافة الخامة'
-        });
-      }
-    }
-
-    // Recalculate parent invoice totals & customer/supplier balance if a line item was added/updated directly
-    if (tableName === 'purchase_items' || tableName === 'purchase_order_items' || tableName === 'sales_items' || tableName === 'sales_order_items') {
-      const fk = (tableName === 'purchase_items' || tableName === 'purchase_order_items') ? 'purchase_order_id' : 'sales_order_id';
-      const newOrderId = payload[fk];
-      const oldOrderId = originalRecord?.[fk];
-      if (oldOrderId && oldOrderId !== newOrderId) {
-        await recalculateParentInvoiceFromItems(tableName, oldOrderId, now);
-      }
-      if (newOrderId) {
-        await recalculateParentInvoiceFromItems(tableName, newOrderId, now);
-      }
-    }
-
-    // Special handling for shipping_orders -> link shipping_cost directly to db.expenses
-    if (tableName === 'shipping_orders') {
-      const shippingId = payload.id;
-      const cost = Number(payload.shipping_cost) || 0;
-      const soId = payload.sales_order_id;
-      let soDisplay = '';
-      let customerName = '';
-      if (soId) {
-        const so = await db.sales_orders.get(soId);
-        if (so) {
-          soDisplay = `#${String(so.id).slice(0, 8).toUpperCase()}`;
-          if (so.customer_id) {
-            const cust = await db.customers.get(so.customer_id);
-            customerName = cust?.customer_name || '';
-          }
+      if (tableName === 'employee_loans') {
+        const loanAmt = Number(payload.loan_amount) || 0;
+        const totalPaid = Number(payload.total_paid) || 0;
+        payload.remaining_amount = Math.max(0, loanAmt - totalPaid);
+        if (payload.remaining_amount <= 0 && loanAmt > 0) {
+          payload.status = 'PAID';
+        } else if (!payload.status) {
+          payload.status = 'ACTIVE';
         }
       }
 
-      const deterministicId = `exp-shipping-${shippingId}`;
-      const existingExpenses = await db.expenses
-        .filter(e => e.id === deterministicId || (e.notes && e.notes.includes(`[SHIPPING:${shippingId}]`)))
-        .toArray();
-      const existingExp = existingExpenses[0];
+      const originalRecord = payload.id ? await db[tableName].get(payload.id) : null;
 
-      if (existingExp && existingExp.deleted_at) {
-        // Respect soft-deleted expense: do nothing
-      } else if (cost > 0) {
-        const expenseData = {
-          id: existingExp ? existingExp.id : deterministicId,
-          category: 'SHIPPING',
-          amount: cost,
-          expense_date: payload.shipping_date || now.split('T')[0],
-          notes: `[SHIPPING:${shippingId}] ${soId ? `[SO:${soId}] ` : ''}Shipping & Delivery for Sales Order ${soDisplay}${customerName ? ' (' + customerName + ')' : ''}${payload.driver_name ? ' - Driver: ' + payload.driver_name : ''}`,
-          recorded_by: null,
-          created_at: existingExp?.created_at || now,
-          updated_at: now,
-          deleted_at: null,
-          sync_status: 'PENDING'
-        };
-
-        await db.expenses.put(expenseData);
-      } else if (existingExp) {
-        await db.expenses.update(existingExp.id, {
-          deleted_at: now,
-          sync_status: 'PENDING'
-        });
-      }
-    }
-
-    // Special handling for payroll -> only sync to db.expenses & deduct employee_loans when status === 'PAID'
-    // Also records full earned wage (net_pay + loan_deductions) so loan repayments settled via salary are not lost from labor costs
-    if (tableName === 'payroll') {
-      const payrollId = payload.id;
-      const isPaidStatus = String(payload.status || '').toUpperCase() === 'PAID';
-      const wasPaidStatus = Boolean(originalRecord && !originalRecord.deleted_at && String(originalRecord.status || '').toUpperCase() === 'PAID');
-      const netPay = Number(payload.net_pay) || 0;
-      const loanDed = Number(payload.loan_deductions) || 0;
-      const totalEarnedWage = Math.round((netPay + loanDed) * 100) / 100;
-      const empId = payload.employee_id;
-      let empName = '';
-      if (empId) {
-        const emp = await db.employees.get(empId);
-        empName = emp?.full_name || '';
-      }
-
-      const deterministicId = `exp-payroll-${payrollId}`;
-      const existingExpenses = await db.expenses
-        .filter(e => e.id === deterministicId || (e.notes && e.notes.includes(`[PAYROLL:${payrollId}]`)))
-        .toArray();
-      const existingExp = existingExpenses[0];
-
-      if (isPaidStatus && totalEarnedWage > 0) {
-        const loanNote = loanDed > 0 ? ` [Net Cash: ${netPay} + Loan Settled: ${loanDed}]` : '';
-        const expenseData = {
-          id: existingExp ? existingExp.id : deterministicId,
-          category: 'PAYROLL',
-          amount: totalEarnedWage,
-          expense_date: payload.period_end || payload.period_start || now.split('T')[0],
-          notes: `[PAYROLL:${payrollId}] ${empId ? `[EMP:${empId}] ` : ''}Payroll for ${empName || 'Employee'} (${payload.period_start || ''} to ${payload.period_end || ''})${loanNote} - Status: PAID`,
-          payroll_id: payrollId,
-          linked_type: 'payroll',
-          linked_id: payrollId,
-          recorded_by: null,
-          created_at: existingExp?.created_at || now,
-          updated_at: now,
-          deleted_at: null,
-          sync_status: 'PENDING'
-        };
-
-        await db.expenses.put(expenseData);
-      } else if (existingExp && !existingExp.deleted_at) {
-        await db.expenses.update(existingExp.id, {
-          deleted_at: now,
-          sync_status: 'PENDING'
-        });
-      }
-
-      // Automatically update employee_loans repayments ONLY when payroll is PAID (and revert if moved back to DRAFT/APPROVED)
-      const effectiveCurrentLoanDed = isPaidStatus ? loanDed : 0;
-      const effectivePrevLoanDed = wasPaidStatus ? (Number(originalRecord.loan_deductions) || 0) : 0;
-      const diffLoanDed = effectiveCurrentLoanDed - effectivePrevLoanDed;
-
-      if (diffLoanDed !== 0 && empId && db.employee_loans) {
-        const activeLoans = await db.employee_loans
-          .filter(l => !l.deleted_at && l.employee_id === empId && (l.status === 'ACTIVE' || l.status === 'PAID'))
-          .toArray();
-
-        let remainingDiff = diffLoanDed;
-        for (const loan of activeLoans) {
-          if (remainingDiff === 0) break;
-          const currentTotalPaid = Number(loan.total_paid) || 0;
-          const loanAmt = Number(loan.loan_amount) || 0;
-
-          let step = 0;
-          if (remainingDiff > 0) {
-            const maxRepayable = Math.max(0, loanAmt - currentTotalPaid);
-            step = Math.min(remainingDiff, maxRepayable);
-            remainingDiff -= step;
-          } else {
-            step = Math.max(remainingDiff, -currentTotalPaid);
-            remainingDiff -= step;
-          }
-
-          const newTotalPaid = Math.max(0, currentTotalPaid + step);
-          const newRemaining = Math.max(0, loanAmt - newTotalPaid);
-          const newStatus = newRemaining <= 0 ? 'PAID' : 'ACTIVE';
-
-          await db.employee_loans.update(loan.id, {
-            total_paid: newTotalPaid,
-            remaining_amount: newRemaining,
-            status: newStatus,
-            sync_status: 'MODIFIED',
-            updated_at: now
-          });
-        }
-      }
-    }
-
-    // Special handling for owner_withdrawals -> automatically sync to db.expenses
-    if (tableName === 'owner_withdrawals') {
-      const withdrawalId = payload.id;
-      const amt = Number(payload.amount) || 0;
-      const deterministicId = `exp-withdrawal-${withdrawalId}`;
-      const existingExpenses = await db.expenses
-        .filter(e => e.id === deterministicId || (e.notes && e.notes.includes(`[OWNER_WITHDRAWAL:${withdrawalId}]`)))
-        .toArray();
-      const existingExp = existingExpenses[0];
-
-      if (existingExp && existingExp.deleted_at) {
-        // Respect soft-deleted expense: do nothing
-      } else if (amt > 0) {
-        const expenseData = {
-          id: existingExp ? existingExp.id : deterministicId,
-          category: 'PERSONAL',
-          amount: amt,
-          expense_date: payload.withdrawal_date || now.split('T')[0],
-          notes: `[OWNER_WITHDRAWAL:${withdrawalId}] Owner Withdrawal: ${payload.owner_name || 'Owner'} (${payload.category || 'PERSONAL'})${payload.notes ? ' - ' + payload.notes : ''}`,
-          recorded_by: null,
-          created_at: existingExp?.created_at || now,
-          updated_at: now,
-          deleted_at: null,
-          sync_status: 'PENDING'
-        };
-
-        await db.expenses.put(expenseData);
-      } else if (existingExp) {
-        await db.expenses.update(existingExp.id, {
-          deleted_at: now,
-          sync_status: 'PENDING'
-        });
-      }
-    }
-
-    // Special handling for work_orders -> Automated Raw Material Deduction (BOM) when COMPLETED
-    if (tableName === 'work_orders') {
-      if (payload.status === 'COMPLETED' && (!originalRecord || originalRecord.status !== 'COMPLETED' || !originalRecord.bom_deducted)) {
-        try {
-          const bomRes = await deductWorkOrderBOM({ ...payload, id: payload.id });
-          if (!bomRes.success) {
-            dialog.alert({
-              variant: 'warning',
-              title: isRTL ? 'تنبيه خصم الخامات (BOM)' : 'BOM Deduction Notice',
-              message: bomRes.reason === 'no_quantity'
-                ? 'معرفتش أحسب الخامات — الكمية مش محددة'
-                : (bomRes.message || (isRTL ? 'تعذر خصم الخامات لهذا الأمر.' : 'Could not deduct materials for this work order.'))
-            });
-          } else {
-            const detailsLines = (bomRes.materials || []).map(
-              m => `- ${m.deducted} ${m.unit || ''} (${m.name}) — المتبقي: ${m.remaining} ${m.unit || ''}`
-            ).join('\n');
-
-            if (bomRes.insufficientStock) {
-              dialog.alert({
-                variant: 'warning',
-                title: 'المخزون مش كافي',
-                message: `المخزون مش كافي\nتم خصم الخامات وتسجيل الرصيد بالسالب:\n${detailsLines}`
+      if (tableName === 'purchase_items' || tableName === 'purchase_order_items' || tableName === 'sales_items' || tableName === 'sales_order_items') {
+        const isPurchaseItem = tableName === 'purchase_items' || tableName === 'purchase_order_items';
+        const matId = payload.raw_material_id || payload.material_id || originalRecord?.raw_material_id || originalRecord?.material_id;
+        if (matId) {
+          const material = await db.raw_materials.get(matId);
+          if (material) {
+            const rate = isPurchaseItem ? 1 : getEffectiveMaterialRate(material, payload.consumption_per_unit);
+            const oldRate = isPurchaseItem ? 1 : getEffectiveMaterialRate(material, originalRecord?.consumption_per_unit);
+            let diff = (Number(payload.quantity) || 0) * rate;
+            if (originalRecord && !originalRecord.deleted_at) {
+              diff -= ((Number(originalRecord.quantity) || 0) * oldRate);
+            }
+            if (Math.abs(diff) > 0.0001) {
+              const stockDir = isPurchaseItem ? 1 : -1;
+              const netDelta = diff * stockDir;
+              const prevStock = Number(material.stock_quantity) || 0;
+              const newStock = prevStock + netDelta;
+              await db.raw_materials.update(material.id, {
+                stock_quantity: newStock,
+                sync_status: 'MODIFIED',
+                updated_at: now
               });
-            } else {
-              dialog.alert({
-                variant: 'success',
-                title: isRTL ? 'الخصم التلقائي للخامات (BOM)' : 'Automated BOM Deduction',
-                message: isRTL
-                  ? `تم إنهاء أمر الشغل وخصم الخامات من المخزن:\n${detailsLines}`
-                  : `Work order completed and materials deducted:\n${detailsLines}`
+              await recordStockMovement({
+                material_id: material.id,
+                material_name: material.material_name,
+                movement_type: netDelta >= 0 ? 'IN' : 'OUT',
+                source: isPurchaseItem ? 'purchase_order' : 'sales_order',
+                reference_type: isPurchaseItem ? 'purchase_order' : 'sales_order',
+                reference_id: payload.purchase_order_id || payload.sales_order_id || payload.id || null,
+                quantity: Math.abs(netDelta),
+                direction: netDelta >= 0 ? 1 : -1,
+                stock_before: prevStock,
+                stock_after: newStock,
+                unit_cost: Number(material.unit_price) || 0,
+                movement_date: now.split('T')[0],
+                notes: isPurchaseItem ? 'تعديل مباشر في بنود المشتريات' : 'تعديل مباشر في بنود المبيعات'
               });
             }
           }
-        } catch (bomErr) {
-          console.error('BOM Deduction error:', bomErr);
-        }
-      } else if (payload.status !== 'COMPLETED' && originalRecord && originalRecord.status === 'COMPLETED' && originalRecord.bom_deducted) {
-        try {
-          await revertWorkOrderBOM(originalRecord);
-        } catch (bomErr) {
-          console.error('BOM Revert error:', bomErr);
         }
       }
-    }
 
-    setIsModalOpen(false);
+      if (payload.id) {
+        // Update
+        for (const field of schema) {
+          if (field.type === 'password' || field.key === 'password_hash') {
+            const val = String(payload[field.key] || '').trim();
+            if (!val && originalRecord) {
+              const origVal = String(originalRecord[field.key] || '');
+              payload[field.key] = origVal && !isSha256Hex(origVal) ? await hashPassword(origVal) : origVal;
+            } else if (val) {
+              payload[field.key] = isSha256Hex(val) ? val : await hashPassword(val);
+            }
+          }
+        }
+        if (tableName === 'users' && (payload.id === 'usr-001-admin' || String(originalRecord?.username || '').toLowerCase() === 'admin')) {
+          payload.role = 'ADMIN';
+          payload.is_active = 1;
+        }
+        payload.updated_at = now;
+        payload.sync_status = 'MODIFIED';
+        await db[tableName].update(payload.id, payload);
+        if (tableName === 'users' && typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('permission-matrix-updated'));
+        }
+
+        if (tableName === 'raw_materials' && originalRecord) {
+          const oldStock = Number(originalRecord.stock_quantity) || 0;
+          const newStock = Number(payload.stock_quantity) || 0;
+          const diff = newStock - oldStock;
+          if (Math.abs(diff) > 0.0001) {
+            await recordStockMovement({
+              material_id: payload.id,
+              material_name: payload.material_name || originalRecord.material_name || '',
+              movement_type: 'ADJUSTMENT',
+              source: 'manual_adjustment',
+              reference_type: 'manual',
+              reference_id: payload.id,
+              quantity: Math.abs(diff),
+              direction: diff >= 0 ? 1 : -1,
+              stock_before: oldStock,
+              stock_after: newStock,
+              unit_cost: Number(payload.unit_price) || 0,
+              movement_date: now.split('T')[0],
+              notes: 'تسوية جردية يدوية لرصيد الخامة'
+            });
+          }
+        }
+      } else {
+        // Create
+        for (const field of schema) {
+          if (field.type === 'password' || field.key === 'password_hash') {
+            const val = String(payload[field.key] || '').trim();
+            if (val && !isSha256Hex(val)) {
+              payload[field.key] = await hashPassword(val);
+            }
+          }
+        }
+        payload.id = uuidv7();
+        payload.created_at = now;
+        payload.updated_at = now;
+        payload.deleted_at = null;
+        payload.sync_status = 'PENDING';
+        await db[tableName].add(payload);
+
+        if (tableName === 'raw_materials' && (Number(payload.stock_quantity) || 0) > 0) {
+          const initQty = Number(payload.stock_quantity) || 0;
+          await recordStockMovement({
+            material_id: payload.id,
+            material_name: payload.material_name || '',
+            movement_type: 'IN',
+            source: 'initial_stock',
+            reference_type: 'manual',
+            reference_id: payload.id,
+            quantity: initQty,
+            direction: 1,
+            stock_before: 0,
+            stock_after: initQty,
+            unit_cost: Number(payload.unit_price) || 0,
+            movement_date: now.split('T')[0],
+            notes: 'رصيد افتتاحي عند إضافة الخامة'
+          });
+        }
+      }
+
+      // Recalculate parent invoice totals & customer/supplier balance if a line item was added/updated directly
+      if (tableName === 'purchase_items' || tableName === 'purchase_order_items' || tableName === 'sales_items' || tableName === 'sales_order_items') {
+        const fk = (tableName === 'purchase_items' || tableName === 'purchase_order_items') ? 'purchase_order_id' : 'sales_order_id';
+        const newOrderId = payload[fk];
+        const oldOrderId = originalRecord?.[fk];
+        if (oldOrderId && oldOrderId !== newOrderId) {
+          await recalculateParentInvoiceFromItems(tableName, oldOrderId, now);
+        }
+        if (newOrderId) {
+          await recalculateParentInvoiceFromItems(tableName, newOrderId, now);
+        }
+      }
+
+      // Special handling for shipping_orders -> link shipping_cost directly to db.expenses
+      if (tableName === 'shipping_orders') {
+        const shippingId = payload.id;
+        const cost = Number(payload.shipping_cost) || 0;
+        const soId = payload.sales_order_id;
+        let soDisplay = '';
+        let customerName = '';
+        if (soId) {
+          const so = await db.sales_orders.get(soId);
+          if (so) {
+            soDisplay = `#${String(so.id).slice(0, 8).toUpperCase()}`;
+            if (so.customer_id) {
+              const cust = await db.customers.get(so.customer_id);
+              customerName = cust?.customer_name || '';
+            }
+          }
+        }
+
+        const deterministicId = `exp-shipping-${shippingId}`;
+        const existingExpenses = await db.expenses
+          .filter(e => e.id === deterministicId || (e.notes && e.notes.includes(`[SHIPPING:${shippingId}]`)))
+          .toArray();
+        const existingExp = existingExpenses[0];
+
+        if (existingExp && existingExp.deleted_at) {
+          // Respect soft-deleted expense: do nothing
+        } else if (cost > 0) {
+          const expenseData = {
+            id: existingExp ? existingExp.id : deterministicId,
+            category: 'SHIPPING',
+            amount: cost,
+            expense_date: payload.shipping_date || now.split('T')[0],
+            notes: `[SHIPPING:${shippingId}] ${soId ? `[SO:${soId}] ` : ''}Shipping & Delivery for Sales Order ${soDisplay}${customerName ? ' (' + customerName + ')' : ''}${payload.driver_name ? ' - Driver: ' + payload.driver_name : ''}`,
+            recorded_by: null,
+            created_at: existingExp?.created_at || now,
+            updated_at: now,
+            deleted_at: null,
+            sync_status: 'PENDING'
+          };
+
+          await db.expenses.put(expenseData);
+        } else if (existingExp) {
+          await db.expenses.update(existingExp.id, {
+            deleted_at: now,
+            sync_status: 'PENDING'
+          });
+        }
+      }
+
+      // Special handling for payroll -> only sync to db.expenses & deduct employee_loans when status === 'PAID'
+      // Also records full earned wage (net_pay + loan_deductions) so loan repayments settled via salary are not lost from labor costs
+      if (tableName === 'payroll') {
+        const payrollId = payload.id;
+        const isPaidStatus = String(payload.status || '').toUpperCase() === 'PAID';
+        const wasPaidStatus = Boolean(originalRecord && !originalRecord.deleted_at && String(originalRecord.status || '').toUpperCase() === 'PAID');
+        const netPay = Number(payload.net_pay) || 0;
+        const loanDed = Number(payload.loan_deductions) || 0;
+        const totalEarnedWage = Math.round((netPay + loanDed) * 100) / 100;
+        const empId = payload.employee_id;
+        let empName = '';
+        if (empId) {
+          const emp = await db.employees.get(empId);
+          empName = emp?.full_name || '';
+        }
+
+        const deterministicId = `exp-payroll-${payrollId}`;
+        const existingExpenses = await db.expenses
+          .filter(e => e.id === deterministicId || (e.notes && e.notes.includes(`[PAYROLL:${payrollId}]`)))
+          .toArray();
+        const existingExp = existingExpenses[0];
+
+        if (isPaidStatus && totalEarnedWage > 0) {
+          const loanNote = loanDed > 0 ? ` [Net Cash: ${netPay} + Loan Settled: ${loanDed}]` : '';
+          const expenseData = {
+            id: existingExp ? existingExp.id : deterministicId,
+            category: 'PAYROLL',
+            amount: totalEarnedWage,
+            expense_date: payload.period_end || payload.period_start || now.split('T')[0],
+            notes: `[PAYROLL:${payrollId}] ${empId ? `[EMP:${empId}] ` : ''}Payroll for ${empName || 'Employee'} (${payload.period_start || ''} to ${payload.period_end || ''})${loanNote} - Status: PAID`,
+            payroll_id: payrollId,
+            linked_type: 'payroll',
+            linked_id: payrollId,
+            recorded_by: null,
+            created_at: existingExp?.created_at || now,
+            updated_at: now,
+            deleted_at: null,
+            sync_status: 'PENDING'
+          };
+
+          await db.expenses.put(expenseData);
+        } else if (existingExp && !existingExp.deleted_at) {
+          await db.expenses.update(existingExp.id, {
+            deleted_at: now,
+            sync_status: 'PENDING'
+          });
+        }
+
+        // Automatically update employee_loans repayments ONLY when payroll is PAID (and revert if moved back to DRAFT/APPROVED)
+        const effectiveCurrentLoanDed = isPaidStatus ? loanDed : 0;
+        const effectivePrevLoanDed = wasPaidStatus ? (Number(originalRecord.loan_deductions) || 0) : 0;
+        const diffLoanDed = effectiveCurrentLoanDed - effectivePrevLoanDed;
+
+        if (diffLoanDed !== 0 && empId && db.employee_loans) {
+          const activeLoans = await db.employee_loans
+            .filter(l => !l.deleted_at && l.employee_id === empId && (l.status === 'ACTIVE' || l.status === 'PAID'))
+            .toArray();
+
+          let remainingDiff = diffLoanDed;
+          for (const loan of activeLoans) {
+            if (remainingDiff === 0) break;
+            const currentTotalPaid = Number(loan.total_paid) || 0;
+            const loanAmt = Number(loan.loan_amount) || 0;
+
+            let step = 0;
+            if (remainingDiff > 0) {
+              const maxRepayable = Math.max(0, loanAmt - currentTotalPaid);
+              step = Math.min(remainingDiff, maxRepayable);
+              remainingDiff -= step;
+            } else {
+              step = Math.max(remainingDiff, -currentTotalPaid);
+              remainingDiff -= step;
+            }
+
+            const newTotalPaid = Math.max(0, currentTotalPaid + step);
+            const newRemaining = Math.max(0, loanAmt - newTotalPaid);
+            const newStatus = newRemaining <= 0 ? 'PAID' : 'ACTIVE';
+
+            await db.employee_loans.update(loan.id, {
+              total_paid: newTotalPaid,
+              remaining_amount: newRemaining,
+              status: newStatus,
+              sync_status: 'MODIFIED',
+              updated_at: now
+            });
+          }
+        }
+      }
+
+      // Special handling for owner_withdrawals -> automatically sync to db.expenses
+      if (tableName === 'owner_withdrawals') {
+        const withdrawalId = payload.id;
+        const amt = Number(payload.amount) || 0;
+        const deterministicId = `exp-withdrawal-${withdrawalId}`;
+        const existingExpenses = await db.expenses
+          .filter(e => e.id === deterministicId || (e.notes && e.notes.includes(`[OWNER_WITHDRAWAL:${withdrawalId}]`)))
+          .toArray();
+        const existingExp = existingExpenses[0];
+
+        if (existingExp && existingExp.deleted_at) {
+          // Respect soft-deleted expense: do nothing
+        } else if (amt > 0) {
+          const expenseData = {
+            id: existingExp ? existingExp.id : deterministicId,
+            category: 'PERSONAL',
+            amount: amt,
+            expense_date: payload.withdrawal_date || now.split('T')[0],
+            notes: `[OWNER_WITHDRAWAL:${withdrawalId}] Owner Withdrawal: ${payload.owner_name || 'Owner'} (${payload.category || 'PERSONAL'})${payload.notes ? ' - ' + payload.notes : ''}`,
+            recorded_by: null,
+            created_at: existingExp?.created_at || now,
+            updated_at: now,
+            deleted_at: null,
+            sync_status: 'PENDING'
+          };
+
+          await db.expenses.put(expenseData);
+        } else if (existingExp) {
+          await db.expenses.update(existingExp.id, {
+            deleted_at: now,
+            sync_status: 'PENDING'
+          });
+        }
+      }
+
+      // Special handling for work_orders -> Automated Raw Material Deduction (BOM) when COMPLETED
+      if (tableName === 'work_orders') {
+        if (payload.status === 'COMPLETED' && (!originalRecord || originalRecord.status !== 'COMPLETED' || !originalRecord.bom_deducted)) {
+          try {
+            const bomRes = await deductWorkOrderBOM({ ...payload, id: payload.id });
+            if (!bomRes.success) {
+              dialog.alert({
+                variant: 'warning',
+                title: isRTL ? 'تنبيه خصم الخامات (BOM)' : 'BOM Deduction Notice',
+                message: bomRes.reason === 'no_quantity'
+                  ? 'معرفتش أحسب الخامات — الكمية مش محددة'
+                  : (bomRes.message || (isRTL ? 'تعذر خصم الخامات لهذا الأمر.' : 'Could not deduct materials for this work order.'))
+              });
+            } else {
+              const detailsLines = (bomRes.materials || []).map(
+                m => `- ${m.deducted} ${m.unit || ''} (${m.name}) — المتبقي: ${m.remaining} ${m.unit || ''}`
+              ).join('\n');
+
+              if (bomRes.insufficientStock) {
+                dialog.alert({
+                  variant: 'warning',
+                  title: 'المخزون مش كافي',
+                  message: `المخزون مش كافي\nتم خصم الخامات وتسجيل الرصيد بالسالب:\n${detailsLines}`
+                });
+              } else {
+                dialog.alert({
+                  variant: 'success',
+                  title: isRTL ? 'الخصم التلقائي للخامات (BOM)' : 'Automated BOM Deduction',
+                  message: isRTL
+                    ? `تم إنهاء أمر الشغل وخصم الخامات من المخزن:\n${detailsLines}`
+                    : `Work order completed and materials deducted:\n${detailsLines}`
+                });
+              }
+            }
+          } catch (bomErr) {
+            console.error('BOM Deduction error:', bomErr);
+          }
+        } else if (payload.status !== 'COMPLETED' && originalRecord && originalRecord.status === 'COMPLETED' && originalRecord.bom_deducted) {
+          try {
+            await revertWorkOrderBOM(originalRecord);
+          } catch (bomErr) {
+            console.error('BOM Revert error:', bomErr);
+          }
+        }
+      }
+
+      setIsModalOpen(false);
     } finally {
       isSavingRef.current = false;
       setIsSaving(false);
@@ -871,7 +869,7 @@ export default function DynamicCRUD({
           });
         }
       }
-      
+
       await db[tableName].update(id, {
         deleted_at: now,
         sync_status: 'DELETED'
@@ -893,8 +891,8 @@ export default function DynamicCRUD({
     const ok = await dialog.confirm({
       variant: 'danger',
       title: isRTL ? 'حذف السجلات المحددة' : 'Bulk Delete Records',
-      message: isRTL 
-        ? `هل أنت متأكد من رغبتك في حذف ${count} سجل محدد من جدول (${title})؟` 
+      message: isRTL
+        ? `هل أنت متأكد من رغبتك في حذف ${count} سجل محدد من جدول (${title})؟`
         : `Are you sure you want to delete ${count} selected records from ${title}?`
     });
 
@@ -1060,12 +1058,12 @@ export default function DynamicCRUD({
         if (field.type === 'relation') val = getRelationLabel(field, val);
         else if (field.type === 'checkbox') val = val ? t('active') : t('inactive');
         else if (field.options) val = t(String(val).toLowerCase()) || val;
-        
+
         // Escape quotes and commas
         return `"${String(val || '').replace(/"/g, '""')}"`;
       }).join(',');
     });
-    
+
     const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers, ...rows].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
@@ -1090,7 +1088,7 @@ export default function DynamicCRUD({
     });
   });
 
-  const computedCards = metricCards !== undefined 
+  const computedCards = metricCards !== undefined
     ? (typeof metricCards === 'function' ? metricCards(data, relationsData, t, isRTL) : metricCards)
     : computeTableMetrics(tableName, data, relationsData, t, isRTL);
 
@@ -1115,9 +1113,9 @@ export default function DynamicCRUD({
       <PageMetricCards cards={computedCards} />
 
       <div className={`glass-card ${viewDetailRecord || profileTarget || isModalOpen ? 'hide-on-print' : 'print-area'}`}>
-        
+
         {/* Table Search & Filter Toolbar */}
-        <div 
+        <div
           className="hide-on-print"
           style={{
             display: 'flex',
@@ -1131,15 +1129,15 @@ export default function DynamicCRUD({
           }}
         >
           <div style={{ position: 'relative', minWidth: '260px', flex: 1, maxWidth: '420px' }}>
-            <Search 
-              size={16} 
-              style={{ 
-                position: 'absolute', 
-                [isRTL ? 'right' : 'left']: '12px', 
-                top: '50%', 
-                transform: 'translateY(-50%)', 
-                color: 'var(--text-muted)' 
-              }} 
+            <Search
+              size={16}
+              style={{
+                position: 'absolute',
+                [isRTL ? 'right' : 'left']: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: 'var(--text-muted)'
+              }}
             />
             <input
               type="text"
@@ -1192,7 +1190,7 @@ export default function DynamicCRUD({
 
         {/* Bulk Action Toolbar */}
         {selectedIds.length > 0 && (
-          <div 
+          <div
             className="hide-on-print"
             style={{
               display: 'flex',
@@ -1208,8 +1206,8 @@ export default function DynamicCRUD({
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ef4444' }}>
-                {isRTL 
-                  ? `تم تحديد ${selectedIds.length} من أصل ${data.length} سجل` 
+                {isRTL
+                  ? `تم تحديد ${selectedIds.length} من أصل ${data.length} سجل`
                   : `${selectedIds.length} of ${data.length} records selected`}
               </span>
               <button
@@ -1249,8 +1247,8 @@ export default function DynamicCRUD({
             >
               <Trash2 size={16} />
               <span>
-                {isRTL 
-                  ? `حذف السجلات المحددة (${selectedIds.length})` 
+                {isRTL
+                  ? `حذف السجلات المحددة (${selectedIds.length})`
                   : `Delete Selected (${selectedIds.length})`}
               </span>
             </button>
@@ -1264,7 +1262,7 @@ export default function DynamicCRUD({
             <p className="report-title">{title} - {t('report')}</p>
           </div>
           <div className="print-meta">
-            {t('printed_at')} {new Date().toLocaleString()}<br/>
+            {t('printed_at')} {new Date().toLocaleString()}<br />
             {t('system_name')}
           </div>
         </div>
@@ -1304,7 +1302,7 @@ export default function DynamicCRUD({
             </thead>
             <tbody>
               {filteredData.map(record => (
-                <tr 
+                <tr
                   key={record.id}
                   className="clickable-row"
                   onClick={() => {
@@ -1382,120 +1380,120 @@ export default function DynamicCRUD({
                           />
                         ) : getRelationLabel(field, record[field.key])
                       )
-                      : field.type === 'image' && record[field.key] ? (
-                        <img
-                          src={record[field.key]}
-                          alt="Item"
-                          onClick={() => setPreviewImage(record[field.key])}
-                          title={t('click_to_view') || 'Click to view original size'}
-                          style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', cursor: 'zoom-in', border: '1px solid var(--border)' }}
-                        />
-                      )
-                      : field.type === 'multi_image' && record[field.key] ? (
-                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                          {(() => {
-                            try {
-                              const imgs = JSON.parse(record[field.key]);
-                              return (Array.isArray(imgs) ? imgs : [imgs]).map((src, idx) => (
-                                <img
-                                  key={idx}
-                                  src={src}
-                                  alt={`Item ${idx}`}
-                                  onClick={() => setPreviewImage(src)}
-                                  title={t('click_to_view') || 'Click to view original size'}
-                                  style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', cursor: 'zoom-in', border: '1px solid var(--border)' }}
-                                />
-                              ));
-                            } catch {
-                              return null;
-                            }
-                          })()}
-                        </div>
-                      )
-                      : field.type === 'checkbox' ? (
-                        <span style={{ 
-                          padding: '0.25rem 0.75rem', 
-                          borderRadius: '999px', 
-                          fontSize: '0.75rem', 
-                          backgroundColor: record[field.key] ? 'rgba(16, 185, 129, 0.1)' : 'rgba(220, 38, 38, 0.1)',
-                          color: record[field.key] ? '#10B981' : 'var(--danger)'
-                        }}>
-                          {record[field.key] ? t('active') : t('inactive')}
-                        </span>
-                      ) : field.type === 'color_palette' ? (() => {
-                        const val = String(record[field.key] || '');
-                        if (!val) return '-';
-                        const hexMatch = val.match(/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})/);
-                        let color = hexMatch ? hexMatch[0] : null;
-                        if (!color) {
-                          const lower = val.toLowerCase();
-                          if (lower.includes('brown') || lower.includes('kraft')) color = '#B8860B';
-                          else if (lower.includes('white') || lower.includes('duplex')) color = '#FFFFFF';
-                          else if (lower.includes('black')) color = '#1A1A1A';
-                          else if (lower.includes('cyan')) color = '#00A3E0';
-                          else if (lower.includes('yellow')) color = '#FACC15';
-                          else if (lower.includes('red')) color = '#DC2626';
-                          else if (lower.includes('green')) color = '#16A34A';
-                          else if (lower.includes('blue')) color = '#2563EB';
-                          else if (lower.includes('gray') || lower.includes('grey')) color = '#9CA3AF';
-                        }
-                        return (
-                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
-                            {color && (
-                              <span 
-                                style={{ 
-                                  width: '14px', 
-                                  height: '14px', 
-                                  borderRadius: '50%', 
-                                  backgroundColor: color, 
-                                  display: 'inline-block',
-                                  border: color.toUpperCase() === '#FFFFFF' ? '1px solid #ccc' : '1px solid rgba(0,0,0,0.2)',
-                                  boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
-                                }} 
-                              />
-                            )}
-                            <span>{val}</span>
-                          </div>
-                        );
-                      })()
-                      : field.options ? (() => {
-                          const val = record[field.key];
-                          if (val === undefined || val === null || val === '') return '';
-                          if (Array.isArray(field.options)) {
-                            const match = field.options.find(o => typeof o === 'object' && o !== null && ((o.value ?? o.key ?? o.id) === val));
-                            if (match) {
-                              return isRTL ? (match.nameAr || match.labelAr || match.label || match.name || val) : (match.nameEn || match.labelEn || match.label || match.name || val);
-                            }
-                          }
-                          const lower = String(val).toLowerCase();
-                          if (i18n.exists(lower)) return t(lower);
-                          if (i18n.exists(String(val))) return t(String(val));
-                          return val;
-                        })()
-                      : (field.key === 'account_balance' || field.key === 'remaining_amount') ? (() => {
-                          const balVal = Number(record[field.key]) || 0;
-                          return (
-                            <span style={{ fontWeight: 700, color: balVal < 0 ? '#2563eb' : (balVal > 0 ? '#EF4444' : '#10B981') }}>
-                              {formatAmount(balVal)} {t('egp')}
-                              {balVal < 0 && (
-                                <span style={{ marginInlineStart: '0.4rem', fontSize: '0.72rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(37, 99, 235, 0.12)', color: '#2563eb', fontWeight: 700 }}>
-                                  دفعة مقدمة
-                                </span>
-                              )}
-                            </span>
-                          );
-                        })()
-                      : field.type === 'number' && field.isCurrency ? `${formatAmount(record[field.key])} ${t('egp')}`
-                      : (record[field.key] ?? (field.key === 'bill_of_lading_number' ? record.vehicle_number : ''))}
+                        : field.type === 'image' && record[field.key] ? (
+                          <img
+                            src={record[field.key]}
+                            alt="Item"
+                            onClick={() => setPreviewImage(record[field.key])}
+                            title={t('click_to_view') || 'Click to view original size'}
+                            style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', cursor: 'zoom-in', border: '1px solid var(--border)' }}
+                          />
+                        )
+                          : field.type === 'multi_image' && record[field.key] ? (
+                            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                              {(() => {
+                                try {
+                                  const imgs = JSON.parse(record[field.key]);
+                                  return (Array.isArray(imgs) ? imgs : [imgs]).map((src, idx) => (
+                                    <img
+                                      key={idx}
+                                      src={src}
+                                      alt={`Item ${idx}`}
+                                      onClick={() => setPreviewImage(src)}
+                                      title={t('click_to_view') || 'Click to view original size'}
+                                      style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', cursor: 'zoom-in', border: '1px solid var(--border)' }}
+                                    />
+                                  ));
+                                } catch {
+                                  return null;
+                                }
+                              })()}
+                            </div>
+                          )
+                            : field.type === 'checkbox' ? (
+                              <span style={{
+                                padding: '0.25rem 0.75rem',
+                                borderRadius: '999px',
+                                fontSize: '0.75rem',
+                                backgroundColor: record[field.key] ? 'rgba(16, 185, 129, 0.1)' : 'rgba(220, 38, 38, 0.1)',
+                                color: record[field.key] ? '#10B981' : 'var(--danger)'
+                              }}>
+                                {record[field.key] ? t('active') : t('inactive')}
+                              </span>
+                            ) : field.type === 'color_palette' ? (() => {
+                              const val = String(record[field.key] || '');
+                              if (!val) return '-';
+                              const hexMatch = val.match(/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})/);
+                              let color = hexMatch ? hexMatch[0] : null;
+                              if (!color) {
+                                const lower = val.toLowerCase();
+                                if (lower.includes('brown') || lower.includes('kraft')) color = '#B8860B';
+                                else if (lower.includes('white') || lower.includes('duplex')) color = '#FFFFFF';
+                                else if (lower.includes('black')) color = '#1A1A1A';
+                                else if (lower.includes('cyan')) color = '#00A3E0';
+                                else if (lower.includes('yellow')) color = '#FACC15';
+                                else if (lower.includes('red')) color = '#DC2626';
+                                else if (lower.includes('green')) color = '#16A34A';
+                                else if (lower.includes('blue')) color = '#2563EB';
+                                else if (lower.includes('gray') || lower.includes('grey')) color = '#9CA3AF';
+                              }
+                              return (
+                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.45rem' }}>
+                                  {color && (
+                                    <span
+                                      style={{
+                                        width: '14px',
+                                        height: '14px',
+                                        borderRadius: '50%',
+                                        backgroundColor: color,
+                                        display: 'inline-block',
+                                        border: color.toUpperCase() === '#FFFFFF' ? '1px solid #ccc' : '1px solid rgba(0,0,0,0.2)',
+                                        boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                                      }}
+                                    />
+                                  )}
+                                  <span>{val}</span>
+                                </div>
+                              );
+                            })()
+                              : field.options ? (() => {
+                                const val = record[field.key];
+                                if (val === undefined || val === null || val === '') return '';
+                                if (Array.isArray(field.options)) {
+                                  const match = field.options.find(o => typeof o === 'object' && o !== null && ((o.value ?? o.key ?? o.id) === val));
+                                  if (match) {
+                                    return isRTL ? (match.nameAr || match.labelAr || match.label || match.name || val) : (match.nameEn || match.labelEn || match.label || match.name || val);
+                                  }
+                                }
+                                const lower = String(val).toLowerCase();
+                                if (i18n.exists(lower)) return t(lower);
+                                if (i18n.exists(String(val))) return t(String(val));
+                                return val;
+                              })()
+                                : (field.key === 'account_balance' || field.key === 'remaining_amount') ? (() => {
+                                  const balVal = Number(record[field.key]) || 0;
+                                  return (
+                                    <span style={{ fontWeight: 700, color: balVal < 0 ? '#2563eb' : (balVal > 0 ? '#EF4444' : '#10B981') }}>
+                                      {formatAmount(balVal)} {t('egp')}
+                                      {balVal < 0 && (
+                                        <span style={{ marginInlineStart: '0.4rem', fontSize: '0.72rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(37, 99, 235, 0.12)', color: '#2563eb', fontWeight: 700 }}>
+                                          دفعة مقدمة
+                                        </span>
+                                      )}
+                                    </span>
+                                  );
+                                })()
+                                  : field.type === 'number' && field.isCurrency ? `${formatAmount(record[field.key])} ${t('egp')}`
+                                    : (record[field.key] ?? (field.key === 'bill_of_lading_number' ? record.vehicle_number : ''))}
                     </td>
                   ))}
                   <td className="hide-on-print" style={{ padding: '1rem' }} onClick={(e) => e.stopPropagation()}>
                     <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center' }}>
                       {/* Single Unified View / Profile Action Button with smooth hover effect */}
-                      <button 
-                        className="icon-btn" 
-                        style={{ 
-                          color: '#2563eb', 
+                      <button
+                        className="icon-btn"
+                        style={{
+                          color: '#2563eb',
                           background: 'rgba(37, 99, 235, 0.08)',
                           borderRadius: '8px',
                           padding: '0.45rem',
@@ -1504,7 +1502,7 @@ export default function DynamicCRUD({
                           justifyContent: 'center',
                           cursor: 'pointer',
                           transition: 'all 0.18s ease'
-                        }} 
+                        }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.background = 'rgba(37, 99, 235, 0.2)';
                           e.currentTarget.style.color = '#1d4ed8';
@@ -1521,7 +1519,7 @@ export default function DynamicCRUD({
                           } else {
                             setViewDetailRecord(record);
                           }
-                        }} 
+                        }}
                         title={TABLE_TO_ENTITY_TYPE?.[tableName] ? (isRTL ? 'عرض الملف والتقرير الشامل' : 'View Full Profile & Report') : (isRTL ? 'عرض التفاصيل' : 'View Details')}
                       >
                         <Eye size={16} />
@@ -1568,11 +1566,11 @@ export default function DynamicCRUD({
                     <td
                       key={field.key}
                       className={isSensitiveField(field) ? 'hide-on-print' : undefined}
-                      style={{ 
-                        padding: '1rem', 
-                        color: 'var(--text-main)', 
+                      style={{
+                        padding: '1rem',
+                        color: 'var(--text-main)',
                         fontWeight: 800,
-                        textAlign: i === 0 ? (isRTL ? 'left' : 'right') : (isRTL ? 'right' : 'left') 
+                        textAlign: i === 0 ? (isRTL ? 'left' : 'right') : (isRTL ? 'right' : 'left')
                       }}
                     >
                       {i === 0 && (
@@ -1585,7 +1583,7 @@ export default function DynamicCRUD({
                         const isNegBalance = (field.key === 'account_balance' || field.key === 'remaining_amount') && sumVal < 0;
                         return (
                           <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 800, color: isNegBalance ? '#2563eb' : 'var(--text-main)' }}>
-                            {field.isCurrency 
+                            {field.isCurrency
                               ? `${formatAmount(sumVal)} ${t('egp') || (isRTL ? 'ج.م' : 'EGP')}${isNegBalance ? ' (دفعة مقدمة)' : ''}`
                               : sumVal}
                           </span>
@@ -1602,18 +1600,18 @@ export default function DynamicCRUD({
       </div>
 
       {isModalOpen && (
-        <div 
+        <div
           className="modern-modal-overlay"
           onClick={(e) => {
             if (e.target === e.currentTarget) setIsModalOpen(false);
           }}
         >
-          <div 
-            className="glass-card modern-modal-dialog" 
-            style={{ 
-              width: 'min(92vw, 840px)', 
-              maxWidth: 'min(92vw, 840px)', 
-              maxHeight: '86vh', 
+          <div
+            className="glass-card modern-modal-dialog"
+            style={{
+              width: 'min(92vw, 840px)',
+              maxWidth: 'min(92vw, 840px)',
+              maxHeight: '86vh',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
@@ -1623,16 +1621,16 @@ export default function DynamicCRUD({
             {/* Modern Executive Modal Header */}
             <div className="modern-modal-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                <div style={{ 
-                  width: 46, 
-                  height: 46, 
-                  borderRadius: '14px', 
-                  background: 'rgba(37, 99, 235, 0.12)', 
-                  color: 'var(--primary)', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  flexShrink: 0 
+                <div style={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: '14px',
+                  background: 'rgba(37, 99, 235, 0.12)',
+                  color: 'var(--primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
                 }}>
                   <FileText size={24} />
                 </div>
@@ -1648,37 +1646,37 @@ export default function DynamicCRUD({
                     )}
                   </div>
                   <p style={{ margin: '3px 0 0', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-                    {formData.id 
-                      ? (isRTL ? 'تعديل وتحديث بيانات السجل المسجل بالنظام' : 'Update existing record attributes') 
+                    {formData.id
+                      ? (isRTL ? 'تعديل وتحديث بيانات السجل المسجل بالنظام' : 'Update existing record attributes')
                       : (isRTL ? 'إدخال بيانات السجل الجديد وتوثيقه' : 'Create and commit a new entry')}
                   </p>
                 </div>
               </div>
-              <button 
+              <button
                 type="button"
-                className="modern-modal-close-btn" 
+                className="modern-modal-close-btn"
                 onClick={() => setIsModalOpen(false)}
                 title={isRTL ? 'إغلاق' : 'Close'}
               >
                 <X size={20} />
               </button>
             </div>
-            
+
             <form id="dynamic-crud-form" onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
               {/* Modal Body - Independently Scrollable */}
-              <div 
+              <div
                 className="modal-body-scroll"
-                style={{ 
-                  flex: 1, 
-                  overflowY: 'auto', 
-                  padding: '1.75rem', 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  gap: '1.5rem' 
+                style={{
+                  flex: 1,
+                  overflowY: 'auto',
+                  padding: '1.75rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1.5rem'
                 }}
               >
                 {customModalRender && customModalRender({ formData, updateField, relationsData, t })}
-                
+
                 {/* Header Details Card */}
                 <div className="modern-card-section">
                   <h3 style={{ fontSize: '0.98rem', fontWeight: 700, marginBottom: '1.25rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -1686,944 +1684,943 @@ export default function DynamicCRUD({
                     {isRTL ? 'بيانات وتفاصيل السجل' : 'Record Attributes & Details'}
                   </h3>
 
-                  <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', 
-                    gap: '1.25rem' 
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                    gap: '1.25rem'
                   }}>
-                {schema.map(field => {
-                  if (field.hideInForm) return null;
+                    {schema.map(field => {
+                      if (field.hideInForm) return null;
 
-                  if (tableName === 'work_orders' && (field.key === 'employee_2' || field.key === 'employee_3' || field.key === 'employee_4' || field.key === 'employee_5' || field.key === 'employee_6')) {
-                    return null;
-                  }
+                      if (tableName === 'work_orders' && (field.key === 'employee_2' || field.key === 'employee_3' || field.key === 'employee_4' || field.key === 'employee_5' || field.key === 'employee_6')) {
+                        return null;
+                      }
 
-                  if (tableName === 'work_orders' && field.key === 'employee_1') {
-                    const employeeOptions = relationsData?.['employees'] || [];
-                    const assignedCount = [1, 2, 3, 4, 5, 6].filter(i => Boolean(formData[`employee_${i}`])).length;
+                      if (tableName === 'work_orders' && field.key === 'employee_1') {
+                        const employeeOptions = relationsData?.['employees'] || [];
+                        const assignedCount = [1, 2, 3, 4, 5, 6].filter(i => Boolean(formData[`employee_${i}`])).length;
 
-                    const removeCrewMember = (slotIdx) => {
-                      setFormData(prev => {
-                        const next = { ...prev };
-                        for (let s = slotIdx; s < 6; s++) {
-                          next[`employee_${s}`] = next[`employee_${s + 1}`] || '';
-                        }
-                        next.employee_6 = '';
-                        formDataRef.current = next;
-                        return next;
-                      });
-                      setWorkOrderEmpCount(prev => Math.max(1, prev - 1));
-                    };
-
-                    return (
-                      <div 
-                        key="work_order_crew_section" 
-                        style={{ 
-                          gridColumn: '1 / -1', 
-                          background: 'var(--surface)', 
-                          border: '1.5px solid var(--border)', 
-                          borderRadius: '12px', 
-                          padding: '1.25rem',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
-                        }}
-                      >
-                        {/* Crew Section Header */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-                            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              <Users size={18} />
-                            </div>
-                            <div>
-                              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)' }}>
-                                {t('assigned_crew')}
-                              </h4>
-                              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                {isRTL ? 'فريق العمل المعين لتنفيذ هذا الأمر (حتى 6 موظفين)' : 'Assigned crew members executing this work order (up to 6)'}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ 
-                              fontSize: '0.78rem', 
-                              fontWeight: 700, 
-                              padding: '0.25rem 0.65rem', 
-                              borderRadius: '999px', 
-                              background: assignedCount > 0 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(100, 116, 139, 0.12)', 
-                              color: assignedCount > 0 ? '#10b981' : 'var(--text-muted)' 
-                            }}>
-                              {assignedCount} / 6 {isRTL ? 'معينين' : 'assigned'}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Dynamic Employee Slots Grid */}
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.95rem' }}>
-                          {Array.from({ length: workOrderEmpCount }, (_, idx) => idx + 1).map(slotIdx => {
-                            const empKey = `employee_${slotIdx}`;
-                            const isLead = slotIdx === 1;
-                            const currentVal = formData[empKey] || '';
-
-                            return (
-                              <div 
-                                key={empKey} 
-                                style={{ 
-                                  background: 'var(--surface-hover)', 
-                                  border: isLead ? '1.5px solid rgba(37, 99, 235, 0.3)' : '1px solid var(--border)', 
-                                  borderRadius: '10px', 
-                                  padding: '0.85rem',
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  gap: '0.45rem'
-                                }}
-                              >
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                  <label style={{ fontSize: '0.82rem', fontWeight: 700, color: isLead ? '#2563eb' : 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                                    <span>{t(empKey)}</span>
-                                    {isLead && <span style={{ color: '#ef4444' }}>*</span>}
-                                  </label>
-
-                                  {!isLead && (
-                                    <button
-                                      type="button"
-                                      onClick={() => removeCrewMember(slotIdx)}
-                                      title={t('remove_crew_employee')}
-                                      style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        color: '#ef4444',
-                                        cursor: 'pointer',
-                                        padding: '2px 4px',
-                                        borderRadius: '4px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '2px',
-                                        fontSize: '0.72rem',
-                                        fontWeight: 600
-                                      }}
-                                    >
-                                      <Trash2 size={13} />
-                                      <span>{t('remove')}</span>
-                                    </button>
-                                  )}
-                                </div>
-
-                                <select
-                                  dir={isRTL ? 'rtl' : 'ltr'}
-                                  value={currentVal}
-                                  onChange={e => updateField(empKey, e.target.value)}
-                                  required={isLead}
-                                  className="modern-input"
-                                  style={{
-                                    width: '100%',
-                                    fontWeight: 600,
-                                    fontSize: '0.9rem',
-                                    direction: isRTL ? 'rtl' : 'ltr',
-                                    textAlign: isRTL ? 'right' : 'left'
-                                  }}
-                                >
-                                  <option value="">-- {t('select')} {t(empKey)} --</option>
-                                  {employeeOptions.map(emp => (
-                                    <option key={emp.id} value={emp.id}>
-                                      {emp.full_name} {emp.job_title ? `(${emp.job_title})` : ''}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {/* Add Employee Button */}
-                        <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          {workOrderEmpCount < 6 ? (
-                            <button
-                              type="button"
-                              onClick={() => setWorkOrderEmpCount(prev => Math.min(6, prev + 1))}
-                              style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.45rem',
-                                padding: '0.55rem 1rem',
-                                background: 'rgba(37, 99, 235, 0.08)',
-                                color: '#2563eb',
-                                border: '1.5px dashed #2563eb',
-                                borderRadius: '8px',
-                                fontWeight: 700,
-                                fontSize: '0.85rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.15s ease'
-                              }}
-                            >
-                              <Plus size={16} />
-                              <span>{t('add_crew_employee')} ({workOrderEmpCount}/6)</span>
-                            </button>
-                          ) : (
-                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                              {t('max_crew_reached')}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  const isFullWidth = field.type === 'textarea' || field.type === 'dimensions' || field.type === 'color_palette' || field.type === 'image' || field.type === 'multi_image';
-                  
-                  return (
-                    <div key={field.key} style={{ gridColumn: isFullWidth ? '1 / -1' : undefined }}>
-                      {field.type !== 'checkbox' && (
-                        <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.45rem', color: 'var(--text-main)' }}>
-                          {t(field.label)} {field.required && <span style={{ color: '#ef4444' }}>*</span>}
-                        </label>
-                      )}
-                      
-                      {field.type === 'text' && (
-                        <input 
-                          type="text" 
-                          value={formData[field.key] || ''}
-                          onChange={e => updateField(field.key, e.target.value)}
-                          required={field.required}
-                          className="modern-input"
-                          style={{ width: '100%' }}
-                        />
-                      )}
-
-                      {field.type === 'password' && (
-                        <input 
-                          type="password" 
-                          value={formData[field.key] || ''}
-                          onChange={e => updateField(field.key, e.target.value)}
-                          required={field.required && !formData.id}
-                          className="modern-input"
-                          style={{ width: '100%' }}
-                          placeholder={formData.id ? t('leave_blank_to_keep_password') : ''}
-                        />
-                      )}
-
-                      {field.type === 'image' && (
-                        <div>
-                          <input 
-                            type="file" 
-                            accept="image/*"
-                            onChange={e => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                  updateField(field.key, reader.result);
-                                };
-                                reader.readAsDataURL(file);
-                              }
-                            }}
-                            required={field.required && !formData[field.key]}
-                            className="modern-input"
-                            style={{ width: '100%' }}
-                          />
-                          {formData[field.key] && (
-                            <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                              <img
-                                src={formData[field.key]}
-                                alt="Preview"
-                                onClick={() => setPreviewImage(formData[field.key])}
-                                title={t('click_to_view') || 'Click to view original size'}
-                                style={{ maxHeight: '100px', maxWidth: '140px', objectFit: 'contain', borderRadius: '8px', cursor: 'zoom-in', border: '1.5px solid var(--border)' }}
-                              />
-                              <button type="button" onClick={() => updateField(field.key, null)} style={{ background: 'var(--danger)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>
-                                {t('remove')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {field.type === 'multi_image' && (
-                        <div>
-                          <input 
-                            type="file" 
-                            accept="image/*"
-                            multiple
-                            onChange={e => {
-                              const files = Array.from(e.target.files);
-                              Promise.all(files.map(file => new Promise((resolve) => {
-                                const reader = new FileReader();
-                                reader.onloadend = () => resolve(reader.result);
-                                reader.readAsDataURL(file);
-                              }))).then(results => {
-                                const existing = formData[field.key] ? JSON.parse(formData[field.key]) : [];
-                                updateField(field.key, JSON.stringify([...existing, ...results]));
-                              });
-                            }}
-                            required={field.required && !formData[field.key]}
-                            className="modern-input"
-                            style={{ width: '100%' }}
-                          />
-                          {formData[field.key] && JSON.parse(formData[field.key]).length > 0 && (
-                            <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                              {JSON.parse(formData[field.key]).map((src, idx) => (
-                                <div key={idx} style={{ position: 'relative' }}>
-                                  <img
-                                    src={src}
-                                    alt="Preview"
-                                    onClick={() => setPreviewImage(src)}
-                                    title={t('click_to_view') || 'Click to view original size'}
-                                    style={{ maxHeight: '100px', maxWidth: '140px', objectFit: 'contain', borderRadius: '8px', cursor: 'zoom-in', border: '1.5px solid var(--border)' }}
-                                  />
-                                  <button type="button" onClick={() => {
-                                    const items = JSON.parse(formData[field.key]);
-                                    items.splice(idx, 1);
-                                    updateField(field.key, JSON.stringify(items));
-                                  }} style={{ position: 'absolute', top: 0, right: 0, background: 'var(--danger)', color: 'white', padding: '2px 6px', borderRadius: '0 6px 0 6px', border: 'none', cursor: 'pointer', fontSize: '10px' }}>
-                                    X
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {field.type === 'number' && (
-                        <input 
-                          type="number" 
-                          step={field.isCurrency ? "0.01" : "any"}
-                          value={formData[field.key] ?? 0}
-                          onChange={e => updateField(field.key, e.target.value)}
-                          required={field.required}
-                          disabled={field.disabled || (field.readOnly && !field.editable)}
-                          className="modern-input"
-                          style={{ 
-                            width: '100%',
-                            opacity: (field.disabled || (field.readOnly && !field.editable)) ? 0.6 : 1,
-                            cursor: (field.disabled || (field.readOnly && !field.editable)) ? 'not-allowed' : 'text'
-                          }}
-                        />
-                      )}
-
-                      {field.type === 'date' && (
-                        <input 
-                          type="date" 
-                          value={formData[field.key] || ''}
-                          onChange={e => updateField(field.key, e.target.value)}
-                          required={field.required}
-                          className="modern-input"
-                          style={{ width: '100%' }}
-                        />
-                      )}
-
-                      {field.type === 'time' && (
-                        <input 
-                          type="time" 
-                          value={formData[field.key] || ''}
-                          onChange={e => updateField(field.key, e.target.value)}
-                          required={field.required}
-                          className="modern-input"
-                          style={{ width: '100%' }}
-                        />
-                      )}
-
-                      {field.type === 'textarea' && (
-                        <textarea 
-                          value={formData[field.key] || ''}
-                          onChange={e => updateField(field.key, e.target.value)}
-                          required={field.required}
-                          rows="3"
-                          className="modern-input"
-                          style={{ width: '100%', resize: 'vertical' }}
-                        />
-                      )}
-
-                      {field.type === 'dimensions' && (() => {
-                        const currentDim = dimensionStates[field.key] || { length: '', width: '', height: '', unit: 'cm', mode: '3d' };
-                        const is3D = currentDim.mode !== 'free';
+                        const removeCrewMember = (slotIdx) => {
+                          setFormData(prev => {
+                            const next = { ...prev };
+                            for (let s = slotIdx; s < 6; s++) {
+                              next[`employee_${s}`] = next[`employee_${s + 1}`] || '';
+                            }
+                            next.employee_6 = '';
+                            return next;
+                          });
+                          setWorkOrderEmpCount(prev => Math.max(1, prev - 1));
+                        };
 
                         return (
-                          <div>
-                            {/* Mode Switcher Tabs */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                {is3D ? (isRTL ? 'الأبعاد الثلاثية (طول × عرض × ارتفاع)' : '3 Dimensions (L × W × H)') : (isRTL ? 'نص حر' : 'Free Text')}
-                              </span>
-                              <div style={{ display: 'flex', gap: '0.25rem', background: 'var(--surface-hover)', padding: '2px', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                                <button
-                                  type="button"
-                                  onClick={() => toggleDimensionMode(field.key, '3d')}
-                                  style={{
-                                    padding: '0.25rem 0.6rem',
-                                    fontSize: '0.75rem',
-                                    fontWeight: is3D ? 600 : 400,
-                                    borderRadius: '4px',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    background: is3D ? 'var(--primary)' : 'transparent',
-                                    color: is3D ? 'var(--primary-foreground)' : 'var(--text-muted)'
-                                  }}
-                                >
-                                  {isRTL ? '3 أبعاد (طول × عرض × ارتفاع)' : '3 Dimensions'}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => toggleDimensionMode(field.key, 'free')}
-                                  style={{
-                                    padding: '0.25rem 0.6rem',
-                                    fontSize: '0.75rem',
-                                    fontWeight: !is3D ? 600 : 400,
-                                    borderRadius: '4px',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    background: !is3D ? 'var(--primary)' : 'transparent',
-                                    color: !is3D ? 'var(--primary-foreground)' : 'var(--text-muted)'
-                                  }}
-                                >
-                                  {isRTL ? 'نص حر' : 'Free Text'}
-                                </button>
+                          <div
+                            key="work_order_crew_section"
+                            style={{
+                              gridColumn: '1 / -1',
+                              background: 'var(--surface)',
+                              border: '1.5px solid var(--border)',
+                              borderRadius: '12px',
+                              padding: '1.25rem',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+                            }}
+                          >
+                            {/* Crew Section Header */}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <Users size={18} />
+                                </div>
+                                <div>
+                                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                                    {t('assigned_crew')}
+                                  </h4>
+                                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                    {isRTL ? 'فريق العمل المعين لتنفيذ هذا الأمر (حتى 6 موظفين)' : 'Assigned crew members executing this work order (up to 6)'}
+                                  </p>
+                                </div>
+                              </div>
+
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{
+                                  fontSize: '0.78rem',
+                                  fontWeight: 700,
+                                  padding: '0.25rem 0.65rem',
+                                  borderRadius: '999px',
+                                  background: assignedCount > 0 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(100, 116, 139, 0.12)',
+                                  color: assignedCount > 0 ? '#10b981' : 'var(--text-muted)'
+                                }}>
+                                  {assignedCount} / 6 {isRTL ? 'معينين' : 'assigned'}
+                                </span>
                               </div>
                             </div>
 
-                            {is3D ? (
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr) auto', gap: '0.65rem', alignItems: 'center' }}>
-                                  {/* Length (الطول) */}
-                                  <div>
-                                    <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                                      {t('length') || (isRTL ? 'الطول' : 'Length')}
-                                    </span>
-                                    <input
-                                      type="number"
-                                      step="any"
-                                      placeholder={isRTL ? 'طول' : 'Length'}
-                                      value={currentDim.length || ''}
-                                      onChange={e => updateDimension(field.key, 'length', e.target.value)}
-                                      className="modern-input"
-                                      style={{ width: '100%' }}
-                                    />
-                                  </div>
+                            {/* Dynamic Employee Slots Grid */}
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.95rem' }}>
+                              {Array.from({ length: workOrderEmpCount }, (_, idx) => idx + 1).map(slotIdx => {
+                                const empKey = `employee_${slotIdx}`;
+                                const isLead = slotIdx === 1;
+                                const currentVal = formData[empKey] || '';
 
-                                  {/* Width (العرض) */}
-                                  <div>
-                                    <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                                      {t('width') || (isRTL ? 'العرض' : 'Width')}
-                                    </span>
-                                    <input
-                                      type="number"
-                                      step="any"
-                                      placeholder={isRTL ? 'عرض' : 'Width'}
-                                      value={currentDim.width || ''}
-                                      onChange={e => updateDimension(field.key, 'width', e.target.value)}
-                                      className="modern-input"
-                                      style={{ width: '100%' }}
-                                    />
-                                  </div>
+                                return (
+                                  <div
+                                    key={empKey}
+                                    style={{
+                                      background: 'var(--surface-hover)',
+                                      border: isLead ? '1.5px solid rgba(37, 99, 235, 0.3)' : '1px solid var(--border)',
+                                      borderRadius: '10px',
+                                      padding: '0.85rem',
+                                      display: 'flex',
+                                      flexDirection: 'column',
+                                      gap: '0.45rem'
+                                    }}
+                                  >
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                      <label style={{ fontSize: '0.82rem', fontWeight: 700, color: isLead ? '#2563eb' : 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                                        <span>{t(empKey)}</span>
+                                        {isLead && <span style={{ color: '#ef4444' }}>*</span>}
+                                      </label>
 
-                                  {/* Height (الارتفاع / High) */}
-                                  <div>
-                                    <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                                      {t('height') || (isRTL ? 'الارتفاع' : 'Height')}
-                                    </span>
-                                    <input
-                                      type="number"
-                                      step="any"
-                                      placeholder={isRTL ? 'ارتفاع' : 'Height'}
-                                      value={currentDim.height || ''}
-                                      onChange={e => updateDimension(field.key, 'height', e.target.value)}
-                                      className="modern-input"
-                                      style={{ width: '100%' }}
-                                    />
-                                  </div>
+                                      {!isLead && (
+                                        <button
+                                          type="button"
+                                          onClick={() => removeCrewMember(slotIdx)}
+                                          title={t('remove_crew_employee')}
+                                          style={{
+                                            background: 'none',
+                                            border: 'none',
+                                            color: '#ef4444',
+                                            cursor: 'pointer',
+                                            padding: '2px 4px',
+                                            borderRadius: '4px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '2px',
+                                            fontSize: '0.72rem',
+                                            fontWeight: 600
+                                          }}
+                                        >
+                                          <Trash2 size={13} />
+                                          <span>{t('remove')}</span>
+                                        </button>
+                                      )}
+                                    </div>
 
-                                  {/* Dimension Unit */}
-                                  <div>
-                                    <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
-                                      {isRTL ? 'الوحدة' : 'Unit'}
-                                    </span>
                                     <select
-                                      value={currentDim.unit || 'cm'}
-                                      onChange={e => updateDimension(field.key, 'unit', e.target.value)}
+                                      dir={isRTL ? 'rtl' : 'ltr'}
+                                      value={currentVal}
+                                      onChange={e => updateField(empKey, e.target.value)}
+                                      required={isLead}
                                       className="modern-input"
-                                      style={{ fontWeight: 600 }}
+                                      style={{
+                                        width: '100%',
+                                        fontWeight: 600,
+                                        fontSize: '0.9rem',
+                                        direction: isRTL ? 'rtl' : 'ltr',
+                                        textAlign: isRTL ? 'right' : 'left'
+                                      }}
                                     >
-                                      <option value="cm">cm / سم</option>
-                                      <option value="mm">mm / مم</option>
-                                      <option value="m">m / م</option>
-                                      <option value="in">in / بوصة</option>
+                                      <option value="">-- {t('select')} {t(empKey)} --</option>
+                                      {employeeOptions.map(emp => (
+                                        <option key={emp.id} value={emp.id}>
+                                          {emp.full_name} {emp.job_title ? `(${emp.job_title})` : ''}
+                                        </option>
+                                      ))}
                                     </select>
                                   </div>
-                                </div>
-
-                                {formData[field.key] && (
-                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface-hover)', padding: '0.35rem 0.75rem', borderRadius: '8px', fontSize: '0.85rem', width: 'fit-content', border: '1.5px solid var(--border)' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>📐 {t('dimensions_preview') || 'Size'}:</span>
-                                    <strong style={{ color: 'var(--primary)' }}>{formData[field.key]}</strong>
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <input
-                                type="text"
-                                placeholder="e.g. 160 cm roll, 50 KG Drum..."
-                                value={formData[field.key] || ''}
-                                onChange={e => updateField(field.key, e.target.value)}
-                                className="modern-input"
-                                style={{ width: '100%' }}
-                              />
-                            )}
-                          </div>
-                        );
-                      })()}
-
-                      {field.type === 'thickness' && (() => {
-                        const currentThick = thicknessStates[field.key] || { val: '', unit: 'GSM', mode: 'structured' };
-                        const isStructured = currentThick.mode !== 'free';
-                        const presets = [
-                          { label: '120 GSM', val: '120', unit: 'GSM' },
-                          { label: '140 GSM', val: '140', unit: 'GSM' },
-                          { label: '180 GSM', val: '180', unit: 'GSM' },
-                          { label: '250 GSM', val: '250', unit: 'GSM' },
-                          { label: '300 GSM', val: '300', unit: 'GSM' },
-                          { label: '350 GSM', val: '350', unit: 'GSM' },
-                          { label: '3-Ply', val: '3', unit: 'Ply' },
-                          { label: '5-Ply', val: '5', unit: 'Ply' }
-                        ];
-
-                        return (
-                          <div>
-                            {/* Mode Switcher Tabs */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                {isStructured ? (isRTL ? 'قيمة ووحدة السماكة' : 'Value & Unit') : (isRTL ? 'نص حر' : 'Free Text')}
-                              </span>
-                              <div style={{ display: 'flex', gap: '0.25rem', background: 'var(--surface-hover)', padding: '2px', borderRadius: '6px', border: '1px solid var(--border)' }}>
-                                <button
-                                  type="button"
-                                  onClick={() => toggleThicknessMode(field.key, 'structured')}
-                                  style={{
-                                    padding: '0.25rem 0.6rem',
-                                    fontSize: '0.75rem',
-                                    fontWeight: isStructured ? 600 : 400,
-                                    borderRadius: '4px',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    background: isStructured ? 'var(--primary)' : 'transparent',
-                                    color: isStructured ? 'var(--primary-foreground)' : 'var(--text-muted)'
-                                  }}
-                                >
-                                  {isRTL ? 'قيمة + وحدة' : 'Value + Unit'}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => toggleThicknessMode(field.key, 'free')}
-                                  style={{
-                                    padding: '0.25rem 0.6rem',
-                                    fontSize: '0.75rem',
-                                    fontWeight: !isStructured ? 600 : 400,
-                                    borderRadius: '4px',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    background: !isStructured ? 'var(--primary)' : 'transparent',
-                                    color: !isStructured ? 'var(--primary-foreground)' : 'var(--text-muted)'
-                                  }}
-                                >
-                                  {isRTL ? 'نص حر' : 'Free Text'}
-                                </button>
-                              </div>
-                            </div>
-
-                            {isStructured ? (
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.65rem', alignItems: 'center' }}>
-                                  {/* Value */}
-                                  <input
-                                    type="number"
-                                    step="any"
-                                    placeholder={isRTL ? 'مثال: 140 أو 250 أو 3' : 'e.g. 140, 250, 3...'}
-                                    value={currentThick.val || ''}
-                                    onChange={e => updateThickness(field.key, 'val', e.target.value)}
-                                    className="modern-input"
-                                    style={{ width: '100%' }}
-                                  />
-
-                                  {/* Unit Selector */}
-                                  <select
-                                    value={currentThick.unit || 'GSM'}
-                                    onChange={e => updateThickness(field.key, 'unit', e.target.value)}
-                                    className="modern-input"
-                                    style={{ fontWeight: 600 }}
-                                  >
-                                    <option value="GSM">GSM / جرام</option>
-                                    <option value="Micron">Micron (µm) / ميكرون</option>
-                                    <option value="mm">mm / مم</option>
-                                    <option value="Ply">Ply / طبقات</option>
-                                    <option value="pt">pt / نقطة</option>
-                                  </select>
-                                </div>
-
-                                {/* Quick Packaging Presets */}
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', alignItems: 'center' }}>
-                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('presets') || 'Presets'}:</span>
-                                  {presets.map(p => (
-                                    <button
-                                      key={p.label}
-                                      type="button"
-                                      onClick={() => {
-                                        setThicknessStates(prev => ({
-                                          ...prev,
-                                          [field.key]: { val: p.val, unit: p.unit, mode: 'structured' }
-                                        }));
-                                        updateField(field.key, `${p.val} ${p.unit}`);
-                                      }}
-                                      style={{
-                                        padding: '0.2rem 0.5rem',
-                                        fontSize: '0.75rem',
-                                        borderRadius: '6px',
-                                        border: '1px solid var(--border)',
-                                        background: currentThick.val === p.val && currentThick.unit === p.unit ? 'var(--primary)' : 'var(--surface-hover)',
-                                        color: currentThick.val === p.val && currentThick.unit === p.unit ? 'var(--primary-foreground)' : 'var(--text-main)',
-                                        cursor: 'pointer'
-                                      }}
-                                    >
-                                      {p.label}
-                                    </button>
-                                  ))}
-                                </div>
-
-                                {formData[field.key] && (
-                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface-hover)', padding: '0.35rem 0.75rem', borderRadius: '8px', fontSize: '0.85rem', width: 'fit-content', border: '1.5px solid var(--border)' }}>
-                                    <span style={{ color: 'var(--text-muted)' }}>📄 {t('thickness') || 'Thickness'}:</span>
-                                    <strong style={{ color: 'var(--primary)' }}>{formData[field.key]}</strong>
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              <input
-                                type="text"
-                                placeholder="e.g. 3-Ply B-Flute 140 GSM..."
-                                value={formData[field.key] || ''}
-                                onChange={e => updateField(field.key, e.target.value)}
-                                className="modern-input"
-                                style={{ width: '100%' }}
-                              />
-                            )}
-                          </div>
-                        );
-                      })()}
-
-                      {field.type === 'color_palette' && (() => {
-                        const currentColor = colorPaletteStates[field.key] || { hex: '#B8860B', name: '', printType: 'plain' };
-
-                        const printOptions = [
-                          { key: 'plain', labelEn: 'Plain / Unprinted', labelAr: 'سادة بدون طباعة' },
-                          { key: '1_color', labelEn: '1-Color Print', labelAr: 'طباعة لون واحد' },
-                          { key: '2_color', labelEn: '2-Color Print', labelAr: 'طباعة لونين' },
-                          { key: 'cmyk', labelEn: 'CMYK Multi-Color', labelAr: 'طباعة 4 ألوان CMYK' },
-                        ];
-
-                        return (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            {/* Packaging Color Palette Swatches */}
-                            <div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                  {isRTL ? 'لوحة ألوان التغليف الشائعة:' : 'Common Packaging Swatches:'}
-                                </span>
-                                {/* Native HTML Color Picker */}
-                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', cursor: 'pointer', color: 'var(--primary)', fontWeight: 600 }}>
-                                  <span>{isRTL ? 'ألوان أخرى 🎨' : 'Custom Palette 🎨'}</span>
-                                  <input
-                                    type="color"
-                                    value={currentColor.hex || '#B8860B'}
-                                    onChange={e => {
-                                      const newHex = e.target.value;
-                                      updateColorPalette(field.key, { hex: newHex });
-                                    }}
-                                    style={{ width: '24px', height: '24px', padding: 0, border: 'none', borderRadius: '4px', cursor: 'pointer', background: 'transparent' }}
-                                  />
-                                </label>
-                              </div>
-
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', alignItems: 'center' }}>
-                                {PACKAGING_PALETTE.map(item => {
-                                  const isSelected = currentColor.hex?.toUpperCase() === item.hex.toUpperCase();
-                                  return (
-                                    <button
-                                      key={item.hex + item.name}
-                                      type="button"
-                                      onClick={() => {
-                                        const displayName = isRTL ? item.nameAr : item.name;
-                                        updateColorPalette(field.key, { hex: item.hex, name: displayName });
-                                      }}
-                                      title={isRTL ? item.nameAr : item.name}
-                                      style={{
-                                        width: '28px',
-                                        height: '28px',
-                                        borderRadius: '50%',
-                                        backgroundColor: item.hex,
-                                        border: isSelected ? '3px solid var(--primary)' : (item.border ? '1px solid #ccc' : '1px solid rgba(0,0,0,0.15)'),
-                                        boxShadow: isSelected ? '0 0 0 2px rgba(99, 102, 241, 0.4)' : '0 1px 3px rgba(0,0,0,0.15)',
-                                        cursor: 'pointer',
-                                        transform: isSelected ? 'scale(1.15)' : 'scale(1)',
-                                        transition: 'transform 0.15s ease'
-                                      }}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            </div>
-
-                            {/* Color Description & Print Details Input */}
-                            <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0.5rem', alignItems: 'center' }}>
-                              <div
-                                style={{
-                                  width: '38px',
-                                  height: '38px',
-                                  borderRadius: '8px',
-                                  backgroundColor: currentColor.hex || '#B8860B',
-                                  border: currentColor.hex?.toUpperCase() === '#FFFFFF' ? '1px solid #ccc' : '1px solid rgba(0,0,0,0.2)',
-                                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                  flexShrink: 0
-                                }}
-                              />
-                              <input
-                                type="text"
-                                placeholder={isRTL ? 'اسم اللون أو مواصفات الطباعة (مثال: كرافت بني طبيعي)' : 'Color or print details (e.g. Brown Kraft, White Duplex)...'}
-                                value={currentColor.name || ''}
-                                onChange={e => updateColorPalette(field.key, { name: e.target.value })}
-                                className="modern-input"
-                                style={{ width: '100%' }}
-                              />
-                            </div>
-
-                            {/* Print Type Quick Selector */}
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                              {printOptions.map(opt => {
-                                const isCurrent = currentColor.printType === opt.key;
-                                return (
-                                  <button
-                                    key={opt.key}
-                                    type="button"
-                                    onClick={() => {
-                                      const label = isRTL ? opt.labelAr : opt.labelEn;
-                                      const baseName = (currentColor.name || '').replace(/\s*-\s*(سادة بدون طباعة|طباعة لون واحد|طباعة لونين|طباعة 4 ألوان CMYK|Plain \/ Unprinted|1-Color Print|2-Color Print|CMYK Multi-Color)/g, '').trim();
-                                      const combinedName = opt.key === 'plain' ? (baseName || (isRTL ? 'سادة' : 'Plain')) : `${baseName || ''} - ${label}`.trim().replace(/^-\s*/, '');
-                                      updateColorPalette(field.key, { printType: opt.key, name: combinedName });
-                                    }}
-                                    style={{
-                                      padding: '0.35rem 0.65rem',
-                                      fontSize: '0.75rem',
-                                      borderRadius: '6px',
-                                      border: '1px solid var(--border)',
-                                      background: isCurrent ? 'var(--primary)' : 'var(--surface-hover)',
-                                      color: isCurrent ? 'var(--primary-foreground)' : 'var(--text-main)',
-                                      cursor: 'pointer'
-                                    }}
-                                  >
-                                    {isRTL ? opt.labelAr : opt.labelEn}
-                                  </button>
                                 );
                               })}
                             </div>
 
-                            {/* Live Badge Preview */}
-                            {formData[field.key] && (
-                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface-hover)', padding: '0.35rem 0.75rem', borderRadius: '8px', fontSize: '0.85rem', width: 'fit-content', border: '1.5px solid var(--border)' }}>
-                                <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: currentColor.hex || '#B8860B', display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)' }} />
-                                <span style={{ color: 'var(--text-muted)' }}>🎨 {t('color_print') || 'Color'}:</span>
-                                <strong style={{ color: 'var(--primary)' }}>{formData[field.key]}</strong>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()}
-
-                      {field.type === 'select' && (() => {
-                        const existingValues = Array.from(new Set((data || []).map(r => r[field.key]).filter(Boolean)));
-                        const optionsMap = new Map();
-                        (field.options || []).forEach(opt => {
-                          if (typeof opt === 'object' && opt !== null) {
-                            const val = opt.value ?? opt.key ?? opt.id;
-                            if (val) optionsMap.set(val, opt);
-                          } else if (opt) {
-                            optionsMap.set(opt, opt);
-                          }
-                        });
-                        existingValues.forEach(val => {
-                          if (!optionsMap.has(val)) {
-                            optionsMap.set(val, val);
-                          }
-                        });
-                        const allOptions = Array.from(optionsMap.values());
-                        const isCustom = customFieldActive[field.key];
-
-                        return (
-                          <div>
-                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                              <select 
-                                dir={isRTL ? 'rtl' : 'ltr'}
-                                value={isCustom ? '__MANUAL_CUSTOM__' : (formData[field.key] || '')}
-                                onChange={e => {
-                                  if (e.target.value === '__MANUAL_CUSTOM__') {
-                                    setCustomFieldActive(prev => ({ ...prev, [field.key]: true }));
-                                    updateField(field.key, '');
-                                  } else {
-                                    setCustomFieldActive(prev => ({ ...prev, [field.key]: false }));
-                                    updateField(field.key, e.target.value);
-                                  }
-                                }}
-                                required={field.required && !isCustom}
-                                className="modern-input"
-                                style={{ 
-                                  flex: 1,
-                                  direction: isRTL ? 'rtl' : 'ltr', 
-                                  textAlign: isRTL ? 'right' : 'left'
-                                }}
-                              >
-                                <option value="" disabled>-- {t('select')} {t(field.label)} --</option>
-                                {allOptions.map((opt, optIdx) => {
-                                  const optVal = (typeof opt === 'object' && opt !== null) ? (opt.value ?? opt.key ?? opt.id) : opt;
-                                  let label = optVal;
-                                  if (typeof opt === 'object' && opt !== null) {
-                                    label = isRTL 
-                                      ? (opt.nameAr || opt.labelAr || opt.label || opt.name || optVal) 
-                                      : (opt.nameEn || opt.labelEn || opt.label || opt.name || optVal);
-                                  } else {
-                                    const lowerKey = String(opt).toLowerCase();
-                                    if (i18n.exists(lowerKey)) {
-                                      label = t(lowerKey);
-                                    } else if (i18n.exists(String(opt))) {
-                                      label = t(String(opt));
-                                    }
-                                  }
-                                  return (
-                                    <option key={optVal || optIdx} value={optVal}>
-                                      {label}
-                                    </option>
-                                  );
-                                })}
-                                {field.allowCustom && (
-                                  <option value="__MANUAL_CUSTOM__" style={{ fontWeight: 'bold', color: 'var(--primary)' }}>
-                                    ✍️ {t('or_add_manual') || '+ Add / Type Manually...'}
-                                  </option>
-                                )}
-                              </select>
-
-                              {field.allowCustom && (
+                            {/* Add Employee Button */}
+                            <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                              {workOrderEmpCount < 6 ? (
                                 <button
                                   type="button"
-                                  className="btn"
-                                  onClick={() => {
-                                    setCustomFieldActive(prev => {
-                                      const nextVal = !prev[field.key];
-                                      const currentInOptions = allOptions.some(opt => {
-                                        const v = (typeof opt === 'object' && opt !== null) ? (opt.value ?? opt.key ?? opt.id) : opt;
-                                        return v === formData[field.key];
-                                      });
-                                      if (!nextVal && !currentInOptions) {
-                                        const firstOpt = allOptions[0];
-                                        const firstVal = (typeof firstOpt === 'object' && firstOpt !== null) ? (firstOpt.value ?? firstOpt.key ?? firstOpt.id) : (firstOpt || '');
-                                        updateField(field.key, firstVal);
-                                      }
-                                      return { ...prev, [field.key]: nextVal };
-                                    });
-                                  }}
-                                  title={t('or_add_manual')}
-                                  style={{ 
-                                    padding: '0.75rem 1rem', 
-                                    fontSize: '0.85rem', 
-                                    whiteSpace: 'nowrap',
-                                    backgroundColor: isCustom ? 'var(--primary)' : 'var(--surface-hover)',
-                                    color: isCustom ? 'var(--primary-foreground)' : 'var(--text-main)',
-                                    border: '1.5px solid var(--border)',
-                                    borderRadius: '10px',
-                                    display: 'flex',
+                                  onClick={() => setWorkOrderEmpCount(prev => Math.min(6, prev + 1))}
+                                  style={{
+                                    display: 'inline-flex',
                                     alignItems: 'center',
-                                    gap: '0.35rem'
+                                    gap: '0.45rem',
+                                    padding: '0.55rem 1rem',
+                                    background: 'rgba(37, 99, 235, 0.08)',
+                                    color: '#2563eb',
+                                    border: '1.5px dashed #2563eb',
+                                    borderRadius: '8px',
+                                    fontWeight: 700,
+                                    fontSize: '0.85rem',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.15s ease'
                                   }}
                                 >
-                                  <Edit3 size={15} />
-                                  {isCustom ? (t('select') || 'Select') : (isRTL ? 'يدوي' : 'Manual')}
+                                  <Plus size={16} />
+                                  <span>{t('add_crew_employee')} ({workOrderEmpCount}/6)</span>
                                 </button>
+                              ) : (
+                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                                  {t('max_crew_reached')}
+                                </span>
                               )}
                             </div>
-
-                            {field.allowCustom && isCustom && (
-                              <div style={{ marginTop: '0.5rem' }}>
-                                <input 
-                                  type="text" 
-                                  placeholder={t(`enter_manual_${field.key}`) || (isRTL ? `أدخل ${t(field.label)} يدوياً...` : `Enter ${t(field.label)} manually...`)}
-                                  value={formData[field.key] || ''}
-                                  onChange={e => updateField(field.key, e.target.value)}
-                                  required={field.required}
-                                  autoFocus
-                                  className="modern-input"
-                                  style={{ 
-                                    width: '100%',
-                                    border: '2px solid var(--primary)'
-                                  }}
-                                />
-                              </div>
-                            )}
                           </div>
                         );
-                      })()}
+                      }
 
-                      {field.type === 'relation' && (
-                        <select 
-                          dir={isRTL ? 'rtl' : 'ltr'}
-                          value={formData[field.key] || ''}
-                          onChange={e => updateField(field.key, e.target.value)}
-                          required={field.required}
-                          className="modern-input"
-                          style={{ width: '100%', direction: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' }}
-                        >
-                          <option value="" disabled>-- {t('select')} {t(field.label)} --</option>
-                          {(relationsData?.[field.relationTable] || []).map(r => {
-                            let display = field.relationLabel === 'id' ? `${t(field.label)} #${String(r.id).slice(0, 8).toUpperCase()}` : r[field.relationLabel];
-                            if (field.relationTable === 'sales_orders') {
-                              const orderNum = String(r.id).slice(0, 8).toUpperCase();
-                              let cust = '';
-                              if (relationsData?.['customers'] && r.customer_id) {
-                                const c = relationsData['customers'].find(x => x.id === r.customer_id);
-                                if (c?.customer_name) cust = ` - ${c.customer_name}`;
-                              }
-                              display = `${t('sales_orders')} #${orderNum}${cust}`;
-                            }
+                      const isFullWidth = field.type === 'textarea' || field.type === 'dimensions' || field.type === 'color_palette' || field.type === 'image' || field.type === 'multi_image';
+
+                      return (
+                        <div key={field.key} style={{ gridColumn: isFullWidth ? '1 / -1' : undefined }}>
+                          {field.type !== 'checkbox' && (
+                            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.45rem', color: 'var(--text-main)' }}>
+                              {t(field.label)} {field.required && <span style={{ color: '#ef4444' }}>*</span>}
+                            </label>
+                          )}
+
+                          {field.type === 'text' && (
+                            <input
+                              type="text"
+                              value={formData[field.key] || ''}
+                              onChange={e => updateField(field.key, e.target.value)}
+                              required={field.required}
+                              className="modern-input"
+                              style={{ width: '100%' }}
+                            />
+                          )}
+
+                          {field.type === 'password' && (
+                            <input
+                              type="password"
+                              value={formData[field.key] || ''}
+                              onChange={e => updateField(field.key, e.target.value)}
+                              required={field.required && !formData.id}
+                              className="modern-input"
+                              style={{ width: '100%' }}
+                              placeholder={formData.id ? t('leave_blank_to_keep_password') : ''}
+                            />
+                          )}
+
+                          {field.type === 'image' && (
+                            <div>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={e => {
+                                  const file = e.target.files[0];
+                                  if (file) {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => {
+                                      updateField(field.key, reader.result);
+                                    };
+                                    reader.readAsDataURL(file);
+                                  }
+                                }}
+                                required={field.required && !formData[field.key]}
+                                className="modern-input"
+                                style={{ width: '100%' }}
+                              />
+                              {formData[field.key] && (
+                                <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                  <img
+                                    src={formData[field.key]}
+                                    alt="Preview"
+                                    onClick={() => setPreviewImage(formData[field.key])}
+                                    title={t('click_to_view') || 'Click to view original size'}
+                                    style={{ maxHeight: '100px', maxWidth: '140px', objectFit: 'contain', borderRadius: '8px', cursor: 'zoom-in', border: '1.5px solid var(--border)' }}
+                                  />
+                                  <button type="button" onClick={() => updateField(field.key, null)} style={{ background: 'var(--danger)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '6px', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600 }}>
+                                    {t('remove')}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {field.type === 'multi_image' && (
+                            <div>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                onChange={e => {
+                                  const files = Array.from(e.target.files);
+                                  Promise.all(files.map(file => new Promise((resolve) => {
+                                    const reader = new FileReader();
+                                    reader.onloadend = () => resolve(reader.result);
+                                    reader.readAsDataURL(file);
+                                  }))).then(results => {
+                                    const existing = formData[field.key] ? JSON.parse(formData[field.key]) : [];
+                                    updateField(field.key, JSON.stringify([...existing, ...results]));
+                                  });
+                                }}
+                                required={field.required && !formData[field.key]}
+                                className="modern-input"
+                                style={{ width: '100%' }}
+                              />
+                              {formData[field.key] && JSON.parse(formData[field.key]).length > 0 && (
+                                <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                  {JSON.parse(formData[field.key]).map((src, idx) => (
+                                    <div key={idx} style={{ position: 'relative' }}>
+                                      <img
+                                        src={src}
+                                        alt="Preview"
+                                        onClick={() => setPreviewImage(src)}
+                                        title={t('click_to_view') || 'Click to view original size'}
+                                        style={{ maxHeight: '100px', maxWidth: '140px', objectFit: 'contain', borderRadius: '8px', cursor: 'zoom-in', border: '1.5px solid var(--border)' }}
+                                      />
+                                      <button type="button" onClick={() => {
+                                        const items = JSON.parse(formData[field.key]);
+                                        items.splice(idx, 1);
+                                        updateField(field.key, JSON.stringify(items));
+                                      }} style={{ position: 'absolute', top: 0, right: 0, background: 'var(--danger)', color: 'white', padding: '2px 6px', borderRadius: '0 6px 0 6px', border: 'none', cursor: 'pointer', fontSize: '10px' }}>
+                                        X
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {field.type === 'number' && (
+                            <input
+                              type="number"
+                              step={field.isCurrency ? "0.01" : "any"}
+                              value={formData[field.key] ?? 0}
+                              onChange={e => updateField(field.key, e.target.value)}
+                              required={field.required}
+                              disabled={field.disabled || (field.readOnly && !field.editable)}
+                              className="modern-input"
+                              style={{
+                                width: '100%',
+                                opacity: (field.disabled || (field.readOnly && !field.editable)) ? 0.6 : 1,
+                                cursor: (field.disabled || (field.readOnly && !field.editable)) ? 'not-allowed' : 'text'
+                              }}
+                            />
+                          )}
+
+                          {field.type === 'date' && (
+                            <input
+                              type="date"
+                              value={formData[field.key] || ''}
+                              onChange={e => updateField(field.key, e.target.value)}
+                              required={field.required}
+                              className="modern-input"
+                              style={{ width: '100%' }}
+                            />
+                          )}
+
+                          {field.type === 'time' && (
+                            <input
+                              type="time"
+                              value={formData[field.key] || ''}
+                              onChange={e => updateField(field.key, e.target.value)}
+                              required={field.required}
+                              className="modern-input"
+                              style={{ width: '100%' }}
+                            />
+                          )}
+
+                          {field.type === 'textarea' && (
+                            <textarea
+                              value={formData[field.key] || ''}
+                              onChange={e => updateField(field.key, e.target.value)}
+                              required={field.required}
+                              rows="3"
+                              className="modern-input"
+                              style={{ width: '100%', resize: 'vertical' }}
+                            />
+                          )}
+
+                          {field.type === 'dimensions' && (() => {
+                            const currentDim = dimensionStates[field.key] || { length: '', width: '', height: '', unit: 'cm', mode: '3d' };
+                            const is3D = currentDim.mode !== 'free';
+
                             return (
-                              <option key={r.id} value={r.id}>
-                                {display}
-                              </option>
-                            );
-                          })}
-                        </select>
-                      )}
+                              <div>
+                                {/* Mode Switcher Tabs */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                    {is3D ? (isRTL ? 'الأبعاد الثلاثية (طول × عرض × ارتفاع)' : '3 Dimensions (L × W × H)') : (isRTL ? 'نص حر' : 'Free Text')}
+                                  </span>
+                                  <div style={{ display: 'flex', gap: '0.25rem', background: 'var(--surface-hover)', padding: '2px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleDimensionMode(field.key, '3d')}
+                                      style={{
+                                        padding: '0.25rem 0.6rem',
+                                        fontSize: '0.75rem',
+                                        fontWeight: is3D ? 600 : 400,
+                                        borderRadius: '4px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        background: is3D ? 'var(--primary)' : 'transparent',
+                                        color: is3D ? 'var(--primary-foreground)' : 'var(--text-muted)'
+                                      }}
+                                    >
+                                      {isRTL ? '3 أبعاد (طول × عرض × ارتفاع)' : '3 Dimensions'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleDimensionMode(field.key, 'free')}
+                                      style={{
+                                        padding: '0.25rem 0.6rem',
+                                        fontSize: '0.75rem',
+                                        fontWeight: !is3D ? 600 : 400,
+                                        borderRadius: '4px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        background: !is3D ? 'var(--primary)' : 'transparent',
+                                        color: !is3D ? 'var(--primary-foreground)' : 'var(--text-muted)'
+                                      }}
+                                    >
+                                      {isRTL ? 'نص حر' : 'Free Text'}
+                                    </button>
+                                  </div>
+                                </div>
 
-                      {field.type === 'checkbox' && (
-                        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-                          <input 
-                            type="checkbox" 
-                            checked={formData[field.key] === 1 || formData[field.key] === true}
-                            onChange={e => updateField(field.key, e.target.checked ? 1 : 0)}
-                          />
-                          <span>{t(field.label)}</span>
-                        </label>
-                      )}
-                    </div>
-                  );
-                })}
+                                {is3D ? (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr) auto', gap: '0.65rem', alignItems: 'center' }}>
+                                      {/* Length (الطول) */}
+                                      <div>
+                                        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+                                          {t('length') || (isRTL ? 'الطول' : 'Length')}
+                                        </span>
+                                        <input
+                                          type="number"
+                                          step="any"
+                                          placeholder={isRTL ? 'طول' : 'Length'}
+                                          value={currentDim.length || ''}
+                                          onChange={e => updateDimension(field.key, 'length', e.target.value)}
+                                          className="modern-input"
+                                          style={{ width: '100%' }}
+                                        />
+                                      </div>
+
+                                      {/* Width (العرض) */}
+                                      <div>
+                                        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+                                          {t('width') || (isRTL ? 'العرض' : 'Width')}
+                                        </span>
+                                        <input
+                                          type="number"
+                                          step="any"
+                                          placeholder={isRTL ? 'عرض' : 'Width'}
+                                          value={currentDim.width || ''}
+                                          onChange={e => updateDimension(field.key, 'width', e.target.value)}
+                                          className="modern-input"
+                                          style={{ width: '100%' }}
+                                        />
+                                      </div>
+
+                                      {/* Height (الارتفاع / High) */}
+                                      <div>
+                                        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+                                          {t('height') || (isRTL ? 'الارتفاع' : 'Height')}
+                                        </span>
+                                        <input
+                                          type="number"
+                                          step="any"
+                                          placeholder={isRTL ? 'ارتفاع' : 'Height'}
+                                          value={currentDim.height || ''}
+                                          onChange={e => updateDimension(field.key, 'height', e.target.value)}
+                                          className="modern-input"
+                                          style={{ width: '100%' }}
+                                        />
+                                      </div>
+
+                                      {/* Dimension Unit */}
+                                      <div>
+                                        <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.25rem' }}>
+                                          {isRTL ? 'الوحدة' : 'Unit'}
+                                        </span>
+                                        <select
+                                          value={currentDim.unit || 'cm'}
+                                          onChange={e => updateDimension(field.key, 'unit', e.target.value)}
+                                          className="modern-input"
+                                          style={{ fontWeight: 600 }}
+                                        >
+                                          <option value="cm">cm / سم</option>
+                                          <option value="mm">mm / مم</option>
+                                          <option value="m">m / م</option>
+                                          <option value="in">in / بوصة</option>
+                                        </select>
+                                      </div>
+                                    </div>
+
+                                    {formData[field.key] && (
+                                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface-hover)', padding: '0.35rem 0.75rem', borderRadius: '8px', fontSize: '0.85rem', width: 'fit-content', border: '1.5px solid var(--border)' }}>
+                                        <span style={{ color: 'var(--text-muted)' }}>📐 {t('dimensions_preview') || 'Size'}:</span>
+                                        <strong style={{ color: 'var(--primary)' }}>{formData[field.key]}</strong>
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <input
+                                    type="text"
+                                    placeholder="e.g. 160 cm roll, 50 KG Drum..."
+                                    value={formData[field.key] || ''}
+                                    onChange={e => updateField(field.key, e.target.value)}
+                                    className="modern-input"
+                                    style={{ width: '100%' }}
+                                  />
+                                )}
+                              </div>
+                            );
+                          })()}
+
+                          {field.type === 'thickness' && (() => {
+                            const currentThick = thicknessStates[field.key] || { val: '', unit: 'GSM', mode: 'structured' };
+                            const isStructured = currentThick.mode !== 'free';
+                            const presets = [
+                              { label: '120 GSM', val: '120', unit: 'GSM' },
+                              { label: '140 GSM', val: '140', unit: 'GSM' },
+                              { label: '180 GSM', val: '180', unit: 'GSM' },
+                              { label: '250 GSM', val: '250', unit: 'GSM' },
+                              { label: '300 GSM', val: '300', unit: 'GSM' },
+                              { label: '350 GSM', val: '350', unit: 'GSM' },
+                              { label: '3-Ply', val: '3', unit: 'Ply' },
+                              { label: '5-Ply', val: '5', unit: 'Ply' }
+                            ];
+
+                            return (
+                              <div>
+                                {/* Mode Switcher Tabs */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                    {isStructured ? (isRTL ? 'قيمة ووحدة السماكة' : 'Value & Unit') : (isRTL ? 'نص حر' : 'Free Text')}
+                                  </span>
+                                  <div style={{ display: 'flex', gap: '0.25rem', background: 'var(--surface-hover)', padding: '2px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleThicknessMode(field.key, 'structured')}
+                                      style={{
+                                        padding: '0.25rem 0.6rem',
+                                        fontSize: '0.75rem',
+                                        fontWeight: isStructured ? 600 : 400,
+                                        borderRadius: '4px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        background: isStructured ? 'var(--primary)' : 'transparent',
+                                        color: isStructured ? 'var(--primary-foreground)' : 'var(--text-muted)'
+                                      }}
+                                    >
+                                      {isRTL ? 'قيمة + وحدة' : 'Value + Unit'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleThicknessMode(field.key, 'free')}
+                                      style={{
+                                        padding: '0.25rem 0.6rem',
+                                        fontSize: '0.75rem',
+                                        fontWeight: !isStructured ? 600 : 400,
+                                        borderRadius: '4px',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        background: !isStructured ? 'var(--primary)' : 'transparent',
+                                        color: !isStructured ? 'var(--primary-foreground)' : 'var(--text-muted)'
+                                      }}
+                                    >
+                                      {isRTL ? 'نص حر' : 'Free Text'}
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {isStructured ? (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.65rem', alignItems: 'center' }}>
+                                      {/* Value */}
+                                      <input
+                                        type="number"
+                                        step="any"
+                                        placeholder={isRTL ? 'مثال: 140 أو 250 أو 3' : 'e.g. 140, 250, 3...'}
+                                        value={currentThick.val || ''}
+                                        onChange={e => updateThickness(field.key, 'val', e.target.value)}
+                                        className="modern-input"
+                                        style={{ width: '100%' }}
+                                      />
+
+                                      {/* Unit Selector */}
+                                      <select
+                                        value={currentThick.unit || 'GSM'}
+                                        onChange={e => updateThickness(field.key, 'unit', e.target.value)}
+                                        className="modern-input"
+                                        style={{ fontWeight: 600 }}
+                                      >
+                                        <option value="GSM">GSM / جرام</option>
+                                        <option value="Micron">Micron (µm) / ميكرون</option>
+                                        <option value="mm">mm / مم</option>
+                                        <option value="Ply">Ply / طبقات</option>
+                                        <option value="pt">pt / نقطة</option>
+                                      </select>
+                                    </div>
+
+                                    {/* Quick Packaging Presets */}
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem', alignItems: 'center' }}>
+                                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{t('presets') || 'Presets'}:</span>
+                                      {presets.map(p => (
+                                        <button
+                                          key={p.label}
+                                          type="button"
+                                          onClick={() => {
+                                            setThicknessStates(prev => ({
+                                              ...prev,
+                                              [field.key]: { val: p.val, unit: p.unit, mode: 'structured' }
+                                            }));
+                                            updateField(field.key, `${p.val} ${p.unit}`);
+                                          }}
+                                          style={{
+                                            padding: '0.2rem 0.5rem',
+                                            fontSize: '0.75rem',
+                                            borderRadius: '6px',
+                                            border: '1px solid var(--border)',
+                                            background: currentThick.val === p.val && currentThick.unit === p.unit ? 'var(--primary)' : 'var(--surface-hover)',
+                                            color: currentThick.val === p.val && currentThick.unit === p.unit ? 'var(--primary-foreground)' : 'var(--text-main)',
+                                            cursor: 'pointer'
+                                          }}
+                                        >
+                                          {p.label}
+                                        </button>
+                                      ))}
+                                    </div>
+
+                                    {formData[field.key] && (
+                                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface-hover)', padding: '0.35rem 0.75rem', borderRadius: '8px', fontSize: '0.85rem', width: 'fit-content', border: '1.5px solid var(--border)' }}>
+                                        <span style={{ color: 'var(--text-muted)' }}>📄 {t('thickness') || 'Thickness'}:</span>
+                                        <strong style={{ color: 'var(--primary)' }}>{formData[field.key]}</strong>
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <input
+                                    type="text"
+                                    placeholder="e.g. 3-Ply B-Flute 140 GSM..."
+                                    value={formData[field.key] || ''}
+                                    onChange={e => updateField(field.key, e.target.value)}
+                                    className="modern-input"
+                                    style={{ width: '100%' }}
+                                  />
+                                )}
+                              </div>
+                            );
+                          })()}
+
+                          {field.type === 'color_palette' && (() => {
+                            const currentColor = colorPaletteStates[field.key] || { hex: '#B8860B', name: '', printType: 'plain' };
+
+                            const printOptions = [
+                              { key: 'plain', labelEn: 'Plain / Unprinted', labelAr: 'سادة بدون طباعة' },
+                              { key: '1_color', labelEn: '1-Color Print', labelAr: 'طباعة لون واحد' },
+                              { key: '2_color', labelEn: '2-Color Print', labelAr: 'طباعة لونين' },
+                              { key: 'cmyk', labelEn: 'CMYK Multi-Color', labelAr: 'طباعة 4 ألوان CMYK' },
+                            ];
+
+                            return (
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                {/* Packaging Color Palette Swatches */}
+                                <div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                      {isRTL ? 'لوحة ألوان التغليف الشائعة:' : 'Common Packaging Swatches:'}
+                                    </span>
+                                    {/* Native HTML Color Picker */}
+                                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem', cursor: 'pointer', color: 'var(--primary)', fontWeight: 600 }}>
+                                      <span>{isRTL ? 'ألوان أخرى 🎨' : 'Custom Palette 🎨'}</span>
+                                      <input
+                                        type="color"
+                                        value={currentColor.hex || '#B8860B'}
+                                        onChange={e => {
+                                          const newHex = e.target.value;
+                                          updateColorPalette(field.key, { hex: newHex });
+                                        }}
+                                        style={{ width: '24px', height: '24px', padding: 0, border: 'none', borderRadius: '4px', cursor: 'pointer', background: 'transparent' }}
+                                      />
+                                    </label>
+                                  </div>
+
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', alignItems: 'center' }}>
+                                    {PACKAGING_PALETTE.map(item => {
+                                      const isSelected = currentColor.hex?.toUpperCase() === item.hex.toUpperCase();
+                                      return (
+                                        <button
+                                          key={item.hex + item.name}
+                                          type="button"
+                                          onClick={() => {
+                                            const displayName = isRTL ? item.nameAr : item.name;
+                                            updateColorPalette(field.key, { hex: item.hex, name: displayName });
+                                          }}
+                                          title={isRTL ? item.nameAr : item.name}
+                                          style={{
+                                            width: '28px',
+                                            height: '28px',
+                                            borderRadius: '50%',
+                                            backgroundColor: item.hex,
+                                            border: isSelected ? '3px solid var(--primary)' : (item.border ? '1px solid #ccc' : '1px solid rgba(0,0,0,0.15)'),
+                                            boxShadow: isSelected ? '0 0 0 2px rgba(99, 102, 241, 0.4)' : '0 1px 3px rgba(0,0,0,0.15)',
+                                            cursor: 'pointer',
+                                            transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+                                            transition: 'transform 0.15s ease'
+                                          }}
+                                        />
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+
+                                {/* Color Description & Print Details Input */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0.5rem', alignItems: 'center' }}>
+                                  <div
+                                    style={{
+                                      width: '38px',
+                                      height: '38px',
+                                      borderRadius: '8px',
+                                      backgroundColor: currentColor.hex || '#B8860B',
+                                      border: currentColor.hex?.toUpperCase() === '#FFFFFF' ? '1px solid #ccc' : '1px solid rgba(0,0,0,0.2)',
+                                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                      flexShrink: 0
+                                    }}
+                                  />
+                                  <input
+                                    type="text"
+                                    placeholder={isRTL ? 'اسم اللون أو مواصفات الطباعة (مثال: كرافت بني طبيعي)' : 'Color or print details (e.g. Brown Kraft, White Duplex)...'}
+                                    value={currentColor.name || ''}
+                                    onChange={e => updateColorPalette(field.key, { name: e.target.value })}
+                                    className="modern-input"
+                                    style={{ width: '100%' }}
+                                  />
+                                </div>
+
+                                {/* Print Type Quick Selector */}
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                                  {printOptions.map(opt => {
+                                    const isCurrent = currentColor.printType === opt.key;
+                                    return (
+                                      <button
+                                        key={opt.key}
+                                        type="button"
+                                        onClick={() => {
+                                          const label = isRTL ? opt.labelAr : opt.labelEn;
+                                          const baseName = (currentColor.name || '').replace(/\s*-\s*(سادة بدون طباعة|طباعة لون واحد|طباعة لونين|طباعة 4 ألوان CMYK|Plain \/ Unprinted|1-Color Print|2-Color Print|CMYK Multi-Color)/g, '').trim();
+                                          const combinedName = opt.key === 'plain' ? (baseName || (isRTL ? 'سادة' : 'Plain')) : `${baseName || ''} - ${label}`.trim().replace(/^-\s*/, '');
+                                          updateColorPalette(field.key, { printType: opt.key, name: combinedName });
+                                        }}
+                                        style={{
+                                          padding: '0.35rem 0.65rem',
+                                          fontSize: '0.75rem',
+                                          borderRadius: '6px',
+                                          border: '1px solid var(--border)',
+                                          background: isCurrent ? 'var(--primary)' : 'var(--surface-hover)',
+                                          color: isCurrent ? 'var(--primary-foreground)' : 'var(--text-main)',
+                                          cursor: 'pointer'
+                                        }}
+                                      >
+                                        {isRTL ? opt.labelAr : opt.labelEn}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Live Badge Preview */}
+                                {formData[field.key] && (
+                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'var(--surface-hover)', padding: '0.35rem 0.75rem', borderRadius: '8px', fontSize: '0.85rem', width: 'fit-content', border: '1.5px solid var(--border)' }}>
+                                    <span style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: currentColor.hex || '#B8860B', display: 'inline-block', border: '1px solid rgba(0,0,0,0.2)' }} />
+                                    <span style={{ color: 'var(--text-muted)' }}>🎨 {t('color_print') || 'Color'}:</span>
+                                    <strong style={{ color: 'var(--primary)' }}>{formData[field.key]}</strong>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+
+                          {field.type === 'select' && (() => {
+                            const existingValues = Array.from(new Set((data || []).map(r => r[field.key]).filter(Boolean)));
+                            const optionsMap = new Map();
+                            (field.options || []).forEach(opt => {
+                              if (typeof opt === 'object' && opt !== null) {
+                                const val = opt.value ?? opt.key ?? opt.id;
+                                if (val) optionsMap.set(val, opt);
+                              } else if (opt) {
+                                optionsMap.set(opt, opt);
+                              }
+                            });
+                            existingValues.forEach(val => {
+                              if (!optionsMap.has(val)) {
+                                optionsMap.set(val, val);
+                              }
+                            });
+                            const allOptions = Array.from(optionsMap.values());
+                            const isCustom = customFieldActive[field.key];
+
+                            return (
+                              <div>
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                  <select
+                                    dir={isRTL ? 'rtl' : 'ltr'}
+                                    value={isCustom ? '__MANUAL_CUSTOM__' : (formData[field.key] || '')}
+                                    onChange={e => {
+                                      if (e.target.value === '__MANUAL_CUSTOM__') {
+                                        setCustomFieldActive(prev => ({ ...prev, [field.key]: true }));
+                                        updateField(field.key, '');
+                                      } else {
+                                        setCustomFieldActive(prev => ({ ...prev, [field.key]: false }));
+                                        updateField(field.key, e.target.value);
+                                      }
+                                    }}
+                                    required={field.required && !isCustom}
+                                    className="modern-input"
+                                    style={{
+                                      flex: 1,
+                                      direction: isRTL ? 'rtl' : 'ltr',
+                                      textAlign: isRTL ? 'right' : 'left'
+                                    }}
+                                  >
+                                    <option value="" disabled>-- {t('select')} {t(field.label)} --</option>
+                                    {allOptions.map((opt, optIdx) => {
+                                      const optVal = (typeof opt === 'object' && opt !== null) ? (opt.value ?? opt.key ?? opt.id) : opt;
+                                      let label = optVal;
+                                      if (typeof opt === 'object' && opt !== null) {
+                                        label = isRTL
+                                          ? (opt.nameAr || opt.labelAr || opt.label || opt.name || optVal)
+                                          : (opt.nameEn || opt.labelEn || opt.label || opt.name || optVal);
+                                      } else {
+                                        const lowerKey = String(opt).toLowerCase();
+                                        if (i18n.exists(lowerKey)) {
+                                          label = t(lowerKey);
+                                        } else if (i18n.exists(String(opt))) {
+                                          label = t(String(opt));
+                                        }
+                                      }
+                                      return (
+                                        <option key={optVal || optIdx} value={optVal}>
+                                          {label}
+                                        </option>
+                                      );
+                                    })}
+                                    {field.allowCustom && (
+                                      <option value="__MANUAL_CUSTOM__" style={{ fontWeight: 'bold', color: 'var(--primary)' }}>
+                                        ✍️ {t('or_add_manual') || '+ Add / Type Manually...'}
+                                      </option>
+                                    )}
+                                  </select>
+
+                                  {field.allowCustom && (
+                                    <button
+                                      type="button"
+                                      className="btn"
+                                      onClick={() => {
+                                        setCustomFieldActive(prev => {
+                                          const nextVal = !prev[field.key];
+                                          const currentInOptions = allOptions.some(opt => {
+                                            const v = (typeof opt === 'object' && opt !== null) ? (opt.value ?? opt.key ?? opt.id) : opt;
+                                            return v === formData[field.key];
+                                          });
+                                          if (!nextVal && !currentInOptions) {
+                                            const firstOpt = allOptions[0];
+                                            const firstVal = (typeof firstOpt === 'object' && firstOpt !== null) ? (firstOpt.value ?? firstOpt.key ?? firstOpt.id) : (firstOpt || '');
+                                            updateField(field.key, firstVal);
+                                          }
+                                          return { ...prev, [field.key]: nextVal };
+                                        });
+                                      }}
+                                      title={t('or_add_manual')}
+                                      style={{
+                                        padding: '0.75rem 1rem',
+                                        fontSize: '0.85rem',
+                                        whiteSpace: 'nowrap',
+                                        backgroundColor: isCustom ? 'var(--primary)' : 'var(--surface-hover)',
+                                        color: isCustom ? 'var(--primary-foreground)' : 'var(--text-main)',
+                                        border: '1.5px solid var(--border)',
+                                        borderRadius: '10px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.35rem'
+                                      }}
+                                    >
+                                      <Edit3 size={15} />
+                                      {isCustom ? (t('select') || 'Select') : (isRTL ? 'يدوي' : 'Manual')}
+                                    </button>
+                                  )}
+                                </div>
+
+                                {field.allowCustom && isCustom && (
+                                  <div style={{ marginTop: '0.5rem' }}>
+                                    <input
+                                      type="text"
+                                      placeholder={t(`enter_manual_${field.key}`) || (isRTL ? `أدخل ${t(field.label)} يدوياً...` : `Enter ${t(field.label)} manually...`)}
+                                      value={formData[field.key] || ''}
+                                      onChange={e => updateField(field.key, e.target.value)}
+                                      required={field.required}
+                                      autoFocus
+                                      className="modern-input"
+                                      style={{
+                                        width: '100%',
+                                        border: '2px solid var(--primary)'
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()}
+
+                          {field.type === 'relation' && (
+                            <select
+                              dir={isRTL ? 'rtl' : 'ltr'}
+                              value={formData[field.key] || ''}
+                              onChange={e => updateField(field.key, e.target.value)}
+                              required={field.required}
+                              className="modern-input"
+                              style={{ width: '100%', direction: isRTL ? 'rtl' : 'ltr', textAlign: isRTL ? 'right' : 'left' }}
+                            >
+                              <option value="" disabled>-- {t('select')} {t(field.label)} --</option>
+                              {(relationsData?.[field.relationTable] || []).map(r => {
+                                let display = field.relationLabel === 'id' ? `${t(field.label)} #${String(r.id).slice(0, 8).toUpperCase()}` : r[field.relationLabel];
+                                if (field.relationTable === 'sales_orders') {
+                                  const orderNum = String(r.id).slice(0, 8).toUpperCase();
+                                  let cust = '';
+                                  if (relationsData?.['customers'] && r.customer_id) {
+                                    const c = relationsData['customers'].find(x => x.id === r.customer_id);
+                                    if (c?.customer_name) cust = ` - ${c.customer_name}`;
+                                  }
+                                  display = `${t('sales_orders')} #${orderNum}${cust}`;
+                                }
+                                return (
+                                  <option key={r.id} value={r.id}>
+                                    {display}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          )}
+
+                          {field.type === 'checkbox' && (
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                              <input
+                                type="checkbox"
+                                checked={formData[field.key] === 1 || formData[field.key] === true}
+                                onChange={e => updateField(field.key, e.target.checked ? 1 : 0)}
+                              />
+                              <span>{t(field.label)}</span>
+                            </label>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
               {/* Modal Sticky Footer */}
               <div className="modern-modal-footer">
-                <button 
-                  type="button" 
-                  className="btn" 
-                  onClick={() => setIsModalOpen(false)} 
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => setIsModalOpen(false)}
                   style={{ padding: '0.65rem 1.4rem', borderRadius: '10px' }}
                 >
                   {t('cancel') || 'Cancel'}
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={isSaving}
                   className="modern-submit-btn"
                   style={{ opacity: isSaving ? 0.7 : 1, cursor: isSaving ? 'not-allowed' : 'pointer' }}

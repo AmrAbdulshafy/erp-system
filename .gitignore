@@ -56,3 +56,6 @@ dist-desktop
 .env.local
 api/.env
 .htaccess
+
+.vercel
+.env*

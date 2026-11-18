@@ -54,12 +54,23 @@ export default function PWAInstallPrompt() {
       setShowBanner(false);
     };
 
+    const handlePromptAvailable = () => {
+      if (window.__pwaDeferredPrompt) {
+        setDeferredPrompt(window.__pwaDeferredPrompt);
+        if (!sessionStorage.getItem(BANNER_DISMISSED_KEY)) {
+          setShowBanner(true);
+        }
+      }
+    };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('pwa-prompt-available', handlePromptAvailable);
     window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
       clearTimeout(timer);
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('pwa-prompt-available', handlePromptAvailable);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);

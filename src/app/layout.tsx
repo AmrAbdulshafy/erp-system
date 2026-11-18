@@ -46,6 +46,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.__pwaDeferredPrompt = null;
+              window.addEventListener('beforeinstallprompt', function(e) {
+                e.preventDefault();
+                window.__pwaDeferredPrompt = e;
+                window.dispatchEvent(new Event('pwa-prompt-available'));
+              });
+            `,
+          }}
+        />
+      </head>
       <body>
         <ThemeProvider
           attribute="class"

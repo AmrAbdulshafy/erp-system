@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
-import { Lock, User, KeyRound, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, Globe, Sun, Moon } from 'lucide-react';
+import { Lock, User, KeyRound, ArrowRight, ShieldCheck, CheckCircle2, AlertCircle, Globe, Sun, Moon, MonitorDown } from 'lucide-react';
 import { ModeToggle } from './mode-toggle';
 import PWAInstallPrompt from './PWAInstallPrompt';
 import { useCompanyProfile } from '../utils/companyProfile';
@@ -532,6 +532,41 @@ export default function LoginScreen() {
             <ShieldCheck size={16} style={{ color: '#2563EB' }} />
             <span>{isRTL ? 'دخول تجريبي كمدير النظام (Demo Admin)' : 'Demo Admin Login (1-Click)'}</span>
           </button>
+
+          {typeof window !== 'undefined' && !window.jinnworxDesktop && (
+            <a
+              href={
+                process.env.NEXT_PUBLIC_DESKTOP_DOWNLOAD_URL ||
+                'https://github.com/AmrAbdulshafy/erp-system/releases/latest/download/Jin-Engine-Setup-1.0.0.exe'
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn"
+              style={{
+                width: '100%',
+                padding: '0.6rem 0.9rem',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
+                border: '1px solid #1d4ed8',
+                color: '#ffffff',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.45rem',
+                textDecoration: 'none',
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+              }}
+            >
+              <MonitorDown size={16} />
+              <span>
+                {isRTL
+                  ? 'تحميل تطبيق سطح المكتب Windows (نسخة تجريبية 3 أيام)'
+                  : 'Download Windows Desktop App (3-Day Trial .exe)'}
+              </span>
+            </a>
+          )}
         </div>
 
         {/* Security badge & Creator footer */}

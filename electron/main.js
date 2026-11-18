@@ -25,6 +25,89 @@ const ONLINE_URL = (process.env.DESKTOP_ONLINE_URL || 'https://erp-system-eight.
 const USE_LOCAL = process.env.DESKTOP_LOCAL === 'true';
 const SERVER_URL = USE_LOCAL ? `http://127.0.0.1:${SERVER_PORT}` : ONLINE_URL;
 
+// ==========================================
+// 3-DAY DESKTOP TRIAL ENFORCEMENT & UNINSTALLER
+// ==========================================
+const TRIAL_DURATION_MS = 3 * 24 * 60 * 60 * 1000; // 3 Days (72 hours)
+
+function getTrialState() {
+  const trialFile = path.join(app.getPath('userData'), 'trial-license.json');
+  const now = Date.now();
+  let state = { firstLaunchAt: now, lastSeenAt: now };
+
+  try {
+    if (fs.existsSync(trialFile)) {
+      const parsed = JSON.parse(fs.readFileSync(trialFile, 'utf8'));
+      if (parsed && typeof parsed.firstLaunchAt === 'number') {
+        state.firstLaunchAt = parsed.firstLaunchAt;
+        state.lastSeenAt = Math.max(now, parsed.lastSeenAt || now);
+      }
+    }
+    fs.writeFileSync(trialFile, JSON.stringify(state, null, 2), 'utf8');
+  } catch (err) {
+    console.warn('[Jin Engine Trial] Could not persist trial state:', err);
+  }
+
+  const elapsedMs = Math.max(now - state.firstLaunchAt, state.lastSeenAt - state.firstLaunchAt);
+  const remainingMs = Math.max(0, TRIAL_DURATION_MS - elapsedMs);
+  const remainingDays = Math.ceil(remainingMs / (24 * 60 * 60 * 1000));
+  const expired = remainingMs <= 0;
+
+  return { expired, remainingDays, remainingMs, firstLaunchAt: state.firstLaunchAt };
+}
+
+function triggerAppUninstaller() {
+  try {
+    const exeDir = path.dirname(process.execPath);
+    const candidates = [
+      path.join(exeDir, 'Uninstall Jin Engine.exe'),
+      path.join(exeDir, 'Uninstall.exe')
+    ];
+    for (const uninstaller of candidates) {
+      if (fs.existsSync(uninstaller)) {
+        spawn(uninstaller, [], { detached: true, stdio: 'ignore' }).unref();
+        app.quit();
+        return true;
+      }
+    }
+  } catch (err) {
+    console.warn('[Jin Engine Trial] Uninstaller launch warning:', err);
+  }
+  app.quit();
+  return false;
+}
+
+function buildTrialExpiredHtml() {
+  return `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<title>Jin Engine — Trial Expired</title>
+<style>
+  body {
+    margin: 0; height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 50% 20%, #1e293b, #09090b 75%);
+    color: #f8fafc; font-family: 'Segoe UI', Tahoma, sans-serif; text-align: center;
+  }
+  .card {
+    max-width: 480px; padding: 40px 32px; border-radius: 20px;
+    background: rgba(24, 24, 27, 0.92); border: 1px solid rgba(239, 68, 68, 0.4);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+  }
+  h1 { margin: 0 0 10px; font-size: 1.65rem; color: #f87171; }
+  p { margin: 0 0 18px; color: #94a3b8; line-height: 1.6; font-size: 0.95rem; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>انتهت الفترة التجريبية (3 أيام)</h1>
+    <p>انتهت مدة التجربة المجانية لنسخة سطح المكتب من نظام <strong>Jin Engine ERP</strong>.<br/>جاري تنظيف الجلسة وإزالة التطبيق تلقائياً...</p>
+    <p style="font-size:0.82rem;color:#64748b;">Your 3-day evaluation period has ended. Launching uninstaller...</p>
+  </div>
+</body>
+</html>`;
+}
+
 function isPortListening(port, host = '127.0.0.1') {
   return new Promise((resolve) => {
     const socket = new net.Socket();
@@ -733,6 +816,8 @@ function createWindow() {
   const { width, height } = primaryDisplay.workAreaSize;
   const iconPath = path.join(__dirname, '..', 'public', 'jin-engine-icon-512.png');
 
+  const trial = getTrialState();
+
   mainWindow = new BrowserWindow({
     width,
     height,
@@ -745,7 +830,9 @@ function createWindow() {
     minimizable: true,
     autoHideMenuBar: true,
     backgroundColor: isDark ? '#09090B' : '#FFFFFF',
-    title: 'Jin Engine ERP System',
+    title: trial.expired
+      ? 'Jin Engine ERP System — Trial Expired'
+      : `Jin Engine ERP System (3-Day Trial: ${trial.remainingDays}d left)`,
     ...(fs.existsSync(iconPath) ? { icon: iconPath } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -786,6 +873,16 @@ function createWindow() {
       bringWindowToFront();
     }
   });
+
+  if (trial.expired) {
+    mainWindow.webContents.session.clearStorageData().catch(() => {});
+    mainWindow.webContents.session.clearCache().catch(() => {});
+    mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(buildTrialExpiredHtml())}`);
+    setTimeout(() => {
+      triggerAppUninstaller();
+    }, 3500);
+    return;
+  }
 
   // Show the animated Jin Engine ERP + Jinnworx splash screen briefly while starting the local server
   mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(buildSplashHtml(isDark))}`);

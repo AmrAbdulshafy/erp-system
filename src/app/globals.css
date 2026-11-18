@@ -1392,10 +1392,58 @@ table td,
     min-width: 560px;
   }
 
-  /* Constrain any modal / dialog cleanly on mobile viewports */
+  /* Constrain and enable smooth touch scrolling on all modals & dialogs on mobile */
+  .modern-modal-overlay {
+    padding: 0.5rem !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .modern-modal-dialog {
+    width: 100% !important;
+    max-width: calc(100vw - 1rem) !important;
+    max-height: 92dvh !important;
+    border-radius: 16px !important;
+  }
+
+  .modern-modal-dialog > form,
+  .modern-modal-dialog > div:not(.modern-modal-header):not(.modern-modal-footer) {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+  }
+
+  .modern-modal-header,
+  .modern-modal-footer {
+    padding: 0.75rem 1rem !important;
+    flex-wrap: wrap !important;
+  }
+
+  .main-content > *,
+  .glass-card,
+  .modern-card-section {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .table-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-x pan-y !important;
+  }
+
+  .table-card thead th {
+    position: static !important;
+  }
+
   div[role="dialog"] > div {
     max-width: calc(100vw - 1rem) !important;
     max-height: 92dvh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
     border-radius: 14px !important;
   }
 }

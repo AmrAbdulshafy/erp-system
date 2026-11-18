@@ -4,12 +4,15 @@ import { useEffect, useState } from 'react';
 import { Download, Share, X, Smartphone, MoreVertical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+const BANNER_DISMISSED_KEY = 'jin_engine_pwa_banner_dismissed';
+
 export default function PWAInstallPrompt() {
   const { i18n } = useTranslation();
   const isRTL = i18n?.language === 'ar';
 
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [showGuideModal, setShowGuideModal] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
   const [isIOSDevice, setIsIOSDevice] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
@@ -29,21 +32,29 @@ export default function PWAInstallPrompt() {
 
     const ua = window.navigator.userAgent.toLowerCase();
     const ios = /iphone|ipad|ipod/.test(ua);
+    const dismissed = sessionStorage.getItem(BANNER_DISMISSED_KEY) === '1';
 
     const timer = setTimeout(() => {
       setIsStandalone(Boolean(standalone));
       setIsIOSDevice(ios);
-    }, 0);
+      if (!standalone && !dismissed) {
+        setShowBanner(true);
+      }
+    }, 600);
 
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
+      if (!sessionStorage.getItem(BANNER_DISMISSED_KEY)) {
+        setShowBanner(true);
+      }
     };
 
     const handleAppInstalled = () => {
       setDeferredPrompt(null);
       setIsStandalone(true);
       setShowGuideModal(false);
+      setShowBanner(false);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -65,10 +76,18 @@ export default function PWAInstallPrompt() {
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
+        setShowBanner(false);
       }
       return;
     }
     setShowGuideModal(true);
+  };
+
+  const dismissBanner = () => {
+    setShowBanner(false);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(BANNER_DISMISSED_KEY, '1');
+    }
   };
 
   return (
@@ -98,13 +117,77 @@ export default function PWAInstallPrompt() {
         <span>{isRTL ? 'تثبيت التطبيق' : 'Install App'}</span>
       </button>
 
+      {/* Floating Mobile & Desktop PWA Install Notification Banner */}
+      {showBanner && (
+        <div
+          role="status"
+          style={{
+            position: 'fixed',
+            bottom: 'max(0.85rem, env(safe-area-inset-bottom))',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'calc(100vw - 1.5rem)',
+            maxWidth: '460px',
+            zIndex: 95,
+            background: 'var(--surface)',
+            border: '1.5px solid rgba(37, 99, 235, 0.45)',
+            borderRadius: '14px',
+            padding: '0.85rem 1rem',
+            boxShadow: '0 16px 40px rgba(0, 0, 0, 0.28)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+          }}
+        >
+          <img
+            src="/jin-engine-logo.svg"
+            alt="Jin Engine"
+            style={{ width: 40, height: 40, borderRadius: '10px', flexShrink: 0 }}
+          />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.25 }}>
+              {isRTL ? 'تثبيت تطبيق Jin Engine' : 'Install Jin Engine App'}
+            </div>
+            <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '2px', lineHeight: 1.35 }}>
+              {isRTL
+                ? 'ثبّت النظام على Android أو iOS كتطبيق مستقل سريع'
+                : 'Add to Home Screen on Android or iOS for app-like speed'}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleInstallClick}
+            className="btn btn-primary"
+            style={{
+              padding: '0.45rem 0.85rem',
+              borderRadius: '8px',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}
+          >
+            {isRTL ? 'تثبيت الآن' : 'Install'}
+          </button>
+          <button
+            type="button"
+            onClick={dismissBanner}
+            className="icon-btn"
+            aria-label={isRTL ? 'إغلاق' : 'Dismiss'}
+            style={{ flexShrink: 0, padding: '0.25rem' }}
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       {showGuideModal && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
             backgroundColor: 'rgba(0,0,0,0.55)',
-            zIndex: 100,
+            zIndex: 10050,
             display: 'flex',
             alignItems: 'flex-end',
             justifyContent: 'center',

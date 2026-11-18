@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Download, Share, X, Smartphone, MoreVertical } from 'lucide-react';
+import { Download, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const BANNER_DISMISSED_KEY = 'jin_engine_pwa_banner_dismissed';
@@ -11,9 +11,7 @@ export default function PWAInstallPrompt() {
   const isRTL = i18n?.language === 'ar';
 
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [showGuideModal, setShowGuideModal] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
-  const [isIOSDevice, setIsIOSDevice] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
@@ -30,20 +28,19 @@ export default function PWAInstallPrompt() {
       window.matchMedia?.('(display-mode: standalone)')?.matches ||
       window.navigator.standalone === true;
 
-    const ua = window.navigator.userAgent.toLowerCase();
-    const ios = /iphone|ipad|ipod/.test(ua);
     const dismissed = sessionStorage.getItem(BANNER_DISMISSED_KEY) === '1';
 
     const timer = setTimeout(() => {
       setIsStandalone(Boolean(standalone));
-      setIsIOSDevice(ios);
-      if (!standalone && !dismissed) {
-        setShowBanner(true);
+      if (window.__pwaDeferredPrompt && !standalone) {
+        setDeferredPrompt(window.__pwaDeferredPrompt);
+        if (!dismissed) setShowBanner(true);
       }
-    }, 600);
+    }, 0);
 
     const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
+      window.__pwaDeferredPrompt = e;
       setDeferredPrompt(e);
       if (!sessionStorage.getItem(BANNER_DISMISSED_KEY)) {
         setShowBanner(true);
@@ -51,9 +48,9 @@ export default function PWAInstallPrompt() {
     };
 
     const handleAppInstalled = () => {
+      window.__pwaDeferredPrompt = null;
       setDeferredPrompt(null);
       setIsStandalone(true);
-      setShowGuideModal(false);
       setShowBanner(false);
     };
 
@@ -67,20 +64,17 @@ export default function PWAInstallPrompt() {
     };
   }, []);
 
-  // Hide only when already running as an installed standalone app
-  if (isStandalone) return null;
+  if (isStandalone || !deferredPrompt) return null;
 
-  const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setDeferredPrompt(null);
-        setShowBanner(false);
-      }
-      return;
+  const handleDirectInstall = async () => {
+    if (!deferredPrompt) return;
+    await deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      window.__pwaDeferredPrompt = null;
+      setDeferredPrompt(null);
+      setShowBanner(false);
     }
-    setShowGuideModal(true);
   };
 
   const dismissBanner = () => {
@@ -94,9 +88,9 @@ export default function PWAInstallPrompt() {
     <>
       <button
         type="button"
-        onClick={handleInstallClick}
+        onClick={handleDirectInstall}
         className="btn pwa-install-btn"
-        title={isRTL ? 'تثبيت التطبيق على الهاتف أو الجهاز' : 'Install Jin Engine App'}
+        title={isRTL ? 'تثبيت التطبيق مباشرة' : 'Install Jin Engine App'}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -117,7 +111,6 @@ export default function PWAInstallPrompt() {
         <span>{isRTL ? 'تثبيت التطبيق' : 'Install App'}</span>
       </button>
 
-      {/* Floating Mobile & Desktop PWA Install Notification Banner */}
       {showBanner && (
         <div
           role="status"
@@ -150,13 +143,13 @@ export default function PWAInstallPrompt() {
             </div>
             <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)', marginTop: '2px', lineHeight: 1.35 }}>
               {isRTL
-                ? 'ثبّت النظام على Android أو iOS كتطبيق مستقل سريع'
-                : 'Add to Home Screen on Android or iOS for app-like speed'}
+                ? 'اضغط تثبيت الآن لتثبيت التطبيق مباشرة على جهازك'
+                : 'Tap Install for direct app installation'}
             </div>
           </div>
           <button
             type="button"
-            onClick={handleInstallClick}
+            onClick={handleDirectInstall}
             className="btn btn-primary"
             style={{
               padding: '0.45rem 0.85rem',
@@ -178,89 +171,6 @@ export default function PWAInstallPrompt() {
           >
             <X size={16} />
           </button>
-        </div>
-      )}
-
-      {showGuideModal && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            backgroundColor: 'rgba(0,0,0,0.55)',
-            zIndex: 10050,
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            padding: '1rem',
-            paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
-          }}
-          onClick={() => setShowGuideModal(false)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              maxWidth: '420px',
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderRadius: '16px',
-              padding: '1.25rem',
-              boxShadow: '0 20px 45px rgba(0,0,0,0.3)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, color: 'var(--text-main)' }}>
-                <Smartphone size={18} style={{ color: '#2563eb' }} />
-                <span>
-                  {isIOSDevice
-                    ? (isRTL ? 'تثبيت Jin Engine على iPhone / iPad' : 'Install Jin Engine on iOS')
-                    : (isRTL ? 'تثبيت Jin Engine على الهاتف / الكمبيوتر' : 'Install Jin Engine App')}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowGuideModal(false)}
-                className="icon-btn"
-                aria-label="Close"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {isIOSDevice ? (
-              <ol style={{ margin: 0, paddingInlineStart: '1.25rem', fontSize: '0.88rem', lineHeight: 1.7, color: 'var(--text-muted)' }}>
-                <li>
-                  {isRTL ? 'افتح الموقع في متصفح Safari واضغط على أيقونة المشاركة' : 'In Safari, tap the Share button'}{' '}
-                  <Share size={14} style={{ display: 'inline', verticalAlign: 'middle', color: '#2563eb' }} />.
-                </li>
-                <li>
-                  {isRTL
-                    ? 'اختر "إضافة إلى الشاشة الرئيسية" (Add to Home Screen).'
-                    : 'Scroll down and tap "Add to Home Screen".'}
-                </li>
-                <li>
-                  {isRTL ? 'اضغط "إضافة" (Add) لتشغيل النظام كتطبيق مستقل.' : 'Tap "Add" to launch Jin Engine as a full-screen app.'}
-                </li>
-              </ol>
-            ) : (
-              <ol style={{ margin: 0, paddingInlineStart: '1.25rem', fontSize: '0.88rem', lineHeight: 1.7, color: 'var(--text-muted)' }}>
-                <li>
-                  {isRTL ? 'في متصفح Chrome أو Edge اضغط على قائمة المتصفح' : 'In Chrome or Edge, tap the browser menu'}{' '}
-                  <MoreVertical size={14} style={{ display: 'inline', verticalAlign: 'middle', color: '#2563eb' }} />.
-                </li>
-                <li>
-                  {isRTL
-                    ? 'اختر "تثبيت التطبيق" (Install app) أو "الإضافة إلى الشاشة الرئيسية" (Add to Home screen).'
-                    : 'Select "Install app" or "Add to Home screen".'}
-                </li>
-                <li>
-                  {isRTL
-                    ? 'تأكد من فتح الرابط عبر HTTPS (رابط Vercel) حتى يظهر خيار التثبيت.'
-                    : 'Make sure you are visiting the HTTPS Vercel URL so native app installation is enabled.'}
-                </li>
-              </ol>
-            )}
-          </div>
         </div>
       )}
     </>

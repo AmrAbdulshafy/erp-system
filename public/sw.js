@@ -2,11 +2,10 @@ const CACHE_NAME = 'jin-engine-erp-v1';
 const STATIC_ASSETS = [
   '/',
   '/manifest.webmanifest',
-  '/jin-engine-logo.svg',
-  '/jin-engine-icon-512.png',
-  '/jin-engine-icon-192.png',
-  '/jin-engine-wordmark-dark.svg',
-  '/jin-engine-wordmark-light.svg',
+  '/all-orders-icon-512.png',
+  '/all-orders-icon-192.png',
+  '/all-orders-logo-dark.png',
+  '/all-orders-logo-light.png',
 ];
 
 self.addEventListener('install', (event) => {

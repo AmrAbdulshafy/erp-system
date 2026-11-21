@@ -144,9 +144,9 @@ export default function PWAInstallPrompt() {
           }}
         >
           <img
-            src="/jin-engine-logo.svg"
-            alt="Jin Engine"
-            style={{ width: 40, height: 40, borderRadius: '10px', flexShrink: 0 }}
+            src="/all-orders-icon-192.png"
+            alt="All Orders"
+            style={{ width: 40, height: 40, borderRadius: '10px', flexShrink: 0, objectFit: 'contain' }}
           />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.25 }}>

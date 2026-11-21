@@ -160,13 +160,12 @@ export default function ClientLayout({ children }) {
               borderRightColor: 'var(--primary)'
             }} />
             <img
-              src="/jin-engine-logo.svg"
-              alt="Jin Engine"
+              src={resolvedTheme === 'light' ? '/all-orders-logo-light.png' : '/all-orders-logo-dark.png'}
+              alt="All Orders"
               style={{
-                width: 56,
-                height: 56,
-                borderRadius: '16px',
-                boxShadow: '0 10px 25px rgba(37, 99, 235, 0.3)',
+                width: 64,
+                height: 64,
+                objectFit: 'contain',
                 display: 'block'
               }}
             />
@@ -190,7 +189,7 @@ export default function ClientLayout({ children }) {
           background: 'var(--surface)',
           border: '1px solid var(--border)'
         }}>
-          <img src={resolvedTheme === 'light' ? '/jin-engine-wordmark-light.svg' : '/jin-engine-wordmark-dark.svg'} alt="Jin Engine" style={{ height: 30, width: 'auto', objectFit: 'contain' }} />
+          <img src={resolvedTheme === 'light' ? '/all-orders-logo-light.png' : '/all-orders-logo-dark.png'} alt="All Orders" style={{ height: 34, width: 'auto', objectFit: 'contain' }} />
           <div dir="ltr" style={{ fontSize: '0.74rem', color: 'var(--text-muted)', fontWeight: 600 }}>
             Created by <strong style={{ color: '#f97316' }}>Jinnworx</strong> &bull; Developed by <strong style={{ color: 'var(--text-main)' }}>Amr Abdulshafy</strong>
           </div>
@@ -325,12 +324,12 @@ export default function ClientLayout({ children }) {
             />
           ) : (
             <img
-              src="/jin-engine-logo.svg"
-              alt="Jin Engine"
+              src={resolvedTheme === 'light' ? '/all-orders-logo-light.png' : '/all-orders-logo-dark.png'}
+              alt="All Orders"
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: '10px',
+                width: 40,
+                height: 40,
+                objectFit: 'contain',
                 flexShrink: 0,
                 display: 'block'
               }}

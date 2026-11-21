@@ -157,120 +157,158 @@ export default function DocumentPrint({
       <div ref={docRef} className="print-doc print-area" dir={isRTL ? 'rtl' : 'ltr'} style={{
         maxWidth: '860px', margin: '0 auto', background: '#ffffff',
         borderRadius: '12px', overflow: 'hidden',
-        border: '1px solid #e4e4e7',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
+        border: '1px solid #d4d4d8',
+        boxShadow: '0 6px 28px rgba(0,0,0,0.08)',
         color: '#09090b',
         direction: isRTL ? 'rtl' : 'ltr',
         textAlign: isRTL ? 'right' : 'left',
         fontFamily: isRTL ? "'Cairo', 'Segoe UI', Tahoma, Arial, sans-serif" : "'Segoe UI', Arial, sans-serif"
       }}>
-        {/* ── Header Band (Executive Zinc & Blue Theme) ── */}
+        {/* ── Header Band (All Orders Red & Black Executive Theme) ── */}
         <div className="doc-header-band" style={{
-          background: 'linear-gradient(135deg, #09090b 0%, #18181b 100%)',
-          borderBottom: '3px solid #2563eb',
-          padding: '2rem 2.5rem', color: '#ffffff',
+          background: '#ffffff',
+          borderBottom: '2px solid #e4e4e7',
+          padding: '1.5rem 2.25rem 1.25rem',
+          color: '#09090b',
           display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
           flexWrap: 'wrap', gap: '1.25rem'
         }}>
-          {/* Left: Status + Quote info */}
-          <div>
-            <div style={{
-              display: 'inline-block',
-              background: 'rgba(255,255,255,0.12)',
-              border: '1px solid rgba(255,255,255,0.25)',
-              borderRadius: '999px', padding: isRTL ? '5px 14px' : '4px 14px',
-              fontSize: '0.75rem', fontWeight: 700, letterSpacing: isRTL ? 'normal' : '0.5px',
-              lineHeight: 1.4,
-              color: '#ffffff', marginBottom: '0.75rem', textTransform: isRTL ? 'none' : 'uppercase'
-            }}>{t(status?.toLowerCase()) || status}</div>
-            <p style={{ margin: 0, fontSize: '0.9rem', color: '#e4e4e7', fontWeight: 500 }}>
-              {docType === 'QUOTATION' ? (t('quotation') || 'Quotation') : (t('invoice') || 'Invoice')} #: <strong style={{ color: '#ffffff' }}>{docNumber}</strong>
-            </p>
-            <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#a1a1aa' }}>
-              {t('date') || 'Date'}: {docDate}
-            </p>
-            {profile.tax_number && String(profile.tax_number).trim() !== '' && (
-              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#a1a1aa' }}>
-                {isRTL ? 'الرقم الضريبي:' : 'Tax Reg:'} {profile.tax_number}
-              </p>
-            )}
-            {profile.commercial_reg && String(profile.commercial_reg).trim() !== '' && (
-              <p style={{ margin: '2px 0 0', fontSize: '0.78rem', color: '#a1a1aa' }}>
-                {isRTL ? 'السجل التجاري:' : 'C.R.:'} {profile.commercial_reg}
-              </p>
-            )}
-          </div>
-          {/* Right: Brand */}
-          <div style={{ textAlign: isRTL ? 'left' : 'right', display: 'flex', flexDirection: 'column', alignItems: isRTL ? 'flex-start' : 'flex-end', gap: '0.35rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexDirection: isRTL ? 'row-reverse' : 'row' }}>
-              <div>
-                <h1 style={{ margin: 0, fontSize: '1.85rem', fontWeight: 900, letterSpacing: '-0.5px', color: '#ffffff', lineHeight: 1.2 }}>
-                  {companyName}
-                </h1>
-                <p style={{ margin: '4px 0 0', color: '#a1a1aa', fontSize: '0.85rem' }}>
-                  {companyTagline}
-                </p>
-              </div>
+          {/* Brand Logo + Document Title */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               {profile.logo && profile.logo.startsWith('data:') ? (
-                <img 
-                  src={profile.logo} 
-                  alt={companyName} 
-                  style={{ height: 44, width: 'auto', maxWidth: 140, objectFit: 'contain', background: 'transparent' }}
+                <img
+                  src={profile.logo}
+                  alt={companyName}
+                  style={{ height: 58, width: 'auto', maxWidth: 190, objectFit: 'contain' }}
                 />
               ) : (
                 <img
-                  src="/jin-engine-logo.svg"
-                  alt={companyName}
-                  style={{ height: 44, width: 44, borderRadius: '10px', objectFit: 'contain' }}
+                  src="/all-orders-logo-light.png"
+                  alt="All Orders for Packaging"
+                  style={{ height: 64, width: 'auto', maxWidth: 220, objectFit: 'contain' }}
                 />
               )}
             </div>
-            {(profile.phone && String(profile.phone).trim() !== '') || (profile.email && String(profile.email).trim() !== '') ? (
-              <p style={{ margin: '2px 0 0', color: '#71717a', fontSize: '0.75rem' }}>
-                {[profile.phone?.trim(), profile.email?.trim()].filter(Boolean).join(' • ')}
-              </p>
-            ) : null}
+            <div style={{ borderBottom: '2.5px solid #18181b', paddingBottom: '0.25rem', marginTop: '0.15rem' }}>
+              <h1 style={{ margin: 0, fontSize: '1.85rem', fontWeight: 900, color: '#09090b', lineHeight: 1.15 }}>
+                {docType === 'QUOTATION'
+                  ? (isRTL ? 'عرض سعر' : 'QUOTATION')
+                  : (isRTL ? 'فاتورة' : 'INVOICE')}
+              </h1>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: '#3f3f46' }}>
+              {companyTagline || (isRTL ? 'حلول تغليف وطباعة احترافية' : 'Professional Packaging & Printing Solutions')}
+            </p>
+          </div>
+
+          {/* Right/End: Tagline + Red Metadata Table */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: isRTL ? 'flex-end' : 'flex-end', gap: '0.6rem', minWidth: '250px' }}>
+            <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#18181b', textAlign: 'center', lineHeight: 1.4 }}>
+              {isRTL ? 'حلول تغليف وطباعة احترافية للمطاعم والكافيهات' : 'Packaging & Printing for Restaurants & Cafes'}
+            </div>
+            <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: '250px', fontSize: '0.82rem', border: '1px solid #d4d4d8', borderRadius: '8px', overflow: 'hidden' }}>
+              <tbody>
+                <tr>
+                  <td style={{ background: '#dc2626', color: '#ffffff', fontWeight: 800, padding: '0.4rem 0.75rem', borderBottom: '1px solid rgba(255,255,255,0.25)', width: '42%' }}>
+                    {docType === 'QUOTATION' ? (isRTL ? 'رقم العرض' : 'Quote #') : (isRTL ? 'رقم الفاتورة' : 'Invoice #')}
+                  </td>
+                  <td style={{ background: '#f4f4f5', color: '#09090b', fontWeight: 800, padding: '0.4rem 0.75rem', borderBottom: '1px solid #e4e4e7', textAlign: 'center', fontFamily: 'monospace' }}>
+                    {docNumber}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ background: '#dc2626', color: '#ffffff', fontWeight: 800, padding: '0.4rem 0.75rem', borderBottom: '1px solid rgba(255,255,255,0.25)' }}>
+                    {t('date') || (isRTL ? 'التاريخ' : 'Date')}
+                  </td>
+                  <td style={{ background: '#f4f4f5', color: '#09090b', fontWeight: 700, padding: '0.4rem 0.75rem', borderBottom: '1px solid #e4e4e7', textAlign: 'center' }}>
+                    {docDate}
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ background: '#dc2626', color: '#ffffff', fontWeight: 800, padding: '0.4rem 0.75rem' }}>
+                    {t('status') || (isRTL ? 'الحالة' : 'Status')}
+                  </td>
+                  <td style={{ background: '#f4f4f5', color: '#09090b', fontWeight: 800, padding: '0.4rem 0.75rem', textAlign: 'center' }}>
+                    {t(status?.toLowerCase()) || status}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            {(profile.tax_number || profile.commercial_reg) && (
+              <div style={{ fontSize: '0.72rem', color: '#52525b' }}>
+                {[
+                  profile.tax_number ? `${isRTL ? 'الرقم الضريبي' : 'Tax'}: ${profile.tax_number}` : '',
+                  profile.commercial_reg ? `${isRTL ? 'س.ت' : 'C.R.'}: ${profile.commercial_reg}` : ''
+                ].filter(Boolean).join(' • ')}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* ── Bill To / Prepared By ── */}
+        {/* ── Two Info Cards: Bill To & Order Details ── */}
         <div className="doc-meta-grid" style={{
           display: 'grid', gridTemplateColumns: '1fr 1fr',
-          padding: '1.5rem 2.5rem', gap: '2rem',
-          borderBottom: '1px solid #e4e4e7', background: '#fafafa'
+          padding: '1.15rem 2.25rem', gap: '1.25rem',
+          background: '#ffffff'
         }}>
-          <div>
-            <p style={{ margin: '0 0 6px', fontSize: '0.72rem', fontWeight: 700, color: '#71717a', textTransform: isRTL ? 'none' : 'uppercase', letterSpacing: isRTL ? 'normal' : '0.5px' }}>
-              {t('prepared_by') || (isRTL ? 'إعداد بواسطة' : 'Prepared By')}
-            </p>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: '1.05rem', color: '#09090b' }}>{preparedBy?.name || '—'}</p>
-            {preparedBy?.phone && <p style={{ margin: '2px 0 0', color: '#71717a', fontSize: '0.85rem' }}>{preparedBy.phone}</p>}
+          {/* Card 1: Bill To */}
+          <div style={{ border: '1px solid #d4d4d8', borderRadius: '10px', overflow: 'hidden', background: '#fafafa' }}>
+            <div style={{ background: '#18181b', color: '#ffffff', padding: '0.45rem 0.85rem', fontWeight: 800, fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <span>👤</span>
+              <span>{t('bill_to') || (isRTL ? 'بيانات العميل / البراند' : 'Bill To')}</span>
+            </div>
+            <div style={{ padding: '0.65rem 0.85rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.83rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e4e4e7', paddingBottom: '0.25rem' }}>
+                <span style={{ color: '#52525b', fontWeight: 700 }}>{isRTL ? 'الاسم / البراند:' : 'Name:'}</span>
+                <span style={{ color: '#09090b', fontWeight: 800 }}>{billTo?.name || '—'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e4e4e7', paddingBottom: '0.25rem' }}>
+                <span style={{ color: '#52525b', fontWeight: 700 }}>{isRTL ? 'رقم الهاتف:' : 'Phone:'}</span>
+                <span style={{ color: '#09090b', fontWeight: 600 }} dir="ltr">{billTo?.phone || '—'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#52525b', fontWeight: 700 }}>{isRTL ? 'العنوان:' : 'Address:'}</span>
+                <span style={{ color: '#09090b', fontWeight: 600 }}>{billTo?.address || '—'}</span>
+              </div>
+            </div>
           </div>
-          <div style={{ textAlign: isRTL ? 'left' : 'right' }}>
-            <p style={{ margin: '0 0 6px', fontSize: '0.72rem', fontWeight: 700, color: '#71717a', textTransform: isRTL ? 'none' : 'uppercase', letterSpacing: isRTL ? 'normal' : '0.5px' }}>
-              {t('bill_to') || (isRTL ? 'العميل / الفاتورة إلى' : 'Bill To')}
-            </p>
-            <p style={{ margin: 0, fontWeight: 700, fontSize: '1.05rem', color: '#09090b' }}>{billTo?.name || '—'}</p>
-            {billTo?.phone && <p style={{ margin: '2px 0 0', color: '#71717a', fontSize: '0.85rem' }}>{billTo.phone}</p>}
-            {billTo?.address && <p style={{ margin: '2px 0 0', color: '#71717a', fontSize: '0.85rem' }}>{billTo.address}</p>}
+
+          {/* Card 2: Order & Prepared By */}
+          <div style={{ border: '1px solid #d4d4d8', borderRadius: '10px', overflow: 'hidden', background: '#fafafa' }}>
+            <div style={{ background: '#18181b', color: '#ffffff', padding: '0.45rem 0.85rem', fontWeight: 800, fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <span>🚚</span>
+              <span>{t('prepared_by') || (isRTL ? 'تفاصيل الطلب والإعداد' : 'Order & Prepared By')}</span>
+            </div>
+            <div style={{ padding: '0.65rem 0.85rem', display: 'flex', flexDirection: 'column', gap: '0.35rem', fontSize: '0.83rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e4e4e7', paddingBottom: '0.25rem' }}>
+                <span style={{ color: '#52525b', fontWeight: 700 }}>{isRTL ? 'إعداد بواسطة:' : 'Prepared By:'}</span>
+                <span style={{ color: '#09090b', fontWeight: 800 }}>{preparedBy?.name || '—'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #e4e4e7', paddingBottom: '0.25rem' }}>
+                <span style={{ color: '#52525b', fontWeight: 700 }}>{isRTL ? 'هاتف المسؤول:' : 'Staff Phone:'}</span>
+                <span style={{ color: '#09090b', fontWeight: 600 }} dir="ltr">{preparedBy?.phone || '—'}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#52525b', fontWeight: 700 }}>{isRTL ? 'عدد البنود:' : 'Items Count:'}</span>
+                <span style={{ color: '#09090b', fontWeight: 700 }}>{items.length}</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* ── Line Items Table ── */}
-        <div className="doc-items-section" style={{ padding: '1.5rem 2.5rem 0' }}>
-          <p style={{ margin: '0 0 1rem', fontSize: '0.72rem', fontWeight: 700, color: '#71717a', textTransform: isRTL ? 'none' : 'uppercase', letterSpacing: isRTL ? 'normal' : '0.5px' }}>
-            {t('line_items') || (isRTL ? 'بنود الطلب' : 'Line Items')}
-          </p>
+        {/* ── Line Items Table (Red # Header + Black Column Headers) ── */}
+        <div className="doc-items-section" style={{ padding: '0 2.25rem' }}>
           <div className="doc-table-scroll">
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem', textAlign: isRTL ? 'right' : 'left' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: isRTL ? 'right' : 'left', border: '1px solid #d4d4d8' }}>
             <thead>
-              <tr style={{ background: '#18181b', color: '#ffffff', border: '1px solid #18181b' }}>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 700, fontSize: '0.78rem', width: '40px', textAlign: isRTL ? 'right' : 'left', color: '#ffffff' }}>#</th>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 700, fontSize: '0.78rem', textAlign: isRTL ? 'right' : 'left', color: '#ffffff' }}>{t('product_name') || (isRTL ? 'المنتج' : 'Product')}</th>
-                <th style={{ padding: '0.75rem 1rem', textAlign: 'center', fontWeight: 700, fontSize: '0.78rem', color: '#ffffff' }}>{t('image') || (isRTL ? 'الصورة' : 'Image')}</th>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 700, fontSize: '0.78rem', textAlign: isRTL ? 'right' : 'left', color: '#ffffff' }}>{t('quantity') || (isRTL ? 'الكمية' : 'Qty')}</th>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 700, fontSize: '0.78rem', textAlign: isRTL ? 'right' : 'left', color: '#ffffff' }}>{t('unit_price') || (isRTL ? 'سعر الوحدة' : 'Unit Price')}</th>
-                <th style={{ padding: '0.75rem 1rem', fontWeight: 700, fontSize: '0.78rem', textAlign: isRTL ? 'left' : 'right', color: '#ffffff' }}>{t('total_price') || (isRTL ? 'الإجمالي' : 'Total')}</th>
+              <tr style={{ background: '#18181b', color: '#ffffff' }}>
+                <th style={{ padding: '0.65rem 0.75rem', fontWeight: 800, fontSize: '0.8rem', width: '44px', textAlign: 'center', background: '#dc2626', color: '#ffffff', borderInlineEnd: '1px solid rgba(255,255,255,0.2)' }}>{isRTL ? 'م' : '#'}</th>
+                <th style={{ padding: '0.65rem 0.85rem', fontWeight: 800, fontSize: '0.8rem', textAlign: isRTL ? 'right' : 'left', color: '#ffffff' }}>{isRTL ? 'الصنف / الوصف التفصيلي' : (t('product_name') || 'Item / Description')}</th>
+                <th style={{ padding: '0.65rem 0.75rem', textAlign: 'center', fontWeight: 800, fontSize: '0.8rem', color: '#ffffff' }}>{t('image') || (isRTL ? 'الصورة' : 'Image')}</th>
+                <th style={{ padding: '0.65rem 0.75rem', fontWeight: 800, fontSize: '0.8rem', textAlign: 'center', color: '#ffffff' }}>{t('quantity') || (isRTL ? 'الكمية' : 'Qty')}</th>
+                <th style={{ padding: '0.65rem 0.75rem', fontWeight: 800, fontSize: '0.8rem', textAlign: 'center', color: '#ffffff' }}>{t('unit_price') || (isRTL ? 'سعر الوحدة' : 'Unit Price')}</th>
+                <th style={{ padding: '0.65rem 0.85rem', fontWeight: 800, fontSize: '0.8rem', textAlign: isRTL ? 'left' : 'right', color: '#ffffff' }}>{t('total_price') || (isRTL ? 'الإجمالي' : 'Total')}</th>
               </tr>
             </thead>
             <tbody>
@@ -278,18 +316,18 @@ export default function DocumentPrint({
                 const images = parseImages(item.image_data);
                 return (
                   <tr key={item.id || idx} style={{
-                    backgroundColor: idx % 2 === 0 ? '#ffffff' : '#f9f9fb',
-                    borderBottom: '1px solid #e4e4e7'
+                    backgroundColor: idx % 2 === 0 ? '#ffffff' : '#f4f4f5',
+                    borderBottom: '1px solid #d4d4d8'
                   }}>
-                    <td style={{ padding: '1rem', color: '#71717a', fontWeight: 700 }}>{idx + 1}</td>
-                    <td style={{ padding: '1rem', fontWeight: 700, color: '#09090b' }}>{item.product_name}</td>
-                    <td style={{ padding: '0.75rem 1rem', textAlign: 'center' }}>
+                    <td style={{ padding: '0.65rem 0.75rem', color: '#09090b', fontWeight: 800, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>{idx + 1}</td>
+                    <td style={{ padding: '0.65rem 0.85rem', fontWeight: 700, color: '#09090b', borderInlineEnd: '1px solid #e4e4e7' }}>{item.product_name}</td>
+                    <td style={{ padding: '0.5rem 0.75rem', textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>
                       {images.length > 0 ? (
                         <div style={{
                           display: 'grid',
                           gridTemplateColumns: images.length === 1 ? '1fr' : 'repeat(2, 1fr)',
                           gap: '4px',
-                          width: images.length === 1 ? '80px' : '130px',
+                          width: images.length === 1 ? '64px' : '110px',
                           margin: '0 auto'
                         }}>
                           {images.map((src, i) => (
@@ -308,22 +346,22 @@ export default function DocumentPrint({
                               title={isRTL ? 'انقر للانتقال للمعاينة الكبيرة أدناه' : 'Click to jump to big scale preview below'}
                               style={{
                                 width: '100%',
-                                height: images.length === 1 ? '80px' : '60px',
+                                height: images.length === 1 ? '64px' : '50px',
                                 objectFit: 'cover',
                                 borderRadius: '4px',
-                                border: '1px solid #e4e4e7',
+                                border: '1px solid #d4d4d8',
                                 cursor: 'pointer'
                               }}
                             />
                           ))}
                         </div>
                       ) : (
-                        <span style={{ fontSize: '0.75rem', color: '#d4d4d8' }}>—</span>
+                        <span style={{ fontSize: '0.75rem', color: '#a1a1aa' }}>—</span>
                       )}
                     </td>
-                    <td style={{ padding: '1rem', color: '#18181b', fontWeight: 500 }}>{item.quantity}</td>
-                    <td style={{ padding: '1rem', color: '#18181b', fontWeight: 500 }}>{formatAmount(item.unit_price)} {t('egp')}</td>
-                    <td style={{ padding: '1rem', fontWeight: 700, color: '#09090b', textAlign: isRTL ? 'left' : 'right' }}>{formatAmount(item.total_price)} {t('egp')}</td>
+                    <td style={{ padding: '0.65rem 0.75rem', color: '#18181b', fontWeight: 700, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>{item.quantity}</td>
+                    <td style={{ padding: '0.65rem 0.75rem', color: '#18181b', fontWeight: 600, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>{formatAmount(item.unit_price)} {t('egp')}</td>
+                    <td style={{ padding: '0.65rem 0.85rem', fontWeight: 800, color: '#09090b', textAlign: isRTL ? 'left' : 'right' }}>{formatAmount(item.total_price)} {t('egp')}</td>
                   </tr>
                 );
               })}
@@ -337,67 +375,114 @@ export default function DocumentPrint({
           </div>
         </div>
 
-        {/* ── Totals ── */}
-        <div style={{ padding: '1.25rem 2.5rem', display: 'flex', justifyContent: isRTL ? 'flex-start' : 'flex-end' }}>
-          <div style={{ width: '320px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', borderTop: '1px solid #e4e4e7', color: '#71717a' }}>
-              <span style={{ fontWeight: 600 }}>{t('subtotal') || (isRTL ? 'المجموع الفرعي' : 'Subtotal')}</span>
-              <span style={{ fontWeight: 600, color: '#18181b' }}>{formatAmount(subtotal)} {t('egp')}</span>
+        {/* ── Notes & Financial Summary (Two-Column Layout) ── */}
+        <div className="doc-meta-grid" style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr',
+          padding: '1.25rem 2.25rem', gap: '1.25rem', alignItems: 'stretch'
+        }}>
+          {/* Notes Box */}
+          <div style={{ border: '1px solid #d4d4d8', borderRadius: '10px', overflow: 'hidden', background: '#fafafa', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ background: '#18181b', color: '#ffffff', padding: '0.45rem 0.85rem', fontWeight: 800, fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <span>📝</span>
+              <span>{t('notes') || (isRTL ? 'ملاحظات إضافية' : 'Additional Notes')}</span>
             </div>
-
-            {discountVal > 0 && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0', color: '#dc2626' }}>
-                <span style={{ fontWeight: 600 }}>
-                  {t('discount') || (isRTL ? 'الخصم' : 'Discount')} {Number(discountPercent) > 0 ? `(${discountPercent}%)` : ''}
-                </span>
-                <span style={{ fontWeight: 700 }}>-{formatAmount(discountVal)} {t('egp')}</span>
-              </div>
-            )}
-
-            <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '0.85rem 1.15rem', marginTop: '0.25rem',
-              background: '#09090b', borderRadius: '8px', color: '#ffffff',
-              border: '1px solid #09090b'
-            }}>
-              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{t('grand_total') || (isRTL ? 'الإجمالي الكلي' : 'Grand Total')}</span>
-              <span style={{ fontWeight: 900, fontSize: '1.2rem', color: '#ffffff' }}>{formatAmount(finalGrandTotal)} {t('egp')}</span>
+            <div style={{ padding: '0.85rem', fontSize: '0.85rem', color: '#18181b', flex: 1, lineHeight: 1.65 }}>
+              {notes || (isRTL ? 'لا توجد ملاحظات إضافية.' : 'No additional notes.')}
             </div>
+          </div>
 
-            {amountPaid !== undefined && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.35rem 0', color: '#059669', fontSize: '0.85rem', fontWeight: 600 }}>
-                <span>{t('amount_paid') || (isRTL ? 'المسدد' : 'Paid')}</span>
-                <span>{formatAmount(amountPaid)} {t('egp')}</span>
+          {/* Financial Summary Box */}
+          <div style={{ border: '1px solid #d4d4d8', borderRadius: '10px', overflow: 'hidden', background: '#ffffff' }}>
+            <div style={{ background: '#dc2626', color: '#ffffff', padding: '0.45rem 0.85rem', fontWeight: 800, fontSize: '0.84rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <span>💰</span>
+              <span>{isRTL ? 'الملخص المالي' : 'Financial Summary'}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', fontSize: '0.85rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0.85rem', borderBottom: '1px solid #e4e4e7' }}>
+                <span style={{ fontWeight: 700, color: '#3f3f46' }}>{t('subtotal') || (isRTL ? 'إجمالي الأصناف' : 'Subtotal')}</span>
+                <span style={{ fontWeight: 800, color: '#09090b' }}>{formatAmount(subtotal)} {t('egp')}</span>
               </div>
-            )}
 
-            {remainingAmount !== undefined && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.35rem 0', color: Number(remainingAmount) > 0 ? '#dc2626' : '#059669', fontSize: '0.85rem', fontWeight: 700 }}>
-                <span>{t('remaining_amount') || (isRTL ? 'المتبقي' : 'Remaining')}</span>
-                <span>{formatAmount(remainingAmount)} {t('egp')}</span>
+              {discountVal > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0.85rem', borderBottom: '1px solid #e4e4e7', color: '#dc2626' }}>
+                  <span style={{ fontWeight: 700 }}>
+                    {t('discount') || (isRTL ? 'خصم' : 'Discount')} {Number(discountPercent) > 0 ? `(${discountPercent}%)` : ''}
+                  </span>
+                  <span style={{ fontWeight: 800 }}>-{formatAmount(discountVal)} {t('egp')}</span>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.65rem 0.85rem', background: '#18181b', color: '#ffffff' }}>
+                <span style={{ fontWeight: 800, fontSize: '0.92rem' }}>{t('grand_total') || (isRTL ? 'الإجمالي النهائي' : 'Grand Total')}</span>
+                <span style={{ fontWeight: 900, fontSize: '1.1rem', color: '#ffffff' }}>{formatAmount(finalGrandTotal)} {t('egp')}</span>
               </div>
-            )}
+
+              {amountPaid !== undefined && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.45rem 0.85rem', borderTop: '1px solid #e4e4e7', color: '#059669', fontWeight: 700 }}>
+                  <span>{t('amount_paid') || (isRTL ? 'المسدد / المقدم' : 'Paid')}</span>
+                  <span>{formatAmount(amountPaid)} {t('egp')}</span>
+                </div>
+              )}
+
+              {remainingAmount !== undefined && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.45rem 0.85rem', borderTop: '1px solid #e4e4e7', color: Number(remainingAmount) > 0 ? '#dc2626' : '#059669', fontWeight: 800 }}>
+                  <span>{t('remaining_amount') || (isRTL ? 'المتبقي عند التسليم' : 'Remaining')}</span>
+                  <span>{formatAmount(remainingAmount)} {t('egp')}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* ── Notes ── */}
-        {notes && (
-          <div style={{ padding: '0 2.5rem 1.5rem' }}>
-            <p style={{ margin: '0 0 6px', fontSize: '0.72rem', fontWeight: 700, color: '#71717a', textTransform: isRTL ? 'none' : 'uppercase', letterSpacing: isRTL ? 'normal' : '0.5px' }}>
-              {t('notes') || (isRTL ? 'ملاحظات' : 'Notes')}
-            </p>
-            <div style={{ background: '#fafafa', border: '1px solid #e4e4e7', borderRadius: '8px', padding: '1rem', color: '#18181b', fontSize: '0.9rem' }}>
-              {notes}
+        {/* ── Terms & Conditions + Signatures ── */}
+        <div style={{ padding: '0 2.25rem 1.25rem' }}>
+          <div style={{ border: '1px solid #d4d4d8', borderRadius: '10px', overflow: 'hidden', background: '#fafafa' }}>
+            <div style={{ background: '#18181b', color: '#ffffff', padding: '0.4rem 0.85rem', fontWeight: 800, fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <span>🤝</span>
+              <span>{isRTL ? 'الشروط والأحكام' : 'Terms & Conditions'}</span>
+            </div>
+            <div className="doc-meta-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.45rem 1.25rem', padding: '0.7rem 0.9rem', fontSize: '0.74rem', color: '#27272a', lineHeight: 1.55 }}>
+              {(isRTL ? [
+                'الأسعار المذكورة مبدئية على المواصفات المتفق عليها من حيث الخامات والقياسات والتصميم.',
+                'يتم اعتماد الطلب بعد استلام موافقة العميل وسداد الدفعة المقدمة.',
+                'مدة التسليم تبدأ من تأكيد التصميم وسداد المقدم المتفق عليه.',
+                'الأسعار لا تشمل أي ضرائب أو رسوم إضافية ما لم يتم الاتفاق على خلاف ذلك.',
+              ] : [
+                'Prices are based on agreed material specifications, dimensions, and artwork.',
+                'Order production begins upon client confirmation and advance payment.',
+                'Delivery lead time starts after final artwork approval.',
+                'Prices exclude taxes or additional fees unless otherwise agreed.',
+              ]).map((term, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem' }}>
+                  <span style={{ width: 17, height: 17, borderRadius: '50%', background: '#dc2626', color: '#ffffff', fontSize: '0.68rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                    {i + 1}
+                  </span>
+                  <span>{term}</span>
+                </div>
+              ))}
             </div>
           </div>
-        )}
+
+          {/* Signatures Row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.15rem', padding: '0 1rem', fontSize: '0.82rem', fontWeight: 800, color: '#18181b', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div style={{ textAlign: 'center', minWidth: '140px', borderTop: '1px solid #a1a1aa', paddingTop: '0.35rem' }}>
+              {isRTL ? 'توقيع من جانبنا (مع ختم الشركة)' : 'Authorized Signature & Stamp'}
+            </div>
+            <div style={{ color: '#dc2626', fontWeight: 900, fontSize: '0.92rem' }}>
+              {isRTL ? '— معاً نصنع الفرق —' : '— Together We Make The Difference —'}
+            </div>
+            <div style={{ textAlign: 'center', minWidth: '140px', borderTop: '1px solid #a1a1aa', paddingTop: '0.35rem' }}>
+              {isRTL ? 'توقيع العميل (مع ختم الشركة)' : 'Client Signature & Stamp'}
+            </div>
+          </div>
+        </div>
 
         {/* ── Attached Quotation & Product Images (Big Scale Below Invoice) ── */}
         {showBigImages && itemsWithImages.length > 0 && (
           <div className="quotation-images-section" style={{
             borderTop: '2px solid #e4e4e7',
             background: '#fafafa',
-            padding: '2rem 2.5rem'
+            padding: '2rem 2.25rem'
           }}>
             {/* Section Header */}
             <div style={{
@@ -578,14 +663,20 @@ export default function DocumentPrint({
           </div>
         )}
 
-        {/* ── Footer ── */}
+        {/* ── Dark Footer Bar ── */}
         <div style={{
-          borderTop: '1px solid #e4e4e7', background: '#fafafa',
-          padding: '1rem 2.5rem',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+          background: '#09090b',
+          color: '#ffffff',
+          padding: '0.75rem 2.25rem',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.78rem'
         }}>
-          <span style={{ fontSize: '0.8rem', color: '#71717a', fontWeight: 500 }}>{getDisplayName(isRTL)} — {t('packaging_solutions_system') || (isRTL ? 'نظام إدارة حلول التعبئة والتغليف' : 'Packaging Solutions System')}</span>
-          <span style={{ fontSize: '0.8rem', color: '#71717a' }}>{t('generated_at') || (isRTL ? 'تاريخ الإصدار' : 'Generated')}: {new Date().toLocaleDateString(isRTL ? 'ar-EG' : 'en-GB')}</span>
+          <span style={{ fontWeight: 700 }}>
+            📍 {companyName} — {isRTL ? 'حلول التغليف والطباعة' : 'Packaging & Printing Solutions'}
+          </span>
+          <span style={{ color: '#d4d4d8' }}>
+            {t('generated_at') || (isRTL ? 'تاريخ الإصدار' : 'Generated')}: {new Date().toLocaleDateString(isRTL ? 'ar-EG' : 'en-GB')}
+          </span>
         </div>
       </div>
 

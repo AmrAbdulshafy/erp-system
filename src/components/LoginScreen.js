@@ -183,15 +183,15 @@ export default function LoginScreen() {
             />
           ) : (
             <img
-              src="/jin-engine-logo.svg"
-              alt="Jin Engine"
+              src={resolvedTheme === 'light' ? '/all-orders-logo-light.png' : '/all-orders-logo-dark.png'}
+              alt="All Orders"
               style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '14px',
-                margin: '0 auto 1.25rem auto',
-                display: 'block',
-                boxShadow: '0 8px 20px rgba(37, 99, 235, 0.25)'
+                height: '84px',
+                width: 'auto',
+                maxWidth: '240px',
+                objectFit: 'contain',
+                margin: '0 auto 1rem auto',
+                display: 'block'
               }}
             />
           )}
@@ -553,7 +553,7 @@ export default function LoginScreen() {
             <span>{isRTL ? 'حماية مشفرة ومصادقة جلسة آمنة (Role-Based Access)' : 'Protected Session & Encrypted Roles'}</span>
           </div>
           <div dir="ltr" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', opacity: 0.9, fontSize: '0.72rem' }}>
-            <img src={resolvedTheme === 'light' ? '/jin-engine-wordmark-light.svg' : '/jin-engine-wordmark-dark.svg'} alt="Jin Engine" style={{ height: 22, width: 'auto', objectFit: 'contain' }} />
+            <img src={resolvedTheme === 'light' ? '/all-orders-logo-light.png' : '/all-orders-logo-dark.png'} alt="All Orders" style={{ height: 26, width: 'auto', objectFit: 'contain' }} />
             <span>Created by <strong style={{ color: '#f97316' }}>Jinnworx</strong> &bull; Developed by <strong style={{ color: 'var(--text-main)' }}>Amr Abdulshafy</strong></span>
           </div>
         </div>

@@ -234,15 +234,14 @@ export default function ClientLayout({ children }) {
     { name: t('production'), path: '/production', icon: Package },
     { name: t('attendance'), path: '/attendance', icon: Clock },
     { name: t('inventory'), path: '/inventory', icon: Box },
+    { name: i18n.language === 'ar' ? 'دليل التشغيل (PDF)' : 'Tutorial (PDF)', path: '/tutorial', icon: BookOpen },
   ];
 
   // Filter navigation items by role permissions
   const navItems = rawNavItems.filter(item => canAccessScreen(user?.role, item.path));
 
-  // Enforce screen authorization guard on current route (and hide /tutorial & /settings)
+  // Enforce screen authorization guard on current route (keep /settings hidden)
   const isHiddenRoute =
-    pathname === '/tutorial' ||
-    pathname?.startsWith('/tutorial/') ||
     pathname === '/settings' ||
     pathname?.startsWith('/settings/');
   const isAuthorized = !isHiddenRoute && canAccessScreen(user?.role, pathname);

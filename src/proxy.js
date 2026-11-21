@@ -8,8 +8,6 @@ import { NextResponse } from 'next/server';
 export async function proxy(request) {
   const { pathname } = request.nextUrl;
   if (
-    pathname === '/tutorial' ||
-    pathname.startsWith('/tutorial/') ||
     pathname === '/settings' ||
     pathname.startsWith('/settings/')
   ) {

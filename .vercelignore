@@ -1,0 +1,10 @@
+node_modules
+.next
+dist-desktop
+build
+electron
+api
+.git
+*.log
+*.exe
+.env.local

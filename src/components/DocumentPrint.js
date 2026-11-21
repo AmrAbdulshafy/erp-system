@@ -18,6 +18,14 @@ function parseImages(imageData) {
   }
 }
 
+// Separates adjacent digits and Arabic letters (e.g. "7سم" -> "7 سم") so html2canvas/PDF never overlaps them
+function formatProductText(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/(\d)([\u0600-\u06FF])/g, '$1 $2')
+    .replace(/([\u0600-\u06FF])(\d)/g, '$1 $2');
+}
+
 export default function DocumentPrint({
   docRef,
   docType = 'QUOTATION', // 'QUOTATION' | 'INVOICE'
@@ -354,8 +362,8 @@ export default function DocumentPrint({
                         pageBreakInside: 'avoid',
                         breakInside: 'avoid'
                       }}>
-                        <td style={{ padding: '0.38rem 0.45rem', color: '#09090b', fontWeight: 800, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>{idx + 1}</td>
-                        <td style={{ padding: '0.38rem 0.65rem', fontWeight: 700, color: '#09090b', borderInlineEnd: '1px solid #e4e4e7', lineHeight: 1.45 }}>{item.product_name}</td>
+                        <td style={{ padding: '0.44rem 0.45rem', color: '#09090b', fontWeight: 800, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>{idx + 1}</td>
+                        <td style={{ padding: '0.44rem 0.65rem', fontWeight: 700, color: '#09090b', borderInlineEnd: '1px solid #e4e4e7', lineHeight: 1.55 }}>{formatProductText(item.product_name)}</td>
                         {hasAnyItemImages && (
                           <td style={{ padding: '0.32rem 0.45rem', textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>
                             {images.length > 0 ? (
@@ -423,7 +431,7 @@ export default function DocumentPrint({
               {chunks.map((chunk, chunkIdx) => (
                 <div key={chunkIdx}>
                   {chunkIdx > 0 && (
-                    <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always', breakBefore: 'page', height: '0.75rem' }} />
+                    <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always', breakBefore: 'page', height: 0, margin: 0, padding: 0 }} />
                   )}
                   {renderTable(chunk.rows, chunk.offset)}
                 </div>

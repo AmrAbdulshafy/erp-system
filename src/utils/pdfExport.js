@@ -17,9 +17,14 @@ export async function exportToPDF(element, filename = 'document.pdf') {
   const html2pdf = (await import('html2pdf.js')).default;
 
   const opt = {
-    margin: [8, 8, 8, 8],
+    margin: [6, 6, 6, 6],
     filename: filename,
     image: { type: 'jpeg', quality: 0.98 },
+    pagebreak: {
+      mode: ['css', 'legacy'],
+      before: '.html2pdf__page-break',
+      avoid: ['tr', '.doc-no-break', '.big-scale-item-card']
+    },
     html2canvas: {
       scale: 2,
       useCORS: true,

@@ -193,12 +193,13 @@ export default function DocumentPrint({
                 />
               )}
             </div>
-            <div style={{ display: 'inline-block', alignSelf: 'flex-start', borderBottom: '2.5px solid #18181b', paddingBottom: '0.2rem', marginTop: '0.1rem' }}>
-              <h1 style={{ margin: 0, fontSize: '1.65rem', fontWeight: 900, color: '#09090b', lineHeight: 1.2 }}>
+            <div style={{ display: 'inline-flex', flexDirection: 'column', alignSelf: 'flex-start', marginTop: '0.1rem' }}>
+              <h1 style={{ margin: 0, fontSize: '1.65rem', fontWeight: 900, color: '#09090b', lineHeight: 1.45, paddingBottom: '2px' }}>
                 {docType === 'QUOTATION'
                   ? (isRTL ? 'عرض سعر' : 'QUOTATION')
                   : (isRTL ? 'فاتورة' : 'INVOICE')}
               </h1>
+              <div style={{ height: '2.5px', width: '100%', background: '#18181b', borderRadius: '2px', marginTop: '2px' }} />
             </div>
             <p style={{ margin: '0.15rem 0 0', fontSize: '0.78rem', fontWeight: 700, color: '#3f3f46' }}>
               {isRTL ? 'حلول تغليف وطباعة احترافية' : (companyTagline || 'Professional Packaging & Printing Solutions')}
@@ -310,105 +311,132 @@ export default function DocumentPrint({
           </div>
         </div>
 
-        {/* ── Line Items Table (Red # Header + Black Column Headers) ── */}
-        <div className="doc-items-section" style={{ padding: '0 1.5rem' }}>
-          <div className="doc-table-scroll">
-          <table className="doc-items-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', textAlign: isRTL ? 'right' : 'left', border: '1px solid #d4d4d8' }}>
-            <thead>
-              <tr style={{ background: '#18181b', color: '#ffffff' }}>
-                <th style={{ padding: '0.42rem 0.5rem', fontWeight: 800, fontSize: '0.74rem', width: '36px', textAlign: 'center', background: '#dc2626', color: '#ffffff', borderInlineEnd: '1px solid rgba(255,255,255,0.2)' }}>{isRTL ? 'م' : '#'}</th>
-                <th style={{ padding: '0.42rem 0.7rem', fontWeight: 800, fontSize: '0.74rem', textAlign: isRTL ? 'center' : 'left', color: '#ffffff' }}>{isRTL ? 'الصنف / الوصف التفصيلي' : (t('product_name') || 'Item / Description')}</th>
-                {hasAnyItemImages && (
-                  <th style={{ padding: '0.42rem 0.5rem', textAlign: 'center', fontWeight: 800, fontSize: '0.74rem', color: '#ffffff' }}>{t('image') || (isRTL ? 'الصورة' : 'Image')}</th>
-                )}
-                <th style={{ padding: '0.42rem 0.5rem', fontWeight: 800, fontSize: '0.74rem', textAlign: 'center', color: '#ffffff', width: '74px' }}>{t('quantity') || (isRTL ? 'الكمية' : 'Qty')}</th>
-                <th style={{ padding: '0.42rem 0.5rem', fontWeight: 800, fontSize: '0.74rem', textAlign: 'center', color: '#ffffff', lineHeight: 1.15, width: '84px' }}>
-                  {isRTL ? <>سعر الوحدة<br /><span style={{ fontSize: '0.64rem', fontWeight: 500 }}>(جنية)</span></> : (t('unit_price') || 'Unit Price')}
-                </th>
-                <th style={{ padding: '0.42rem 0.6rem', fontWeight: 800, fontSize: '0.74rem', textAlign: 'center', color: '#ffffff', lineHeight: 1.15, width: '92px' }}>
-                  {isRTL ? <>الإجمالي<br /><span style={{ fontSize: '0.64rem', fontWeight: 500 }}>(جنية)</span></> : (t('total_price') || 'Total')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item, idx) => {
-                const images = parseImages(item.image_data);
-                const qtyNum = Number(item.quantity) || 0;
-                const unitNum = Number(item.unit_price) || 0;
-                const totalNum = Number(item.total_price) || 0;
-                return (
-                  <tr key={item.id || idx} style={{
-                    backgroundColor: idx % 2 === 0 ? '#ffffff' : '#f4f4f5',
-                    borderBottom: '1px solid #d4d4d8'
-                  }}>
-                    <td style={{ padding: '0.26rem 0.45rem', color: '#09090b', fontWeight: 800, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>{idx + 1}</td>
-                    <td style={{ padding: '0.26rem 0.65rem', fontWeight: 700, color: '#09090b', borderInlineEnd: '1px solid #e4e4e7', lineHeight: 1.3 }}>{item.product_name}</td>
-                    {hasAnyItemImages && (
-                      <td style={{ padding: '0.25rem 0.45rem', textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>
-                        {images.length > 0 ? (
-                          <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: images.length === 1 ? '1fr' : 'repeat(2, 1fr)',
-                            gap: '4px',
-                            width: images.length === 1 ? '50px' : '90px',
-                            margin: '0 auto'
-                          }}>
-                            {images.map((src, i) => (
-                              <img
-                                key={i}
-                                src={src}
-                                alt={`${item.product_name} ${i + 1}`}
-                                onClick={() => {
-                                  const target = document.getElementById(`doc-item-image-${idx + 1}`);
-                                  if (target) {
-                                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                  } else {
-                                    setPreviewImage(src);
-                                  }
-                                }}
-                                title={isRTL ? 'انقر للانتقال للمعاينة الكبيرة أدناه' : 'Click to jump to big scale preview below'}
-                                style={{
-                                  width: '100%',
-                                  height: images.length === 1 ? '50px' : '40px',
-                                  objectFit: 'cover',
-                                  borderRadius: '4px',
-                                  border: '1px solid #d4d4d8',
-                                  cursor: 'pointer'
-                                }}
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <span style={{ fontSize: '0.72rem', color: '#a1a1aa' }}>—</span>
-                        )}
-                      </td>
-                    )}
-                    <td style={{ padding: '0.26rem 0.45rem', color: '#18181b', fontWeight: 700, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>
-                      {qtyNum > 0 ? qtyNum.toLocaleString('en-US') : '—'}
-                    </td>
-                    <td style={{ padding: '0.26rem 0.45rem', color: '#18181b', fontWeight: 700, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>
-                      {unitNum > 0 ? formatAmount(unitNum) : '—'}
-                    </td>
-                    <td style={{ padding: '0.26rem 0.55rem', fontWeight: 800, color: '#09090b', textAlign: 'center' }}>
-                      {totalNum > 0 ? formatAmount(totalNum) : '—'}
-                    </td>
-                  </tr>
-                );
-              })}
-              {items.length === 0 && (
-                <tr>
-                  <td colSpan={hasAnyItemImages ? 6 : 5} style={{ padding: '1.5rem', textAlign: 'center', color: '#71717a' }}>{t('no_items') || 'No items.'}</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-          </div>
-        </div>
+        {/* ── Line Items Table (15 Items/Page for Clean 2-Page A4 Layout) ── */}
+        {(() => {
+          const ITEMS_PER_PAGE = 15;
+          const chunks = items.length > ITEMS_PER_PAGE
+            ? [
+                { rows: items.slice(0, ITEMS_PER_PAGE), offset: 0 },
+                { rows: items.slice(ITEMS_PER_PAGE), offset: ITEMS_PER_PAGE }
+              ]
+            : [{ rows: items, offset: 0 }];
 
-        {/* ── Notes & Financial Summary (Compact Single-Page Proportions) ── */}
-        <div className="doc-meta-grid" style={{
+          const renderTable = (chunkRows, startOffset) => (
+            <div className="doc-table-scroll">
+              <table className="doc-items-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: isRTL ? 'right' : 'left', border: '1px solid #d4d4d8' }}>
+                <thead>
+                  <tr style={{ background: '#18181b', color: '#ffffff' }}>
+                    <th style={{ padding: '0.48rem 0.5rem', fontWeight: 800, fontSize: '0.76rem', width: '36px', textAlign: 'center', background: '#dc2626', color: '#ffffff', borderInlineEnd: '1px solid rgba(255,255,255,0.2)' }}>{isRTL ? 'م' : '#'}</th>
+                    <th style={{ padding: '0.48rem 0.7rem', fontWeight: 800, fontSize: '0.76rem', textAlign: isRTL ? 'center' : 'left', color: '#ffffff' }}>{isRTL ? 'الصنف / الوصف التفصيلي' : (t('product_name') || 'Item / Description')}</th>
+                    {hasAnyItemImages && (
+                      <th style={{ padding: '0.48rem 0.5rem', textAlign: 'center', fontWeight: 800, fontSize: '0.76rem', color: '#ffffff' }}>{t('image') || (isRTL ? 'الصورة' : 'Image')}</th>
+                    )}
+                    <th style={{ padding: '0.48rem 0.5rem', fontWeight: 800, fontSize: '0.76rem', textAlign: 'center', color: '#ffffff', width: '74px' }}>{t('quantity') || (isRTL ? 'الكمية' : 'Qty')}</th>
+                    <th style={{ padding: '0.48rem 0.5rem', fontWeight: 800, fontSize: '0.76rem', textAlign: 'center', color: '#ffffff', lineHeight: 1.25, width: '84px' }}>
+                      {isRTL ? <>سعر الوحدة<br /><span style={{ fontSize: '0.66rem', fontWeight: 500 }}>(جنية)</span></> : (t('unit_price') || 'Unit Price')}
+                    </th>
+                    <th style={{ padding: '0.48rem 0.6rem', fontWeight: 800, fontSize: '0.76rem', textAlign: 'center', color: '#ffffff', lineHeight: 1.25, width: '92px' }}>
+                      {isRTL ? <>الإجمالي<br /><span style={{ fontSize: '0.66rem', fontWeight: 500 }}>(جنية)</span></> : (t('total_price') || 'Total')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {chunkRows.map((item, localIdx) => {
+                    const idx = startOffset + localIdx;
+                    const images = parseImages(item.image_data);
+                    const qtyNum = Number(item.quantity) || 0;
+                    const unitNum = Number(item.unit_price) || 0;
+                    const totalNum = Number(item.total_price) || 0;
+                    return (
+                      <tr key={item.id || idx} style={{
+                        backgroundColor: idx % 2 === 0 ? '#ffffff' : '#f4f4f5',
+                        borderBottom: '1px solid #d4d4d8',
+                        pageBreakInside: 'avoid',
+                        breakInside: 'avoid'
+                      }}>
+                        <td style={{ padding: '0.38rem 0.45rem', color: '#09090b', fontWeight: 800, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>{idx + 1}</td>
+                        <td style={{ padding: '0.38rem 0.65rem', fontWeight: 700, color: '#09090b', borderInlineEnd: '1px solid #e4e4e7', lineHeight: 1.45 }}>{item.product_name}</td>
+                        {hasAnyItemImages && (
+                          <td style={{ padding: '0.32rem 0.45rem', textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>
+                            {images.length > 0 ? (
+                              <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: images.length === 1 ? '1fr' : 'repeat(2, 1fr)',
+                                gap: '4px',
+                                width: images.length === 1 ? '50px' : '90px',
+                                margin: '0 auto'
+                              }}>
+                                {images.map((src, i) => (
+                                  <img
+                                    key={i}
+                                    src={src}
+                                    alt={`${item.product_name} ${i + 1}`}
+                                    onClick={() => {
+                                      const target = document.getElementById(`doc-item-image-${idx + 1}`);
+                                      if (target) {
+                                        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                      } else {
+                                        setPreviewImage(src);
+                                      }
+                                    }}
+                                    title={isRTL ? 'انقر للانتقال للمعاينة الكبيرة أدناه' : 'Click to jump to big scale preview below'}
+                                    style={{
+                                      width: '100%',
+                                      height: images.length === 1 ? '50px' : '40px',
+                                      objectFit: 'cover',
+                                      borderRadius: '4px',
+                                      border: '1px solid #d4d4d8',
+                                      cursor: 'pointer'
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            ) : (
+                              <span style={{ fontSize: '0.72rem', color: '#a1a1aa' }}>—</span>
+                            )}
+                          </td>
+                        )}
+                        <td style={{ padding: '0.38rem 0.45rem', color: '#18181b', fontWeight: 700, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>
+                          {qtyNum > 0 ? qtyNum.toLocaleString('en-US') : '—'}
+                        </td>
+                        <td style={{ padding: '0.38rem 0.45rem', color: '#18181b', fontWeight: 700, textAlign: 'center', borderInlineEnd: '1px solid #e4e4e7' }}>
+                          {unitNum > 0 ? formatAmount(unitNum) : '—'}
+                        </td>
+                        <td style={{ padding: '0.38rem 0.55rem', fontWeight: 800, color: '#09090b', textAlign: 'center' }}>
+                          {totalNum > 0 ? formatAmount(totalNum) : '—'}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {items.length === 0 && (
+                    <tr>
+                      <td colSpan={hasAnyItemImages ? 6 : 5} style={{ padding: '1.5rem', textAlign: 'center', color: '#71717a' }}>{t('no_items') || 'No items.'}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          );
+
+          return (
+            <div className="doc-items-section" style={{ padding: '0 1.5rem' }}>
+              {chunks.map((chunk, chunkIdx) => (
+                <div key={chunkIdx}>
+                  {chunkIdx > 0 && (
+                    <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always', breakBefore: 'page', height: '0.75rem' }} />
+                  )}
+                  {renderTable(chunk.rows, chunk.offset)}
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
+        {/* ── Notes & Financial Summary ── */}
+        <div className="doc-meta-grid doc-no-break" style={{
           display: 'grid', gridTemplateColumns: '1fr 1fr',
-          padding: '0.65rem 1.5rem', gap: '1rem', alignItems: 'stretch'
+          padding: '0.8rem 1.5rem', gap: '1rem', alignItems: 'stretch',
+          pageBreakInside: 'avoid', breakInside: 'avoid'
         }}>
           {/* Notes Box */}
           <div style={{ border: '1px solid #d4d4d8', borderRadius: '8px', overflow: 'hidden', background: '#fafafa', display: 'flex', flexDirection: 'column' }}>
@@ -464,8 +492,8 @@ export default function DocumentPrint({
           </div>
         </div>
 
-        {/* ── Terms & Conditions (Compact 10 Terms) + Signatures ── */}
-        <div style={{ padding: '0 1.5rem 0.75rem' }}>
+        {/* ── Terms & Conditions (10 Terms) + Signatures ── */}
+        <div className="doc-no-break" style={{ padding: '0 1.5rem 0.9rem', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
           <div style={{ border: '1px solid #d4d4d8', borderRadius: '8px', overflow: 'hidden', background: '#fafafa' }}>
             <div style={{ background: '#18181b', color: '#ffffff', padding: '0.3rem 0.75rem', fontWeight: 800, fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <span>🤝</span>
@@ -750,14 +778,22 @@ export default function DocumentPrint({
           .doc-items-section {
             padding: 0 12px !important;
           }
+          .doc-items-table tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
           .doc-items-table th {
-            padding: 4px 6px !important;
+            padding: 5px 6px !important;
             font-size: 8.5pt !important;
           }
           .doc-items-table td {
-            padding: 2.5px 6px !important;
-            font-size: 8.2pt !important;
-            line-height: 1.2 !important;
+            padding: 4.5px 7px !important;
+            font-size: 8.5pt !important;
+            line-height: 1.4 !important;
+          }
+          .doc-no-break {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
           }
           .big-scale-item-card {
             page-break-inside: avoid !important;
@@ -768,11 +804,13 @@ export default function DocumentPrint({
             page-break-before: always !important;
           }
         }
-        /* Arabic Text Shaping & Ligature Fixes for PDF / Print / Canvas */
+        /* Arabic Text Shaping, Mixed Digit/Arabic Spacing & Ligature Fixes for PDF / Print / Canvas */
         .print-doc[dir="rtl"],
         .print-doc[dir="rtl"] * {
           letter-spacing: normal !important;
           word-spacing: normal !important;
+          font-variant-numeric: normal !important;
+          text-rendering: auto !important;
         }
         .print-doc[dir="rtl"] th,
         .print-doc[dir="rtl"] td,
@@ -784,7 +822,6 @@ export default function DocumentPrint({
         .print-doc[dir="rtl"] h3 {
           font-feature-settings: "liga" 1, "clig" 1;
           -webkit-font-feature-settings: "liga" 1, "clig" 1;
-          text-rendering: geometricPrecision;
         }
       `}</style>
       {/* Full size original image popup modal */}
